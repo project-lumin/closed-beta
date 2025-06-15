@@ -26,7 +26,7 @@
 						"inline": false
 					},
 					{
-						"name": "Adatbázis ping",
+						"name": "Database ping",
 						"value": "`{db:.3f}s`",
 						"inline": false
 					}
@@ -49,15 +49,15 @@
 			}
 		],
 		"random": [
-			"Hazaértél, és láttad, hogy **{amount} Ft-al** bővült a számlád egyenlege.",
-			"Egy nehéz nap után **{amount} Ft-ot** kaptál fizetségül!",
-			"Sikeresen teljesítetted az első napod az új melóban, így **{amount} Ft-ot** kaptál.",
-			"Cégbeli előléptetésed mellé kaptál egy **{amount} Ft-os** bónuszt!",
-			"Részvényeid után **{amount} Ft-ot** kaptál.",
-			"Előléptettek a munkahelyeden, így szereztél **{amount} Ft-ot**.",
-			"Taxisofőrként **{amount} Ft-ot** szereztél ma.",
-			"Elmentél a boltba zacskós levest venni, de a kasszás többet adott vissza. Szereztél **{amount} Ft-ot** és egy csomag zacskós levest.",
-			"Nehéz napod volt a mezőn - kaptál **{amount} Ft-ot**."
+			"You arrived home from work and saw that **${amount}** was added to your account.",
+			"You've reached the end of a tiring day. You received **${amount}** for your hard work!",
+			"You've successfully completed your first day at work. Your reward: **${amount}**.",
+			"You've been promoted at your company, so you received a **${amount}** bonus!",
+			"You received **${amount}** dividend on your shares.",
+			"You've been successfully promoted at your workplace! You received an advance of **${amount}**",
+			"As a taxi driver, you earned **${amount}** today.",
+			"You went to the store, bought noodles, but the cashier gave you the wrong change. You received **${amount}** and a pack of noodles.",
+			"You had a hard day on the fields and earned **${amount}**."
 		]
 	},
 	"crime": {
@@ -73,11 +73,11 @@
 			"You threatened the street vendor. He gave you $**{amount}** to leave him alone!",
 			"You robbed the factory, so you received $**{amount}**.",
 			"You robbed the corner store. You stole $**{amount}** and a pack of gum.",
-			"Rendszergazdai munkaköröd részeként kihívtak egy router lecserélésére, de te elloptad és eladtad az új routert, ezzel **{amount} Ft-ot** szereztél!"
+			"You work as a sysadmin. You were called to replace an old router with a new one, but you stole the new one, earning $**{amount}**!"
 		]
 	},
 	"allowance": {
-		"content": "Megkaptad a napi jutalmad, **{amount} Ft-ot**."
+		"content": "You received your daily allowance of **${amount}**."
 	},
 	"addmoney": {
 		"success": {
@@ -116,7 +116,7 @@
 			}
 		},
 		"success": {
-			"content": "Sikeresen betettél **{amount} Ft-ot** a bankba!"
+			"content": "You have successfully deposited **${amount}** into your bank account!"
 		}
 	},
 	"withdraw": {
@@ -133,7 +133,7 @@
 			}
 		},
 		"success": {
-			"content": "Sikeresen jóváírtál **{amount} Ft-ot** a bankodból!"
+			"content": "You have successfully withdrawn **${amount}** from your bank account!"
 		}
 	},
 	"luck": {
@@ -147,8 +147,8 @@
 			],
 			"random": [
 				"You bought a lottery ticket and got a full match :tada: You won $**{amount}**.",
-				"Nagyot nyertél egy fogadáson - **{amount} Ft-ot**!",
-				"Első két kártyád összesen 21-es értékkel rendelkezett blackjackben, így nyertél **{amount} Ft-ot**.",
+				"You made a high-value bet and won. You received $**{amount}**.",
+				"You were dealt two cards with a total value of 21 first while playing blackjack, so you won $**{amount}**.",
 				"You found $**{amount}** on the ground while walking down the street."
 			]
 		},
@@ -169,7 +169,7 @@
 		},
 		"errors": {
 			"balance": {
-				"content": "Minimum **{amount} Ft-al** kell rendelkezned ehhez!"
+				"content": "You need at least $**{amount}** to play this game!"
 			}
 		}
 	},
@@ -193,12 +193,12 @@
 				"fields": [
 					{
 						"name": "Cash",
-						"value": "{cash} Ft",
+						"value": "${cash}",
 						"inline": true
 					},
 					{
 						"name": "Bank",
-						"value": "{bank} Ft",
+						"value": "${bank}",
 						"inline": true
 					},
 					{
@@ -223,8 +223,8 @@
 							"inline": false
 						},
 						{
-							"name": "Nyereség",
-							"value": "{amount} Ft",
+							"name": "Won amount",
+							"value": "${amount}",
 							"inline": false
 						}
 					],
@@ -244,7 +244,7 @@
 						},
 						{
 							"name": "Lost amount",
-							"value": "{amount} Ft",
+							"value": "${amount}",
 							"inline": false
 						},
 						{
@@ -270,12 +270,12 @@
 				"fields": [
 					{
 						"name": "#{number} {user}",
-						"value": "Készpénz: `{cash} Ft`\nBank: `{bank} Ft`",
+						"value": "Cash: `${cash}`\nBank: `${bank}`",
 						"inline": false
 					},
 					{
-						"name": "Psszt...",
-						"value": "Úgy tűnik, még senki sem használta az economy rendszert. Légy te az első!",
+						"name": "Psst...",
+						"value": "It seems like no one has used the economy system yet. Be the first!",
 						"inline": false
 					}
 				],
@@ -291,7 +291,7 @@
 						"title": "Shop",
 						"fields": [
 							{
-								"name": "{item.name} ({item.price} Ft)",
+								"name": "{item.name} (${item.price})",
 								"value": "{item.role.mention}: {item.description}",
 								"inline": false
 							}
@@ -306,7 +306,7 @@
 		},
 		"buy": {
 			"success": {
-				"content": "Megvetted a(z) **{item.name}** terméket **{item.price} Ft-ért**."
+				"content": "You bought **{item.name}** for $**{item.price}**."
 			},
 			"errors": {
 				"balance": {
@@ -316,7 +316,7 @@
 					"content": "This item doesn't exist!"
 				},
 				"role_not_found": {
-					"content": "Törölték a termékhez tartozó rangot! Kérj meg egy admint, hogy távolítsa el a boltból."
+					"content": "The role for this item doesn't exist! Ask an admin to remove it."
 				}
 			}
 		},
@@ -378,7 +378,7 @@
 				"embeds": [
 					{
 						"title": "Warn",
-						"description": "Figyelmeztetve lettél a(z) **{warn.guild}** szerveren.",
+						"description": "You have been warned in **{warn.guild}**.",
 						"fields": [
 							{
 								"name": "Reason",
@@ -400,7 +400,7 @@
 				"embeds": [
 					{
 						"title": "Warn removed",
-						"description": "A figyelmeztetésed a(z) **{warn.guild}** szerveren el lett távolítva.",
+						"description": "Your warn in **{warn.guild}** has been removed.",
 						"fields": [
 							{
 								"name": "Original reason",
@@ -413,10 +413,10 @@
 			},
 			"errors": {
 				"bot": {
-					"content": "Engem nem figyelmeztethetsz!"
+					"content": "I'm invincible."
 				},
 				"hierarchy": {
-					"content": "Nem figyelmeztethetsz olyan tagot, akinek a rangja magasabb nálad!"
+					"content": "You can't warn a user with a higher role than you."
 				}
 			}
 		},
@@ -551,7 +551,7 @@
 				"embeds": [
 					{
 						"title": "Unmuted",
-						"description": "Feloldották a némításod a(z) **{guild}** szerveren.",
+						"description": "You have been unmuted in **{guild}**.",
 						"fields": [
 							{
 								"name": "Original reason",
@@ -569,7 +569,7 @@
 				"embeds": [
 					{
 						"title": "Mute",
-						"description": "Le lettél némítva a(z) **{guild}** szerveren.",
+						"description": "You have been muted in **{guild}**.",
 						"fields": [
 							{
 								"name": "Reason",
@@ -590,10 +590,10 @@
 			"reason": "Muted by {moderator.name}",
 			"errors": {
 				"bot": {
-					"content": "Engem nem némíthatsz le!"
+					"content": "I'm invincible."
 				},
 				"hierarchy": {
-					"content": "Nem némíthatsz le nálad magasabb rangú tagot!"
+					"content": "You can't mute a user with a higher role than you."
 				}
 			}
 		},
@@ -608,7 +608,7 @@
 				]
 			},
 			"notify": {
-				"content": "Feloldották a némításod a(z) **{guild}** szerveren."
+				"content": "You have been unmuted in **{guild}**."
 			},
 			"errors": {
 				"hierarchy": {
@@ -633,7 +633,7 @@
 				"embeds": [
 					{
 						"title": "Kick",
-						"description": "Ki lettél rúgva a(z) **{guild}** szerverről.",
+						"description": "You have been kicked from **{guild}**.",
 						"fields": [
 							{
 								"name": "Reason",
@@ -649,7 +649,7 @@
 			},
 			"errors": {
 				"bot": {
-					"content": "Engem nem rúghatsz ki!"
+					"content": "I'm invincible."
 				}
 			}
 		},
@@ -680,7 +680,7 @@
 				"embeds": [
 					{
 						"title": "Ban",
-						"description": "Ki lettél tiltva a(z) **{guild}** szerverről.",
+						"description": "You have been banned from **{guild}**.",
 						"fields": [
 							{
 								"name": "Reason",
@@ -700,7 +700,7 @@
 			},
 			"errors": {
 				"bot": {
-					"content": "Engem nem tilthatsz ki!"
+					"content": "I'm invincible."
 				},
 				"hierarchy": {
 					"content": "You can't ban a user with a higher role than you."
@@ -712,13 +712,13 @@
 				"embeds": [
 					{
 						"title": "Unban",
-						"description": "**{user.name}** kitiltása feloldva.",
+						"description": "Unbanned {user.mention}.",
 						"color": 6656243
 					}
 				]
 			},
 			"notify": {
-				"content": "Kitiltásod feloldották a(z) **{guild}** szerveren."
+				"content": "You have been unbanned from **{guild}**."
 			}
 		}
 	},
@@ -797,7 +797,7 @@
 		"create_public_threads": "Create Public Threads",
 		"deafen_members": "Deafen Members",
 		"embed_links": "Embed Links",
-		"external_emojis": "Külső emotikon használata",
+		"external_emojis": "Use External Emojis",
 		"external_stickers": "Use External Stickers",
 		"kick_members": "Kick Members",
 		"manage_channels": "Manage Channels",
@@ -809,7 +809,7 @@
 		"manage_permissions": "Manage Permissions",
 		"manage_roles": "Manage Roles",
 		"manage_threads": "Manage Threads",
-		"manage_webhooks": "Webhookok kezelése",
+		"manage_webhooks": "Manage Webhooks",
 		"mention_everyone": "Mention Everyone",
 		"moderate_members": "Timeout Members",
 		"move_members": "Move Members",
@@ -828,15 +828,15 @@
 		"use_application_commands": "Use Application Commands",
 		"use_embedded_activities": "Use Embedded Activities",
 		"use_external_apps": "Use External Applications",
-		"use_external_emojis": "Külső emotikonok használata",
+		"use_external_emojis": "Use External Emojis",
 		"use_external_sounds": "Use External Sounds",
 		"use_external_stickers": "Use External Stickers",
-		"use_soundboard": "A Soundboard használata",
-		"use_voice_activation": "Voice Activity használata",
+		"use_soundboard": "Use Soundboard",
+		"use_voice_activation": "Use Voice Activation",
 		"view_audit_log": "View Audit Log",
 		"view_channel": "View Channel",
-		"view_creator_monetization_analytics": "Készítői monetizációs analitikák megtekintése",
-		"view_guild_insights": "A Server Insights megtekintése"
+		"view_creator_monetization_analytics": "View Creator Monetization Analytics",
+		"view_guild_insights": "View Server Insights"
 	},
 	"errors": {
 		"missing_required_argument": {
@@ -859,7 +859,7 @@
 		"bot_missing_permissions": {
 			"embeds": [
 				{
-					"title": "Ehhez nincs jogom!",
+					"title": "Missing Permissions",
 					"description": "The bot needs additional permissions to run this command.",
 					"fields": [
 						{
@@ -892,7 +892,7 @@
 		"missing_permissions": {
 			"embeds": [
 				{
-					"title": "Nincs jogod ehhez!",
+					"title": "Missing Permissions",
 					"description": "You need additional permissions to run this command.",
 					"fields": [
 						{
@@ -908,8 +908,8 @@
 		"command_on_cooldown": {
 			"embeds": [
 				{
-					"title": "Egy picit lassíts!",
-					"description": "A **{command.name}** parancsot legközelebb `{retry_after}` idő múlva használhatod újra.",
+					"title": "You're on cooldown",
+					"description": "You may use this command in `{retry_after}`.",
 					"color": 13369344
 				}
 			]
@@ -926,8 +926,8 @@
 		"emoji_not_found": {
 			"embeds": [
 				{
-					"title": "Nincs ilyen emoji",
-					"description": "A megadott emoji nem található.",
+					"title": "Emoji not found",
+					"description": "The emoji you specified was not found.",
 					"color": 13369344
 				}
 			]
@@ -963,7 +963,7 @@
 			"embeds": [
 				{
 					"title": "Forbidden",
-					"description": "A bot 403-as (Forbidden) hibába ütközött. Kérlek, ellenőrizd a bot jogait és a rang hierarchiát.",
+					"description": "The bot got a 403 Forbidden error. Please check for role hierarchy and bot permissions.",
 					"color": 13369344
 				}
 			]
@@ -971,7 +971,7 @@
 		"not_owner": {
 			"embeds": [
 				{
-					"title": "Nem használhatod ezt a parancsot!",
+					"title": "Not the owner",
 					"description": "You are not an owner of this bot.",
 					"color": 13369344
 				}
@@ -980,8 +980,8 @@
 	},
 	"snapshot": {
 		"strings": {
-			"server_snapshot": "{guild.name} Snapshot-ja",
-			"save_load_reason": "fm01 Snapshot betöltés - {author.name}"
+			"server_snapshot": "Snapshot of {guild.name}",
+			"save_load_reason": "Lumin save load - {author.name}"
 		},
 		"create": {
 			"embeds": [
@@ -996,7 +996,7 @@
 			"embeds": [
 				{
 					"title": "Snapshot",
-					"description": "A Snapshot sikeresen be lett töltve. A szerver előző állapotát a **/snapshot load** paranccsal tudod visszaállítani, ezzel a kóddal: ```{code}```.",
+					"description": "The snapshot has been loaded successfully. You can restore the old state of the server by running the **/snapshot load** command with the code: ```{code}```.",
 					"color": 6656243
 				}
 			]
@@ -1005,7 +1005,7 @@
 			"embeds": [
 				{
 					"title": "Snapshot load alert",
-					"description": "{author.name} betöltött egy Snapshot-ot a(z) {guild.name} szerveren. A szerver előző állapotát a **/snapshot load** paranccsal tudod visszaállítani, ezzel a kóddal: ```{code}```.",
+					"description": "{author.name} has loaded a snapshot in {guild.name}. You can restore the old state of the server by running the snapshot load command with the code `{code}`.",
 					"color": 13369344
 				}
 			]
@@ -1023,11 +1023,11 @@
 	"setup": {
 		"prefix": {
 			"set": {
-				"content": "A prefix mától `{prefix}`"
+				"content": "The prefix is now `{prefix}`"
 			},
 			"errors": {
 				"long": {
-					"content": "A prefix maximum {limit} karakter hosszú lehet!"
+					"content": "The prefix can only be up to {limit} characters long!"
 				}
 			}
 		}
