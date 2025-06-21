@@ -898,6 +898,9 @@
 						"name": "{server.name}",
 						"icon_url": "{server.icon}"
 					},
+					"image": {
+						"url": "{server.banner}"
+					},
 					"timestamp": "{now}"
 				}
 			]
