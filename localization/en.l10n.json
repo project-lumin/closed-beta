@@ -1545,9 +1545,159 @@
 			]
 		}
 	},
-	"log": {
-		"on_message_edit": {
-			"content": {
+"log": {
+	"on_automod_rule_create": {
+		"create": {
+			"embeds": [
+				{
+					"title": "AutoMod Rule Created",
+					"color": 3066993,
+					"fields": [
+						{
+							"name": "Rule Name",
+							"value": "{rule.name}",
+							"inline": true
+						},
+						{
+							"name": "Rule ID",
+							"value": "`{rule.id}`",
+							"inline": true
+						},
+						{
+							"name": "Created By",
+							"value": "{rule.creator.mention}",
+							"inline": true
+						},
+						{
+							"name": "Trigger",
+							"value": "`{rule.trigger_type}`",
+							"inline": true
+						},
+						{
+							"name": "Actions",
+							"value": "{rule.actions}",
+							"inline": true
+						},
+						{
+							"name": "Enabled",
+							"value": "{rule.enabled}",
+							"inline": true
+						}
+					]
+				}
+			]
+		}
+	},
+	"on_automod_rule_update": {
+		"update": {
+			"embeds": [
+				{
+					"title": "AutoMod Rule Updated",
+					"color": 3447003,
+					"fields": [
+						{
+							"name": "Rule Name",
+							"value": "{rule.name}",
+							"inline": true
+						},
+						{
+							"name": "Rule ID",
+							"value": "`{rule.id}`",
+							"inline": true
+						},
+						{
+							"name": "Status",
+							"value": "{rule.enabled}",
+							"inline": true
+						},
+						{
+							"name": "Actions",
+							"value": "{rule.actions}",
+							"inline": true
+						},
+						{
+							"name": "Exempt Roles",
+							"value": "{rule.exempt_roles}"
+						},
+						{
+							"name": "Exempt Channels",
+							"value": "{rule.exempt_channels}"
+						}
+					]
+				}
+			]
+		}
+	},
+	"on_automod_rule_delete": {
+		"delete": {
+			"embeds": [
+				{
+					"title": "AutoMod Rule Deleted",
+					"color": 15158332,
+					"fields": [
+						{
+							"name": "Rule Name",
+							"value": "{rule.name}",
+							"inline": true
+						},
+						{
+							"name": "Rule ID",
+							"value": "`{rule.id}`",
+							"inline": true
+						},
+						{
+							"name": "Originally Created By",
+							"value": "{rule.creator.mention}",
+							"inline": true
+						}
+					]
+				}
+			]
+		}
+	},
+	"on_automod_action": {
+		"action": {
+			"embeds": [
+				{
+					"title": "AutoMod Action Executed",
+					"color": 15105570,
+					"description": "A message by {execution.member.mention} was flagged.",
+					"fields": [
+						{
+							"name": "Member",
+							"value": "{execution.member.mention} (`{execution.member.id}`)",
+							"inline": true
+						},
+						{
+							"name": "Action Taken",
+							"value": "`{execution.action_types}`",
+							"inline": true
+						},
+						{
+							"name": "In Channel",
+							"value": "{execution.channel}",
+							"inline": true
+						},
+						{
+							"name": "Triggered By",
+							"value": "`{execution.rule_trigger_type}`",
+							"inline": true
+						},
+						{
+							"name": "Matched Keyword",
+							"value": "```\n{execution.matched_keyword}\n```"
+						},
+						{
+							"name": "Full Matched Content",
+							"value": "```\n{execution.matched_content}\n```"
+						}
+					]
+				}
+			]
+		}
+	},
+	"on_message_edit": {
+		"content": {
 				"embeds": [
 					{
 						"title": "Message Edited",

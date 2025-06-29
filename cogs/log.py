@@ -1,3 +1,4 @@
+
 import sys
 from typing import Iterable
 
@@ -83,6 +84,32 @@ class LogListeners(commands.Cog):
 	# 'on_thread_member_remove', 'on_voice_state_update'
 
 	# DONE:
+
+	@commands.Cog.listener()
+	async def on_automod_rule_create(self, rule: discord.AutoModRule):
+		await self.send_webhook(
+			rule.guild.id, "create", rule=await CustomAutoModRule.from_rule(rule)
+		)
+
+	@commands.Cog.listener()
+	async def on_automod_rule_update(self, rule: discord.AutoModRule):
+		await self.send_webhook(
+			rule.guild.id, "update", rule=await CustomAutoModRule.from_rule(rule)
+		)
+
+	@commands.Cog.listener()
+	async def on_automod_rule_delete(self, rule: discord.AutoModRule):
+		await self.send_webhook(
+			rule.guild.id, "delete", rule=await CustomAutoModRule.from_rule(rule)
+		)
+
+	@commands.Cog.listener()
+	async def on_automod_action(self, execution: 'discord.AutoModAction'):
+		await self.send_webhook(
+			execution.guild.id,
+			"action",
+			execution=CustomAutoModAction.from_action(execution),
+		)
 
 	async def get_webhook(self, guild_id: int) -> Optional[discord.Webhook]:
 		"""
@@ -179,8 +206,6 @@ class LogListeners(commands.Cog):
 		if before.pinned != after.pinned:
 			await self.send_webhook(before.guild.id, "pinned", before=CustomMessage.from_message(before), after=CustomMessage.from_message(after))
 
-
-0
 async def setup(client: MyClient) -> None:
 	await client.add_cog(LogCommands(client))
 	await client.add_cog(LogListeners(client))

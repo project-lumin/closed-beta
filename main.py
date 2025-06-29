@@ -200,6 +200,8 @@ class MyClient(commands.AutoShardedBot):
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None  # type: ignore
 		self.ready_event = asyncio.Event()
+		error_log_channel_id_str = os.getenv("ERROR_LOG_CHANNEL_ID")
+		self.error_log_channel_id = int(error_log_channel_id_str) if error_log_channel_id_str else None
 		self.devs = [648168353453572117,  # pearoo
 			657350415511322647,  # liba
 			452133888047972352,  # aki26
@@ -321,7 +323,7 @@ class MyClient(commands.AutoShardedBot):
 		benchmark = perf_counter()
 
 		# Load all cogs within the cogs folder
-		allowed: list[str] = ["afk", "basic", "economy", "info", "mod", "setup", "snapshot", "status"]
+		allowed: list[str] = ["afk", "basic", "economy", "info", "mod", "setup", "snapshot", "status","log"]
 		if DEBUG:
 			allowed.extend(("log",))
 
@@ -396,7 +398,9 @@ class MyClient(commands.AutoShardedBot):
 			case commands.CommandNotFound() | app_commands.CommandNotFound():
 				return
 			case discord.RateLimited():
-				channel: discord.TextChannel = await self.fetch_channel(1268260404677574697)
+				if not self.error_log_channel_id:
+					raise error
+				channel: discord.TextChannel = await self.fetch_channel(self.error_log_channel_id)
 				webhook: discord.Webhook | None = discord.utils.get(
 					await channel.webhooks(), name=f"{self.user.display_name} Rate Limit"
 					)
@@ -408,9 +412,16 @@ class MyClient(commands.AutoShardedBot):
 				raise error
 			case _:
 				# if the error is unknown, log it
-				channel: discord.TextChannel = ctx.channel if DEBUG and ctx and ctx.channel else await self.fetch_channel(
-					1268260404677574697
-					)
+				report_channel: Optional[discord.TextChannel] = None
+				if DEBUG and ctx and ctx.channel:
+					report_channel = ctx.channel
+				elif self.error_log_channel_id:
+					report_channel = await self.fetch_channel(self.error_log_channel_id)
+
+				if not report_channel:
+					logger.error(f"An unhandled error occurred, and no error reporting channel is configured.")
+					raise error
+
 				stack = "".join(traceback.format_exception(type(error), error, error.__traceback__))
 				# if stack is more than 1700 characters, turn it into a .txt file and store it as an attachment
 				too_long = len(stack) > 1700
@@ -421,11 +432,12 @@ class MyClient(commands.AutoShardedBot):
 					file = discord.File(fp="auto-report_stack-trace.txt", filename="error.txt")
 					stack = "The stack trace was too long to send in a message, so it was saved as a file."
 				webhook: discord.Webhook = discord.utils.get(
-					await channel.webhooks(), name=f"{self.user.display_name} Errors"
+					await report_channel.webhooks(), name=f"{self.user.display_name} Errors"
 					)
 				if not webhook:
-					webhook = await channel.create_webhook(
-						name=f"{self.user.display_name} Errors", avatar=await ctx.me.avatar.read()
+					avatar_data = await ctx.me.avatar.read() if ctx.me.avatar else None
+					webhook = await report_channel.create_webhook(
+						name=f"{self.user.display_name} Errors", avatar=avatar_data
 						)
 				await webhook.send(
 					content=f"**ID:** {ctx.message.id}\n"
