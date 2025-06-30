@@ -43,6 +43,7 @@
    DB_HOST=localhost
    DB_PASSWORD=your-db-password
    DB_PORT=5432
+   ERROR_LOG_CHANNEL_ID=your_error_channel_id
    ```
 
 4. **Install PostgreSQL**, then:

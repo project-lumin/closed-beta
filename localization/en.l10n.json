@@ -1546,279 +1546,604 @@
 		}
 	},
 	"log": {
+		"on_invite_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "Invite Created",
+						"description": "Invite `{invite.code}` was created for {invite.channel} by {invite.inviter.mention}.",
+						"fields": [
+							{ "name": "Max Uses", "value": "{invite.max_uses}", "inline": true },
+							{ "name": "Max Age (seconds)", "value": "{invite.max_age}", "inline": true },
+							{ "name": "Temporary", "value": "{invite.temporary}", "inline": true }
+						],
+						"color": 5763719
+					}
+				]
+			}
+		},
+		"on_invite_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Invite Deleted",
+						"description": "Invite `{invite.code}` for {invite.channel} was deleted{actor_string}.",
+						"color": 15548997
+					}
+				]
+			}
+		},
+		"on_guild_channel_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "Channel Created",
+						"description": "Channel {channel.mention} (`{channel.name}`) was created{actor_string}.",
+						"color": 5763719
+					}
+				]
+			}
+		},
+		"on_guild_channel_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Channel Deleted",
+						"description": "Channel `{channel.name}` was deleted{actor_string}.",
+						"color": 15548997
+					}
+				]
+			}
+		},
+		"on_guild_channel_pins_update": {
+			"pins": {
+				"embeds": [
+					{
+						"title": "Channel Pins Updated",
+						"description": "The pins in {channel.mention} were updated. Last pin at: {last_pin}",
+						"color": 2067276
+					}
+				]
+			}
+		},
+		"on_guild_channel_update": {
+			"name": {
+				"embeds": [
+					{
+						"title": "Channel Name Updated",
+						"description": "The name of {after.mention} was updated{actor_string}.",
+						"fields": [
+							{
+								"name": "Previous name",
+								"value": "`{before.name}`",
+								"inline": true
+							},
+							{
+								"name": "New name",
+								"value": "`{after.name}`",
+								"inline": true
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"topic": {
+				"embeds": [
+					{
+						"title": "Channel Topic Updated",
+						"description": "The topic of {after.mention} was updated{actor_string}.",
+						"fields": [
+							{
+								"name": "Before",
+								"value": "```\n{before.topic}\n```",
+								"inline": false
+							},
+							{
+								"name": "After",
+								"value": "```\n{after.topic}\n```",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"nsfw": {
+				"embeds": [
+					{
+						"title": "Channel NSFW Status Updated",
+						"description": "The NSFW status of {after.mention} was updated{actor_string}.",
+						"fields": [
+							{
+								"name": "NSFW?",
+								"value": "{after.nsfw}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"slowmode_delay": {
+				"embeds": [
+					{
+						"title": "Channel Slowmode Updated",
+						"description": "The slowmode of {after.mention} was changed from `{before.slowmode_delay}s` to `{after.slowmode_delay}s`{actor_string}.",
+						"color": 3447003
+					}
+				]
+			},
+			"permissions": {
+				"embeds": [
+					{
+						"title": "Channel Permissions Updated",
+						"description": "Permissions for {channel.mention} were updated{actor_string}.\n\n{diff}",
+						"color": 3447003
+					}
+				]
+			},
+			"position": {
+				"embeds": [
+					{
+						"title": "Channel Position Updated",
+						"description": "{after.mention} was moved from position `{before.position}` to `{after.position}`.",
+						"color": 3447003
+					}
+				]
+			}
+		},
+		"on_automod_rule_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "AutoMod Rule Created",
+						"color": 3066993,
+						"fields": [
+							{
+								"name": "Rule Name",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "Rule ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Created By",
+								"value": "{rule.creator.mention}",
+								"inline": true
+							},
+							{
+								"name": "Trigger",
+								"value": "`{rule.trigger_type}`",
+								"inline": true
+							},
+							{
+								"name": "Actions",
+								"value": "{rule.actions}",
+								"inline": true
+							},
+							{
+								"name": "Enabled",
+								"value": "{rule.enabled}",
+								"inline": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_rule_update": {
+			"update": {
+				"embeds": [
+					{
+						"title": "AutoMod Rule Updated",
+						"color": 3447003,
+						"fields": [
+							{
+								"name": "Rule Name",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "Rule ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Status",
+								"value": "{rule.enabled}",
+								"inline": true
+							},
+							{
+								"name": "Actions",
+								"value": "{rule.actions}",
+								"inline": true
+							},
+							{
+								"name": "Exempt Roles",
+								"value": "{rule.exempt_roles}"
+							},
+							{
+								"name": "Exempt Channels",
+								"value": "{rule.exempt_channels}"
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_rule_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "AutoMod Rule Deleted",
+						"color": 15158332,
+						"fields": [
+							{
+								"name": "Rule Name",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "Rule ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Originally Created By",
+								"value": "{rule.creator.mention}",
+								"inline": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_action": {
+			"action": {
+				"embeds": [
+					{
+						"title": "AutoMod Action Executed",
+						"color": 15105570,
+						"description": "A message by {execution.member.mention} was flagged.",
+						"fields": [
+							{
+								"name": "Member",
+								"value": "{execution.member.mention} (`{execution.member.id}`)",
+								"inline": true
+							},
+							{
+								"name": "Action Taken",
+								"value": "`{execution.action_types}`",
+								"inline": true
+							},
+							{
+								"name": "In Channel",
+								"value": "{execution.channel}",
+								"inline": true
+							},
+							{
+								"name": "Triggered By",
+								"value": "`{execution.rule_trigger_type}`",
+								"inline": true
+							},
+							{
+								"name": "Matched Keyword",
+								"value": "```\n{execution.matched_keyword}\n```"
+							},
+							{
+								"name": "Full Matched Content",
+								"value": "```\n{execution.matched_content}\n```"
+							}
+						]
+					}
+				]
+			}
+		},
 		"on_message_edit": {
 			"content": {
 				"embeds": [
 					{
 						"title": "Message Edited",
+						"description": "A message from {after.author.mention} in {after.mention} was edited. [Jump to message]({after.jump_url})",
 						"fields": [
 							{
-								"name": "Content before",
-								"value": "{before.content}",
-								"inline": true
+								"name": "Before",
+								"value": "```\n{before.content}\n```"
 							},
 							{
-								"name": "Content after",
-								"value": "{after.content}",
-								"inline": true
+								"name": "After",
+								"value": "```\n{after.content}\n```"
 							}
 						],
-						"author": {
-							"name": "{before.author.name}",
-							"icon_url": "{before.author.icon}"
-						},
-						"timestamp": "{now}"
+						"color": 3447003
+					}
+				]
+			},
+			"embeds": {
+				"embeds": [
+					{
+						"title": "Message Embeds Updated",
+						"description": "Embeds in a message from {after.author.mention} in {after.mention} were updated. [Jump to message]({after.jump_url})",
+						"color": 3447003
+					}
+				]
+			},
+			"attachments": {
+				"embeds": [
+					{
+						"title": "Message Attachments Updated",
+						"description": "Attachments in a message from {after.author.mention} in {after.mention} were updated. [Jump to message]({after.jump_url})",
+						"color": 3447003
+					}
+				]
+			},
+			"pinned": {
+				"embeds": [
+					{
+						"title": "Message Pin Status Updated",
+						"description": "The pin status of a message from {after.author.mention} in {after.mention} was updated. [Jump to message]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Pinned?",
+								"value": "{after.pinned}"
+							}
+						],
+						"color": 3447003
 					}
 				]
 			}
-		}
-	},
-	"permissions": {
-		"add_reactions": "Add Reactions",
-		"administrator": "Administrator",
-		"attach_files": "Attach Files",
-		"ban_members": "Ban Members",
-		"change_nickname": "Change Nickname",
-		"connect": "Connect",
-		"create_events": "Create Events",
-		"create_expressions": "Create Expressions",
-		"create_instant_invite": "Create Instant Invite",
-		"create_polls": "Create Polls",
-		"create_private_threads": "Create Private Threads",
-		"create_public_threads": "Create Public Threads",
-		"deafen_members": "Deafen Members",
-		"embed_links": "Embed Links",
-		"external_emojis": "Use External Emojis",
-		"external_stickers": "Use External Stickers",
-		"kick_members": "Kick Members",
-		"manage_channels": "Manage Channels",
-		"manage_emojis": "Manage Emojis",
-		"manage_emojis_and_stickers": "Manage Emojis and Stickers",
-		"manage_guild": "Manage Server",
-		"manage_messages": "Manage Messages",
-		"manage_nicknames": "Manage Nicknames",
-		"manage_permissions": "Manage Permissions",
-		"manage_roles": "Manage Roles",
-		"manage_threads": "Manage Threads",
-		"manage_webhooks": "Manage Webhooks",
-		"mention_everyone": "Mention Everyone",
-		"moderate_members": "Timeout Members",
-		"move_members": "Move Members",
-		"mute_members": "Mute Members",
-		"priority_speaker": "Priority Speaker",
-		"read_message_history": "Read Message History",
-		"read_messages": "Read Messages",
-		"request_to_speak": "Request to Speak",
-		"send_messages": "Send Messages",
-		"send_messages_in_threads": "Send Messages in Threads",
-		"send_polls": "Send Polls",
-		"send_tts_messages": "Send TTS Messages",
-		"send_voice_messages": "Send Voice Messages",
-		"speak": "Speak",
-		"stream": "Go Live",
-		"use_application_commands": "Use Application Commands",
-		"use_embedded_activities": "Use Embedded Activities",
-		"use_external_apps": "Use External Applications",
-		"use_external_emojis": "Use External Emojis",
-		"use_external_sounds": "Use External Sounds",
-		"use_external_stickers": "Use External Stickers",
-		"use_soundboard": "Use Soundboard",
-		"use_voice_activation": "Use Voice Activation",
-		"view_audit_log": "View Audit Log",
-		"view_channel": "View Channel",
-		"view_creator_monetization_analytics": "View Creator Monetization Analytics",
-		"view_guild_insights": "View Server Insights"
-	},
-	"errors": {
-		"missing_required_argument": {
-			"embeds": [
-				{
-					"title": "Missing Argument",
-					"description": "Correct usage:\n```{command.usage}```",
-					"timestamp": "{now}",
-					"fields": [
-						{
-							"name": "Description",
-							"value": "{command.description}",
-							"inline": false
-						}
-					],
-					"color": 13369344
-				}
-			]
 		},
-		"bot_missing_permissions": {
-			"embeds": [
-				{
-					"title": "Missing Permissions",
-					"description": "The bot needs additional permissions to run this command.",
-					"fields": [
-						{
-							"name": "Missing Permissions",
-							"value": "```{permissions}```",
-							"inline": false
-						}
-					],
-					"color": 13369344
-				}
-			]
+		"permissions": {
+			"add_reactions": "Add Reactions",
+			"administrator": "Administrator",
+			"attach_files": "Attach Files",
+			"ban_members": "Ban Members",
+			"change_nickname": "Change Nickname",
+			"connect": "Connect",
+			"create_events": "Create Events",
+			"create_expressions": "Create Expressions",
+			"create_instant_invite": "Create Instant Invite",
+			"create_polls": "Create Polls",
+			"create_private_threads": "Create Private Threads",
+			"create_public_threads": "Create Public Threads",
+			"deafen_members": "Deafen Members",
+			"embed_links": "Embed Links",
+			"external_emojis": "Use External Emojis",
+			"external_stickers": "Use External Stickers",
+			"kick_members": "Kick Members",
+			"manage_channels": "Manage Channels",
+			"manage_emojis": "Manage Emojis",
+			"manage_emojis_and_stickers": "Manage Emojis and Stickers",
+			"manage_guild": "Manage Server",
+			"manage_messages": "Manage Messages",
+			"manage_nicknames": "Manage Nicknames",
+			"manage_permissions": "Manage Permissions",
+			"manage_roles": "Manage Roles",
+			"manage_threads": "Manage Threads",
+			"manage_webhooks": "Manage Webhooks",
+			"mention_everyone": "Mention Everyone",
+			"moderate_members": "Timeout Members",
+			"move_members": "Move Members",
+			"mute_members": "Mute Members",
+			"priority_speaker": "Priority Speaker",
+			"read_message_history": "Read Message History",
+			"read_messages": "Read Messages",
+			"request_to_speak": "Request to Speak",
+			"send_messages": "Send Messages",
+			"send_messages_in_threads": "Send Messages in Threads",
+			"send_polls": "Send Polls",
+			"send_tts_messages": "Send TTS Messages",
+			"send_voice_messages": "Send Voice Messages",
+			"speak": "Speak",
+			"stream": "Go Live",
+			"use_application_commands": "Use Application Commands",
+			"use_embedded_activities": "Use Embedded Activities",
+			"use_external_apps": "Use External Applications",
+			"use_external_emojis": "Use External Emojis",
+			"use_external_sounds": "Use External Sounds",
+			"use_external_stickers": "Use External Stickers",
+			"use_soundboard": "Use Soundboard",
+			"use_voice_activation": "Use Voice Activation",
+			"view_audit_log": "View Audit Log",
+			"view_channel": "View Channel",
+			"view_creator_monetization_analytics": "View Creator Monetization Analytics",
+			"view_guild_insights": "View Server Insights"
 		},
-		"bad_argument": {
-			"embeds": [
-				{
-					"title": "Incorrect usage",
-					"description": "Correct usage:\n```{command.usage}```",
-					"timestamp": "{now}",
-					"fields": [
-						{
-							"name": "Description",
-							"value": "{command.description}",
-							"inline": false
-						}
-					],
-					"color": 13369344
-				}
-			]
-		},
-		"missing_permissions": {
-			"embeds": [
-				{
-					"title": "Missing Permissions",
-					"description": "You need additional permissions to run this command.",
-					"fields": [
-						{
-							"name": "Missing Permissions",
-							"value": "```{permissions}```",
-							"inline": false
-						}
-					],
-					"color": 13369344
-				}
-			]
-		},
-		"command_on_cooldown": {
-			"embeds": [
-				{
-					"title": "You're on cooldown",
-					"description": "You may use this command in `{retry_after}`.",
-					"color": 13369344
-				}
-			]
-		},
-		"channel_not_found": {
-			"embeds": [
-				{
-					"title": "Channel not found",
-					"description": "The channel you specified was not found.",
-					"color": 13369344
-				}
-			]
-		},
-		"emoji_not_found": {
-			"embeds": [
-				{
-					"title": "Emoji not found",
-					"description": "The emoji you specified was not found.",
-					"color": 13369344
-				}
-			]
-		},
-		"member_not_found": {
-			"embeds": [
-				{
-					"title": "Member not found",
-					"description": "The member you specified was not found.",
-					"color": 13369344
-				}
-			]
-		},
-		"user_not_found": {
-			"embeds": [
-				{
-					"title": "User not found",
-					"description": "The user you specified was not found.",
-					"color": 13369344
-				}
-			]
-		},
-		"role_not_found": {
-			"embeds": [
-				{
-					"title": "Role not found",
-					"description": "The role you specified was not found.",
-					"color": 13369344
-				}
-			]
-		},
-		"forbidden": {
-			"embeds": [
-				{
-					"title": "Forbidden",
-					"description": "The bot got a 403 Forbidden error. Please check for role hierarchy and bot permissions.",
-					"color": 13369344
-				}
-			]
-		},
-		"not_owner": {
-			"embeds": [
-				{
-					"title": "Not the owner",
-					"description": "You are not an owner of this bot.",
-					"color": 13369344
-				}
-			]
-		}
-	},
-	"snapshot": {
-		"strings": {
-			"server_snapshot": "Snapshot of {guild.name}",
-			"save_load_reason": "Lumin save load - {author.name}"
-		},
-		"create": {
-			"embeds": [
-				{
-					"title": "Snapshot",
-					"description": "The snapshot has been created successfully.\nCode: ```{code}```",
-					"color": 6656243
-				}
-			]
-		},
-		"load": {
-			"embeds": [
-				{
-					"title": "Snapshot",
-					"description": "The snapshot has been loaded successfully. You can restore the old state of the server by running the **/snapshot load** command with the code: ```{code}```.",
-					"color": 6656243
-				}
-			]
-		},
-		"owner_alert": {
-			"embeds": [
-				{
-					"title": "Snapshot load alert",
-					"description": "{author.name} has loaded a snapshot in {guild.name}. You can restore the old state of the server by running the snapshot load command with the code `{code}`.",
-					"color": 13369344
-				}
-			]
-		},
-		"not_found": {
-			"embeds": [
-				{
-					"title": "Snapshot not found",
-					"description": "The snapshot you specified was not found.",
-					"color": 13369344
-				}
-			]
-		}
-	},
-	"setup": {
-		"prefix": {
-			"set": {
-				"content": "The prefix is now `{prefix}`"
+		"errors": {
+			"missing_required_argument": {
+				"embeds": [
+					{
+						"title": "Missing Argument",
+						"description": "Correct usage:\n```{command.usage}```",
+						"timestamp": "{now}",
+						"fields": [
+							{
+								"name": "Description",
+								"value": "{command.description}",
+								"inline": false
+							}
+						],
+						"color": 13369344
+					}
+				]
 			},
-			"errors": {
-				"long": {
-					"content": "The prefix can only be up to {limit} characters long!"
+			"bot_missing_permissions": {
+				"embeds": [
+					{
+						"title": "Missing Permissions",
+						"description": "The bot needs additional permissions to run this command.",
+						"fields": [
+							{
+								"name": "Missing Permissions",
+								"value": "```{permissions}```",
+								"inline": false
+							}
+						],
+						"color": 13369344
+					}
+				]
+			},
+			"bad_argument": {
+				"embeds": [
+					{
+						"title": "Incorrect usage",
+						"description": "Correct usage:\n```{command.usage}```",
+						"timestamp": "{now}",
+						"fields": [
+							{
+								"name": "Description",
+								"value": "{command.description}",
+								"inline": false
+							}
+						],
+						"color": 13369344
+					}
+				]
+			},
+			"missing_permissions": {
+				"embeds": [
+					{
+						"title": "Missing Permissions",
+						"description": "You need additional permissions to run this command.",
+						"fields": [
+							{
+								"name": "Missing Permissions",
+								"value": "```{permissions}```",
+								"inline": false
+							}
+						],
+						"color": 13369344
+					}
+				]
+			},
+			"command_on_cooldown": {
+				"embeds": [
+					{
+						"title": "You're on cooldown",
+						"description": "You may use this command in `{retry_after}`.",
+						"color": 13369344
+					}
+				]
+			},
+			"channel_not_found": {
+				"embeds": [
+					{
+						"title": "Channel not found",
+						"description": "The channel you specified was not found.",
+						"color": 13369344
+					}
+				]
+			},
+			"emoji_not_found": {
+				"embeds": [
+					{
+						"title": "Emoji not found",
+						"description": "The emoji you specified was not found.",
+						"color": 13369344
+					}
+				]
+			},
+			"member_not_found": {
+				"embeds": [
+					{
+						"title": "Member not found",
+						"description": "The member you specified was not found.",
+						"color": 13369344
+					}
+				]
+			},
+			"user_not_found": {
+				"embeds": [
+					{
+						"title": "User not found",
+						"description": "The user you specified was not found.",
+						"color": 13369344
+					}
+				]
+			},
+			"role_not_found": {
+				"embeds": [
+					{
+						"title": "Role not found",
+						"description": "The role you specified was not found.",
+						"color": 13369344
+					}
+				]
+			},
+			"forbidden": {
+				"embeds": [
+					{
+						"title": "Forbidden",
+						"description": "The bot got a 403 Forbidden error. Please check for role hierarchy and bot permissions.",
+						"color": 13369344
+					}
+				]
+			},
+			"not_owner": {
+				"embeds": [
+					{
+						"title": "Not the owner",
+						"description": "You are not an owner of this bot.",
+						"color": 13369344
+					}
+				]
+			}
+		},
+		"snapshot": {
+			"strings": {
+				"server_snapshot": "Snapshot of {guild.name}",
+				"save_load_reason": "Lumin save load - {author.name}"
+			},
+			"create": {
+				"embeds": [
+					{
+						"title": "Snapshot",
+						"description": "The snapshot has been created successfully.\nCode: ```{code}```",
+						"color": 6656243
+					}
+				]
+			},
+			"load": {
+				"embeds": [
+					{
+						"title": "Snapshot",
+						"description": "The snapshot has been loaded successfully. You can restore the old state of the server by running the **/snapshot load** command with the code: ```{code}```.",
+						"color": 6656243
+					}
+				]
+			},
+			"owner_alert": {
+				"embeds": [
+					{
+						"title": "Snapshot load alert",
+						"description": "{author.name} has loaded a snapshot in {guild.name}. You can restore the old state of the server by running the snapshot load command with the code `{code}`.",
+						"color": 13369344
+					}
+				]
+			},
+			"not_found": {
+				"embeds": [
+					{
+						"title": "Snapshot not found",
+						"description": "The snapshot you specified was not found.",
+						"color": 13369344
+					}
+				]
+			}
+		},
+		"setup": {
+			"prefix": {
+				"set": {
+					"content": "The prefix is now `{prefix}`"
+				},
+				"errors": {
+					"long": {
+						"content": "The prefix can only be up to {limit} characters long!"
+					}
 				}
 			}
 		}

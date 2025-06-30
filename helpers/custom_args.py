@@ -879,6 +879,8 @@ class CustomMessage:
 	"""Returns the message's ID."""
 	content: str
 	"""Returns the message's content."""
+	jump_url: str
+	"""Returns a URL that allows the user to jump to the message."""
 	_embeds: list[discord.Embed] = field(repr=False)
 	_attachments: list[discord.Attachment] = field(repr=False)
 	_stickers: list[discord.StickerItem] = field(repr=False)
@@ -904,10 +906,11 @@ class CustomMessage:
 		return cls(
 			id=message.id,
 			content=message.content,
+			jump_url=message.jump_url,
 			_embeds=message.embeds,
 			_attachments=message.attachments,
 			_stickers=message.stickers,
-			_author=CustomMember.from_user(message.author),
+			_author=CustomUser.from_user(message.author),
 			_channel=message.channel,
 			_guild=CustomGuild.from_guild(message.guild) if message.guild else None,
 			_created_at=message.created_at,
@@ -940,7 +943,7 @@ class CustomMessage:
 		return len(self._stickers)
 
 	@property
-	def author(self) -> CustomMember:
+	def author(self) -> CustomUser:
 		"""Returns the message's author."""
 		return self._author
 
@@ -1017,6 +1020,11 @@ class CustomMessage:
 	def poll(self) -> bool:
 		"""Returns whether the message has a poll."""
 		return bool(self._poll)
+
+	@property
+	def mention(self) -> str:
+		"""Returns the message's channel mention. An alias for .channel for consistency."""
+		return self.channel
 
 	def __str__(self):
 		return self.content
@@ -1180,11 +1188,9 @@ class CustomTextChannel:
 		return CustomGuild.from_guild(self._guild)
 
 	@property
-	def slowmode(self) -> int:
+	def slowmode_delay(self) -> int:
 		"""Returns the slowmode delay in seconds."""
 		return self._slowmode_delay
-
-	slowmode_delay = slowmode
 
 	@property
 	def auto_archive(self) -> int:
@@ -1192,11 +1198,9 @@ class CustomTextChannel:
 		return self._default_auto_archive_duration
 
 	@property
-	def thread_slowmode(self) -> int:
+	def thread_slowmode_delay(self) -> int:
 		"""Returns the channel's thread slowmode delay in minutes."""
 		return self._slowmode_delay
-
-	thread_slowmode_delay = thread_slowmode
 
 	@property
 	def members(self):
@@ -1299,8 +1303,6 @@ class CustomVoiceChannel:
 	def slowmode_delay(self) -> int:
 		"""Returns the channel's slowmode delay in seconds."""
 		return self._slowmode_delay
-
-	slowmode = slowmode_delay
 
 	@property
 	def category(self) -> Optional[CustomCategoryChannel]:
@@ -1415,8 +1417,6 @@ class CustomStageChannel:
 	def slowmode_delay(self) -> int:
 		"""Returns the channel's slowmode delay in seconds."""
 		return self._slowmode_delay
-
-	slowmode = slowmode_delay
 
 	@property
 	def requesting_to_speak(self) -> int:
@@ -1766,3 +1766,242 @@ class CustomTemplate:
 		return self._is_dirty
 
 	unsynced = dirty = is_dirty
+
+@dataclass
+class CustomInvite:
+	"""A class that represents a Discord invite with useful formatting properties."""
+	code: str
+	url: str
+	inviter: Optional[CustomUser] = field(repr=False)
+	created_at: Optional[FormatDateTime] = field(repr=False)
+	_max_age: int = field(repr=False)
+	max_uses: int
+	temporary: bool
+	channel: str
+	uses: int
+
+	@classmethod
+	def from_invite(cls, invite: discord.Invite):
+		# Discord API can be inconsistent, provide defaults for optional fields.
+		max_age_sec = invite.max_age if invite.max_age is not None else 0
+		return cls(
+			code=invite.code,
+			url=invite.url,
+			inviter=CustomUser.from_user(invite.inviter) if invite.inviter else None,
+			created_at=FormatDateTime(invite.created_at, "f") if invite.created_at else None,
+			_max_age=max_age_sec,
+			max_uses=invite.max_uses if invite.max_uses is not None else 0,
+			temporary=invite.temporary if invite.temporary is not None else False,
+			channel=invite.channel.mention if hasattr(invite.channel, 'mention') else "N/A",
+			uses=invite.uses if invite.uses is not None else 0
+		)
+
+	@classmethod
+	def from_audit_log_diff(cls, audit_data: discord.AuditLogDiff, guild_id: int):
+		# Create a dummy user object for CustomUser.from_user
+		inviter_obj = None
+		if hasattr(audit_data, "inviter") and audit_data.inviter:
+			inviter_obj = CustomUser.from_user(audit_data.inviter)
+
+		max_age_sec = audit_data.max_age if hasattr(audit_data, "max_age") and audit_data.max_age is not None else 0
+		max_uses_val = audit_data.max_uses if hasattr(audit_data, "max_uses") and audit_data.max_uses is not None else 0
+		temporary_val = audit_data.temporary if hasattr(audit_data, "temporary") and audit_data.temporary is not None else False
+		uses_val = audit_data.uses if hasattr(audit_data, "uses") and audit_data.uses is not None else 0
+		
+		channel_mention = "N/A"
+		if hasattr(audit_data, "channel") and audit_data.channel:
+			channel_mention = f"<#{audit_data.channel.id}>"
+
+		return cls(
+			code=audit_data.code,
+			url=f"https://discord.gg/{audit_data.code}",
+			inviter=inviter_obj,
+			created_at=None,  # Not available in audit log diff for deletes
+			_max_age=max_age_sec,
+			max_uses=max_uses_val,
+			temporary=temporary_val,
+			channel=channel_mention,
+			uses=uses_val
+		)
+
+	@property
+	def max_age(self) -> Union[str, FormatDateTime]:
+		"""Returns the invite's max age as a relative timestamp or a human-readable duration."""
+		if self._max_age == 0:
+			return "Never"
+		
+		if self.created_at:
+			expires = self.created_at.data + datetime.timedelta(seconds=self._max_age)
+			return FormatDateTime(expires, "R")
+
+		# Fallback for when created_at is not available (e.g., deleted invites)
+		return str(datetime.timedelta(seconds=self._max_age))
+
+	def __str__(self) -> str:
+		return self.code
+
+@dataclass
+class CustomRuleAction:
+	type: str
+	"""Returns the action's type."""
+	_channel: Optional[discord.TextChannel] = field(repr=False)
+	_duration: Optional[datetime.timedelta] = field(repr=False)
+
+	@classmethod
+	def from_action(cls, action: 'discord.AutoModRuleAction', guild: discord.Guild):
+		channel = guild.get_channel(action.channel_id) if action.channel_id else None
+		return cls(
+			type=action.type.name,
+			_channel=channel,
+			_duration=action.duration
+		)
+	
+	@property
+	def channel(self) -> Optional[str]:
+		"""Returns the channel the action is sent to."""
+		return self._channel.mention if self._channel else None
+	
+	@property
+	def duration(self) -> Optional[str]:
+		"""Returns the duration of the timeout."""
+		if not self._duration:
+			return None
+		
+		days = self._duration.days
+		seconds = self._duration.seconds
+		hours = seconds // 3600
+		minutes = (seconds % 3600) // 60
+		
+		return f"{days}d {hours}h {minutes}m"
+
+@dataclass
+class CustomAutoModRule:
+	name: str
+	"""Returns the rule's name."""
+	id: int
+	"""Returns the rule's ID."""
+	enabled: bool
+	"""Returns whether the rule is enabled."""
+	trigger_type: str
+	"""Returns the rule's trigger type."""
+	_creator: discord.Member = field(repr=False)
+	_guild: discord.Guild = field(repr=False)
+	_actions: list['discord.AutoModRuleAction'] = field(repr=False)
+	_exempt_roles: list[discord.Role] = field(repr=False)
+	_exempt_channels: list[discord.abc.GuildChannel] = field(repr=False)
+	_created_at: datetime.datetime = field(repr=False)
+
+	@classmethod
+	async def from_rule(cls, rule: discord.AutoModRule):
+		creator = rule.guild.get_member(rule.creator_id) or await rule.guild.fetch_member(rule.creator_id)
+		return cls(
+			name=rule.name,
+			id=rule.id,
+			enabled=rule.enabled,
+			trigger_type=rule.trigger.type.name,
+			_creator=creator,
+			_guild=rule.guild,
+			_actions=rule.actions,
+			_exempt_roles=rule.exempt_roles,
+			_exempt_channels=rule.exempt_channels,
+			_created_at=discord.utils.snowflake_time(rule.id)
+		)
+
+	@property
+	def creator(self) -> CustomMember:
+		"""Returns the rule's creator."""
+		return CustomMember.from_member(self._creator)
+
+	@property
+	def guild(self) -> CustomGuild:
+		"""Returns the rule's guild."""
+		return CustomGuild.from_guild(self._guild)
+
+	@property
+	def actions(self) -> str:
+		"""Returns the rule's actions."""
+		if not self._actions:
+			return "None"
+		
+		action_strings = []
+		for action in self._actions:
+			if action.type.name == "send_alert_message":
+				channel = self._guild.get_channel(action.channel_id)
+				if channel:
+					action_strings.append(f"Send Alert to {channel.mention}")
+				else:
+					action_strings.append("Send Alert (Channel not found)")
+			elif action.type.name == "timeout":
+				duration_seconds = action.duration.total_seconds()
+				minutes, seconds = divmod(duration_seconds, 60)
+				hours, minutes = divmod(minutes, 60)
+				days, hours = divmod(hours, 24)
+				
+				duration_str = ""
+				if days > 0:
+					duration_str += f"{int(days)}d "
+				if hours > 0:
+					duration_str += f"{int(hours)}h "
+				if minutes > 0:
+					duration_str += f"{int(minutes)}m "
+				if seconds > 0:
+					duration_str += f"{int(seconds)}s"
+				
+				action_strings.append(f"Timeout ({duration_str.strip()})")
+			else:
+				action_strings.append(action.type.name.replace("_", " ").title())
+				
+		return ", ".join(action_strings)
+
+	@property
+	def exempt_roles(self) -> str:
+		"""Returns the rule's exempt roles."""
+		return ", ".join([role.mention for role in self._exempt_roles]) if self._exempt_roles else "None"
+
+	@property
+	def exempt_channels(self) -> str:
+		"""Returns the rule's exempt channels."""
+		return ", ".join([channel.mention for channel in self._exempt_channels]) if self._exempt_channels else "None"
+	
+	@property
+	def created_at(self) -> FormatDateTime:
+		"""Returns when the rule was created."""
+		return FormatDateTime(self._created_at, "f")
+
+	def __str__(self) -> str:
+		return self.name
+
+@dataclass
+class CustomAutoModAction:
+	action: CustomRuleAction = field(repr=False)
+	"""The action that was taken."""
+	rule_trigger_type: str = field(repr=False)
+	"""The trigger type of the rule that was executed."""
+	rule_id: int = field(repr=False)
+	"""The ID of the rule that was executed."""
+	guild: CustomGuild = field(repr=False)
+	"""The guild where the action was executed."""
+	member: CustomMember = field(repr=False)
+	"""The member who triggered the action."""
+	channel: Optional[str] = field(repr=False)
+	"""The channel where the action was executed."""
+	message_id: Optional[int] = field(repr=False)
+	"""The ID of the message that triggered the action."""
+	matched_keyword: Optional[str] = field(repr=False)
+	"""The keyword that was matched."""
+	matched_content: Optional[str] = field(repr=False)
+	"""The content that was matched."""
+
+	@classmethod
+	def from_action(cls, execution: 'discord.AutoModAction'):
+		return cls(
+			action=CustomRuleAction.from_action(execution.action, execution.guild),
+			rule_trigger_type=execution.rule_trigger_type.name,
+			rule_id=execution.rule_id,
+			guild=CustomGuild.from_guild(execution.guild),
+			member=CustomMember.from_member(execution.member),
+			channel=execution.channel.mention if execution.channel else None,
+			message_id=execution.message_id,
+			matched_keyword=execution.matched_keyword,
+			matched_content=execution.matched_content,
+		)
