@@ -1794,5 +1794,55 @@
 				}
 			}
 		}
+	},
+	"giveaway": {
+		"message": {
+			"button": "🎉 {participants}",
+			"ended": {
+				"content": "This giveaway has already ended!",
+				"ephemeral": true
+			},
+			"already_joined": {
+				"content": "You've already joined this giveaway!",
+				"ephemeral": true
+			},
+			"joined": {
+				"content": "You have joined the giveaway!",
+				"ephemeral": true
+			}
+		},
+		"end": {
+			"success": {
+				"content": "🎉 **Congratulations,** {winners}! You won the giveaway!"
+			},
+			"no_winners": {
+				"content": "No one joined the giveaway..."
+			}
+		},
+		"start": {
+			"response": {
+				"embeds": [
+					{
+						"title": "🎉 Giveaway!",
+						"description": "{prize}",
+						"fields": [
+							{
+								"name": "Winners",
+								"value": "{winners}",
+								"inline": true
+							},
+							{
+								"name": "Ends",
+								"value": "{ends}",
+								"inline": true
+							}
+						],
+						"footer": {
+							"text": "Click the button below to enter!"
+						}
+					}
+				]
+			}
+		}
 	}
 }

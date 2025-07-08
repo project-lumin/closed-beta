@@ -1,21 +1,21 @@
 """A helper for custom messages."""
 
+import datetime
 import json
 import logging
 import pathlib
 import random
 import re
-from typing import Union, Any, overload, Optional, Type, Iterable, Dict, List, Tuple
+from typing import Any, Optional, Type, Union, overload
 
 import discord
-from discord.ext import localization, commands
-from typing import Type
+from .custom_args import CustomGuild, CustomMember, CustomUser
+from discord.ext import commands, localization
 
 from helpers import emojis
-from .custom_args import *
 
 logger = logging.getLogger(__name__)
-PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+\}$")
+PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+}$")
 
 class CustomResponse:
 	"""A class to handle custom responses."""
@@ -151,17 +151,9 @@ class CustomResponse:
 		else:
 			locale = str(locale)
 
-		match original:
-			case discord.Guild():
-				guild_id = original.id
-			case discord.Interaction() | commands.Context():
-				guild_id = original.guild.id
-			case _:
-				guild_id = None
-
 		context_formatting = { "author": CustomMember.from_member(original.author) if isinstance(
-			original, (discord.Interaction, commands.Context)
-		) else None, "guild": (CustomGuild.from_guild(original.guild) if isinstance(
+			original, commands.Context
+		) else CustomUser.from_user(original.user) if isinstance(original, discord.Interaction) else None, "guild": (CustomGuild.from_guild(original.guild) if isinstance(
 			original, (discord.Interaction, commands.Context)
 		) and hasattr(original, "guild") else CustomGuild.from_guild(original) if isinstance(
 			original, discord.Guild

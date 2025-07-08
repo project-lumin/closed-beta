@@ -321,7 +321,7 @@ class MyClient(commands.AutoShardedBot):
 		benchmark = perf_counter()
 
 		# Load all cogs within the cogs folder
-		allowed: list[str] = ["afk", "basic", "economy", "info", "mod", "setup", "snapshot", "status"]
+		allowed: list[str] = ["afk", "basic", "economy", "giveaway", "info", "mod", "setup", "snapshot", "status"]
 		if DEBUG:
 			allowed.extend(("log",))
 

@@ -27,3 +27,9 @@ dependencies = [
 packages = ["helpers"]
 
 [tool.uv]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.format]
+indent-style = "tab"
