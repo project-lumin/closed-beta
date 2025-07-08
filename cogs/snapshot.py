@@ -16,414 +16,414 @@ from main import MyClient
 
 
 class Snapshot(commands.Cog):
-    def __init__(self, client):
-        self.client: MyClient = client
-        self.connection: asyncpg.Pool = client.db
-        self.custom_response: CustomResponse = CustomResponse(client, "snapshot")
+	def __init__(self, client):
+		self.client: MyClient = client
+		self.connection: asyncpg.Pool = client.db
+		self.custom_response: CustomResponse = CustomResponse(client, "snapshot")
 
-    @staticmethod
-    async def save(ctx: main.Context) -> dict:
-        """
-        Creates a snapshot of the server.
+	@staticmethod
+	async def save(ctx: main.Context) -> dict:
+		"""
+		Creates a snapshot of the server.
 
-        Parameters
-        ----------
-        ctx: `main.Context`
-                The context to get the guild data from.
+		Parameters
+		----------
+		ctx: `main.Context`
+		        The context to get the guild data from.
 
-        Returns
-        -------
-        `dict`
-                The payload of the snapshot.
-        """
+		Returns
+		-------
+		`dict`
+		        The payload of the snapshot.
+		"""
 
-        payload = {"roles": {}, "channels": {}}
+		payload = {"roles": {}, "channels": {}}
 
-        for x in ctx.guild.roles:
-            payload["roles"][x.id] = {
-                "perms": x.permissions.value,
-                "color": x.color.value,
-                "hoist": x.hoist,
-                "managable": x.managed,
-                "position": x.position,
-                "name": x.name,
-                "display_icon": (await x.display_icon.read()).decode("latin1")
-                if x.display_icon and type(x.display_icon) == discord.Asset
-                else x.display_icon
-                if x.display_icon
-                else None,
-            }
+		for x in ctx.guild.roles:
+			payload["roles"][x.id] = {
+				"perms": x.permissions.value,
+				"color": x.color.value,
+				"hoist": x.hoist,
+				"managable": x.managed,
+				"position": x.position,
+				"name": x.name,
+				"display_icon": (await x.display_icon.read()).decode("latin1")
+				if x.display_icon and type(x.display_icon) == discord.Asset
+				else x.display_icon
+				if x.display_icon
+				else None,
+			}
 
-        for x in ctx.guild.channels:
-            payload["channels"][x.id] = {
-                "position": x.position,
-                "type": str(x.type),
-                "category": x.category.name if x.category else None,
-                "name": x.name,
-                "bitrate": x.bitrate if x.type == [discord.ChannelType.voice] else None,
-                "slowmode": x.slowmode_delay
-                if x.type
-                not in [
-                    discord.ChannelType.voice,
-                    discord.ChannelType.category,
-                    discord.ChannelType.stage_voice,
-                ]
-                else None,
-                "nsfw": x.is_nsfw()
-                if x.type
-                not in [
-                    discord.ChannelType.voice,
-                    discord.ChannelType.category,
-                    discord.ChannelType.stage_voice,
-                ]
-                else None,
-                "user_limit": x.user_limit
-                if x.type in [discord.ChannelType.voice]
-                else None,
-                "topic": x.topic
-                if x.type
-                not in [discord.ChannelType.voice, discord.ChannelType.category]
-                else None,
-                "permission_sync": x.permissions_synced
-                if x.type not in [discord.ChannelType.category]
-                else None,
-                "default_auto_archive_duration": x.default_auto_archive_duration
-                if x.type in [discord.ChannelType.text, discord.ChannelType.forum]
-                else 0,
-                "rtc_region": x.rtc_region
-                if x.type in [discord.ChannelType.voice]
-                else None,
-            }
-            payload["channels"][x.id]["overwrites"] = {}
-            for y in x.overwrites:
-                payload["channels"][x.id]["overwrites"][y.id] = {
-                    "allow": x.overwrites[y].pair()[0].value,
-                    "deny": x.overwrites[y].pair()[1].value,
-                    "role": y.name,
-                }
+		for x in ctx.guild.channels:
+			payload["channels"][x.id] = {
+				"position": x.position,
+				"type": str(x.type),
+				"category": x.category.name if x.category else None,
+				"name": x.name,
+				"bitrate": x.bitrate if x.type == [discord.ChannelType.voice] else None,
+				"slowmode": x.slowmode_delay
+				if x.type
+				not in [
+					discord.ChannelType.voice,
+					discord.ChannelType.category,
+					discord.ChannelType.stage_voice,
+				]
+				else None,
+				"nsfw": x.is_nsfw()
+				if x.type
+				not in [
+					discord.ChannelType.voice,
+					discord.ChannelType.category,
+					discord.ChannelType.stage_voice,
+				]
+				else None,
+				"user_limit": x.user_limit
+				if x.type in [discord.ChannelType.voice]
+				else None,
+				"topic": x.topic
+				if x.type
+				not in [discord.ChannelType.voice, discord.ChannelType.category]
+				else None,
+				"permission_sync": x.permissions_synced
+				if x.type not in [discord.ChannelType.category]
+				else None,
+				"default_auto_archive_duration": x.default_auto_archive_duration
+				if x.type in [discord.ChannelType.text, discord.ChannelType.forum]
+				else 0,
+				"rtc_region": x.rtc_region
+				if x.type in [discord.ChannelType.voice]
+				else None,
+			}
+			payload["channels"][x.id]["overwrites"] = {}
+			for y in x.overwrites:
+				payload["channels"][x.id]["overwrites"][y.id] = {
+					"allow": x.overwrites[y].pair()[0].value,
+					"deny": x.overwrites[y].pair()[1].value,
+					"role": y.name,
+				}
 
-        return payload
+		return payload
 
-    async def create_snapshot(self, ctx: main.Context) -> Optional[UUID]:
-        """
-        Creates a snapshot and inserts it into the database.
+	async def create_snapshot(self, ctx: main.Context) -> Optional[UUID]:
+		"""
+		Creates a snapshot and inserts it into the database.
 
-        Parameters
-        ----------
-        ctx: `main.Context`
-                The context to get the guild data from.
+		Parameters
+		----------
+		ctx: `main.Context`
+		        The context to get the guild data from.
 
-        Returns
-        -------
-        `UUID`
-                Code (`UUID`) if the snapshot was successful.
-        """
-        payload = await self.save(ctx)
+		Returns
+		-------
+		`UUID`
+		        Code (`UUID`) if the snapshot was successful.
+		"""
+		payload = await self.save(ctx)
 
-        code = uuid.uuid4()
-        row = await self.connection.fetchrow(
-            "SELECT * FROM snapshots WHERE code = $1", str(code)
-        )
-        while row:  # if the code already exists
-            code = uuid.uuid4()
-            row = await self.connection.fetchrow(
-                "SELECT * FROM snapshots WHERE code = $1", str(code)
-            )
+		code = uuid.uuid4()
+		row = await self.connection.fetchrow(
+			"SELECT * FROM snapshots WHERE code = $1", str(code)
+		)
+		while row:  # if the code already exists
+			code = uuid.uuid4()
+			row = await self.connection.fetchrow(
+				"SELECT * FROM snapshots WHERE code = $1", str(code)
+			)
 
-        await self.connection.execute(
-            "INSERT INTO snapshots(guild_id, name, payload, author_id, date, code) VALUES($1, $2, $3, $4, $5, $6)",
-            ctx.guild.id,
-            await self.custom_response("snapshot.strings.server_snapshot", ctx),
-            json.dumps(payload),
-            ctx.author.id,
-            datetime.datetime.now(),
-            str(code),
-        )
+		await self.connection.execute(
+			"INSERT INTO snapshots(guild_id, name, payload, author_id, date, code) VALUES($1, $2, $3, $4, $5, $6)",
+			ctx.guild.id,
+			await self.custom_response("snapshot.strings.server_snapshot", ctx),
+			json.dumps(payload),
+			ctx.author.id,
+			datetime.datetime.now(),
+			str(code),
+		)
 
-        return code
+		return code
 
-    async def get_snapshot(self, code: Union[str, UUID]) -> Optional[dict]:
-        """
-        Gets a snapshot from the database.
+	async def get_snapshot(self, code: Union[str, UUID]) -> Optional[dict]:
+		"""
+		Gets a snapshot from the database.
 
-        Parameters
-        ----------
-        code: Union[`str`, `UUID`]
-                The code of the snapshot.
+		Parameters
+		----------
+		code: Union[`str`, `UUID`]
+		        The code of the snapshot.
 
-        Returns
-        -------
-        `dict`
-                The snapshot's payload.
-        """
-        payload = await self.connection.fetchval(
-            "SELECT payload FROM snapshots WHERE code = $1", code
-        )
-        if payload:
-            return json.loads(payload)
-        else:
-            return None
+		Returns
+		-------
+		`dict`
+		        The snapshot's payload.
+		"""
+		payload = await self.connection.fetchval(
+			"SELECT payload FROM snapshots WHERE code = $1", code
+		)
+		if payload:
+			return json.loads(payload)
+		else:
+			return None
 
-    async def delete_all_channels(self, ctx: main.Context):
-        """
-        Deletes all channels in the server.
+	async def delete_all_channels(self, ctx: main.Context):
+		"""
+		Deletes all channels in the server.
 
-        Parameters
-        ----------
-        ctx: `main.Context`
-                The context to get the guild data from.
-        """
-        for x in ctx.guild.channels:
-            try:
-                await x.delete(
-                    reason=await self.custom_response(
-                        "snapshot.strings.save_load_reason", ctx
-                    )
-                )
-            except (discord.Forbidden, discord.NotFound, discord.HTTPException):
-                continue
-            await asyncio.sleep(0.5)
+		Parameters
+		----------
+		ctx: `main.Context`
+		        The context to get the guild data from.
+		"""
+		for x in ctx.guild.channels:
+			try:
+				await x.delete(
+					reason=await self.custom_response(
+						"snapshot.strings.save_load_reason", ctx
+					)
+				)
+			except (discord.Forbidden, discord.NotFound, discord.HTTPException):
+				continue
+			await asyncio.sleep(0.5)
 
-    async def delete_all_roles(self, ctx: main.Context):
-        """
-        Deletes all roles in the server.
+	async def delete_all_roles(self, ctx: main.Context):
+		"""
+		Deletes all roles in the server.
 
-        Parameters
-        ----------
-        ctx: `main.Context`
-                The context to get the guild data from.
-        """
-        for x in ctx.guild.roles:
-            try:
-                await x.delete(
-                    reason=await self.custom_response(
-                        "snapshot.strings.save_load_reason", ctx
-                    )
-                )
-            except (discord.Forbidden, discord.NotFound, discord.HTTPException):
-                continue
-            await asyncio.sleep(0.5)
+		Parameters
+		----------
+		ctx: `main.Context`
+		        The context to get the guild data from.
+		"""
+		for x in ctx.guild.roles:
+			try:
+				await x.delete(
+					reason=await self.custom_response(
+						"snapshot.strings.save_load_reason", ctx
+					)
+				)
+			except (discord.Forbidden, discord.NotFound, discord.HTTPException):
+				continue
+			await asyncio.sleep(0.5)
 
-    async def load_snapshot(self, ctx: main.Context, payload: dict):
-        for x in sorted(
-            payload["roles"],
-            key=lambda x: payload["roles"][x]["position"],
-            reverse=True,
-        ):
-            perms = discord.Permissions(permissions=int(payload["roles"][x]["perms"]))
-            if payload["roles"][x]["color"]:
-                color = discord.Colour(int(payload["roles"][x]["color"]))
-            else:
-                color = None
-            if not payload["roles"][x]["name"] == "@everyone":
-                try:
-                    dicon = (
-                        payload["roles"][x]["display_icon"].encode("latin1")
-                        if payload["roles"][x]["display_icon"]
-                        else None
-                    )
-                except:
-                    dicon = (
-                        payload["roles"][x]["display_icon"]
-                        if payload["roles"][x]["display_icon"]
-                        else None
-                    )
-                role = await ctx.guild.create_role(
-                    name=payload["roles"][x]["name"],
-                    permissions=perms,
-                    colour=color,
-                    hoist=bool(payload["roles"][x]["hoist"]),
-                    reason=await self.custom_response(
-                        "snapshot.strings.save_load_reason", ctx
-                    ),
-                    display_icon=dicon if "ROLE_ICONS" in ctx.guild.features else None,
-                )
-                await asyncio.sleep(0.5)
-        for y in sorted(
-            payload["channels"], key=lambda x: payload["channels"][x]["type"]
-        ):
-            x = payload["channels"][y]
-            if x["type"] == "text" or x["type"] == "news":
-                try:
-                    cat = discord.utils.get(ctx.guild.categories, name=x["category"])
-                    overwrites = {}
-                    for z in x["overwrites"]:
-                        role = discord.utils.get(
-                            ctx.guild.roles, name=x["overwrites"][z]["role"]
-                        )
-                        if role:
-                            overwrites[role] = discord.PermissionOverwrite.from_pair(
-                                discord.Permissions(x["overwrites"][z]["allow"]),
-                                discord.Permissions(x["overwrites"][z]["deny"]),
-                            )
-                    await ctx.guild.create_text_channel(
-                        name=x["name"],
-                        category=cat if cat else None,
-                        position=int(x["position"]),
-                        reason=await self.custom_response(
-                            "snapshot.strings.save_load_reason", ctx
-                        ),
-                        slowmode_delay=int(x["slowmode"]) if x["slowmode"] else None,
-                        topic=x["topic"] if x["topic"] else None,
-                        nsfw=bool(x["nsfw"]),
-                        overwrites=overwrites,
-                        news=x["type"] == "news",
-                        default_auto_archive_duration=x[
-                            "default_auto_archive_duration"
-                        ],
-                    )
-                    await asyncio.sleep(0.5)
-                except:
-                    continue
-            elif x["type"] == "voice":
-                try:
-                    cat = discord.utils.get(ctx.guild.categories, name=x["category"])
-                    overwrites = {}
-                    for z in x["overwrites"]:
-                        role = discord.utils.get(
-                            ctx.guild.roles, name=x["overwrites"][z]["role"]
-                        )
-                        if role:
-                            overwrites[role] = discord.PermissionOverwrite.from_pair(
-                                discord.Permissions(x["overwrites"][z]["allow"]),
-                                discord.Permissions(x["overwrites"][z]["deny"]),
-                            )
-                    await ctx.guild.create_voice_channel(
-                        name=x["name"],
-                        category=cat if cat else None,
-                        position=int(x["position"]),
-                        reason=await self.custom_response(
-                            "snapshot.strings.save_load_reason", ctx
-                        ),
-                        bitrate=int(x["bitrate"]) if x["bitrate"] else None,
-                        user_limit=int(x["user_limit"]) if x["user_limit"] else None,
-                        overwrites=overwrites,
-                        rtc_region=x["rtc_region"],
-                    )
-                    await asyncio.sleep(0.5)
-                except:
-                    continue
-            elif x["type"] == "stage_voice":
-                try:
-                    cat = discord.utils.get(ctx.guild.categories, name=x["category"])
-                    overwrites = {}
-                    for z in x["overwrites"]:
-                        role = discord.utils.get(
-                            ctx.guild.roles, name=x["overwrites"][z]["role"]
-                        )
-                        if role:
-                            overwrites[role] = discord.PermissionOverwrite.from_pair(
-                                discord.Permissions(x["overwrites"][z]["allow"]),
-                                discord.Permissions(x["overwrites"][z]["deny"]),
-                            )
-                    await ctx.guild.create_stage_channel(
-                        name=x["name"],
-                        category=cat if cat else None,
-                        position=int(x["position"]),
-                        reason=await self.custom_response(
-                            "snapshot.strings.save_load_reason", ctx
-                        ),
-                        overwrites=overwrites,
-                    )
-                    await asyncio.sleep(0.5)
-                except:
-                    continue
-            elif x["type"] == "category":
-                try:
-                    overwrites = {}
-                    for z in x["overwrites"]:
-                        role = discord.utils.get(
-                            ctx.guild.roles, name=x["overwrites"][z]["role"]
-                        )
-                        if role:
-                            overwrites[role] = discord.PermissionOverwrite.from_pair(
-                                discord.Permissions(x["overwrites"][z]["allow"]),
-                                discord.Permissions(x["overwrites"][z]["deny"]),
-                            )
-                    await ctx.guild.create_category(
-                        name=x["name"],
-                        position=int(x["position"]),
-                        reason=await self.custom_response(
-                            "snapshot.strings.save_load_reason", ctx
-                        ),
-                        overwrites=overwrites,
-                    )
-                    await asyncio.sleep(0.5)
-                except:
-                    continue
-            elif x["type"] == "forum":
-                try:
-                    overwrites = {}
-                    for z in x["overwrites"]:
-                        role = discord.utils.get(
-                            ctx.guild.roles, name=x["overwrites"][z]["role"]
-                        )
-                        if role:
-                            overwrites[role] = discord.PermissionOverwrite.from_pair(
-                                discord.Permissions(x["overwrites"][z]["allow"]),
-                                discord.Permissions(x["overwrites"][z]["deny"]),
-                            )
-                    cat = discord.utils.get(ctx.guild.categories, name=x["category"])
-                    await ctx.guild.create_forum(
-                        name=x["name"],
-                        category=cat if cat else None,
-                        position=int(x["position"]),
-                        reason=await self.custom_response(
-                            "snapshot.strings.save_load_reason", ctx
-                        ),
-                        nsfw=bool(x["nsfw"]),
-                        topic=x["topic"] if x["topic"] else None,
-                        default_thread_slowmode_delay=int(x["slowmode"])
-                        if x["slowmode"]
-                        else None,
-                        overwrites=overwrites,
-                        default_auto_archive_duration=x[
-                            "default_auto_archive_duration"
-                        ],
-                    )
-                    await asyncio.sleep(0.5)
-                except:
-                    continue
+	async def load_snapshot(self, ctx: main.Context, payload: dict):
+		for x in sorted(
+			payload["roles"],
+			key=lambda x: payload["roles"][x]["position"],
+			reverse=True,
+		):
+			perms = discord.Permissions(permissions=int(payload["roles"][x]["perms"]))
+			if payload["roles"][x]["color"]:
+				color = discord.Colour(int(payload["roles"][x]["color"]))
+			else:
+				color = None
+			if not payload["roles"][x]["name"] == "@everyone":
+				try:
+					dicon = (
+						payload["roles"][x]["display_icon"].encode("latin1")
+						if payload["roles"][x]["display_icon"]
+						else None
+					)
+				except:
+					dicon = (
+						payload["roles"][x]["display_icon"]
+						if payload["roles"][x]["display_icon"]
+						else None
+					)
+				role = await ctx.guild.create_role(
+					name=payload["roles"][x]["name"],
+					permissions=perms,
+					colour=color,
+					hoist=bool(payload["roles"][x]["hoist"]),
+					reason=await self.custom_response(
+						"snapshot.strings.save_load_reason", ctx
+					),
+					display_icon=dicon if "ROLE_ICONS" in ctx.guild.features else None,
+				)
+				await asyncio.sleep(0.5)
+		for y in sorted(
+			payload["channels"], key=lambda x: payload["channels"][x]["type"]
+		):
+			x = payload["channels"][y]
+			if x["type"] == "text" or x["type"] == "news":
+				try:
+					cat = discord.utils.get(ctx.guild.categories, name=x["category"])
+					overwrites = {}
+					for z in x["overwrites"]:
+						role = discord.utils.get(
+							ctx.guild.roles, name=x["overwrites"][z]["role"]
+						)
+						if role:
+							overwrites[role] = discord.PermissionOverwrite.from_pair(
+								discord.Permissions(x["overwrites"][z]["allow"]),
+								discord.Permissions(x["overwrites"][z]["deny"]),
+							)
+					await ctx.guild.create_text_channel(
+						name=x["name"],
+						category=cat if cat else None,
+						position=int(x["position"]),
+						reason=await self.custom_response(
+							"snapshot.strings.save_load_reason", ctx
+						),
+						slowmode_delay=int(x["slowmode"]) if x["slowmode"] else None,
+						topic=x["topic"] if x["topic"] else None,
+						nsfw=bool(x["nsfw"]),
+						overwrites=overwrites,
+						news=x["type"] == "news",
+						default_auto_archive_duration=x[
+							"default_auto_archive_duration"
+						],
+					)
+					await asyncio.sleep(0.5)
+				except:
+					continue
+			elif x["type"] == "voice":
+				try:
+					cat = discord.utils.get(ctx.guild.categories, name=x["category"])
+					overwrites = {}
+					for z in x["overwrites"]:
+						role = discord.utils.get(
+							ctx.guild.roles, name=x["overwrites"][z]["role"]
+						)
+						if role:
+							overwrites[role] = discord.PermissionOverwrite.from_pair(
+								discord.Permissions(x["overwrites"][z]["allow"]),
+								discord.Permissions(x["overwrites"][z]["deny"]),
+							)
+					await ctx.guild.create_voice_channel(
+						name=x["name"],
+						category=cat if cat else None,
+						position=int(x["position"]),
+						reason=await self.custom_response(
+							"snapshot.strings.save_load_reason", ctx
+						),
+						bitrate=int(x["bitrate"]) if x["bitrate"] else None,
+						user_limit=int(x["user_limit"]) if x["user_limit"] else None,
+						overwrites=overwrites,
+						rtc_region=x["rtc_region"],
+					)
+					await asyncio.sleep(0.5)
+				except:
+					continue
+			elif x["type"] == "stage_voice":
+				try:
+					cat = discord.utils.get(ctx.guild.categories, name=x["category"])
+					overwrites = {}
+					for z in x["overwrites"]:
+						role = discord.utils.get(
+							ctx.guild.roles, name=x["overwrites"][z]["role"]
+						)
+						if role:
+							overwrites[role] = discord.PermissionOverwrite.from_pair(
+								discord.Permissions(x["overwrites"][z]["allow"]),
+								discord.Permissions(x["overwrites"][z]["deny"]),
+							)
+					await ctx.guild.create_stage_channel(
+						name=x["name"],
+						category=cat if cat else None,
+						position=int(x["position"]),
+						reason=await self.custom_response(
+							"snapshot.strings.save_load_reason", ctx
+						),
+						overwrites=overwrites,
+					)
+					await asyncio.sleep(0.5)
+				except:
+					continue
+			elif x["type"] == "category":
+				try:
+					overwrites = {}
+					for z in x["overwrites"]:
+						role = discord.utils.get(
+							ctx.guild.roles, name=x["overwrites"][z]["role"]
+						)
+						if role:
+							overwrites[role] = discord.PermissionOverwrite.from_pair(
+								discord.Permissions(x["overwrites"][z]["allow"]),
+								discord.Permissions(x["overwrites"][z]["deny"]),
+							)
+					await ctx.guild.create_category(
+						name=x["name"],
+						position=int(x["position"]),
+						reason=await self.custom_response(
+							"snapshot.strings.save_load_reason", ctx
+						),
+						overwrites=overwrites,
+					)
+					await asyncio.sleep(0.5)
+				except:
+					continue
+			elif x["type"] == "forum":
+				try:
+					overwrites = {}
+					for z in x["overwrites"]:
+						role = discord.utils.get(
+							ctx.guild.roles, name=x["overwrites"][z]["role"]
+						)
+						if role:
+							overwrites[role] = discord.PermissionOverwrite.from_pair(
+								discord.Permissions(x["overwrites"][z]["allow"]),
+								discord.Permissions(x["overwrites"][z]["deny"]),
+							)
+					cat = discord.utils.get(ctx.guild.categories, name=x["category"])
+					await ctx.guild.create_forum(
+						name=x["name"],
+						category=cat if cat else None,
+						position=int(x["position"]),
+						reason=await self.custom_response(
+							"snapshot.strings.save_load_reason", ctx
+						),
+						nsfw=bool(x["nsfw"]),
+						topic=x["topic"] if x["topic"] else None,
+						default_thread_slowmode_delay=int(x["slowmode"])
+						if x["slowmode"]
+						else None,
+						overwrites=overwrites,
+						default_auto_archive_duration=x[
+							"default_auto_archive_duration"
+						],
+					)
+					await asyncio.sleep(0.5)
+				except:
+					continue
 
-    @commands.hybrid_group(
-        name="snapshot",
-        description="snapshot_specs-description",
-        fallback="snapshot_specs-fallback",
-    )
-    @app_commands.checks.has_permissions(administrator=True)
-    @commands.has_permissions(administrator=True)
-    async def snapshot(self, ctx: main.Context):
-        code = await self.create_snapshot(ctx)
+	@commands.hybrid_group(
+		name="snapshot",
+		description="snapshot_specs-description",
+		fallback="snapshot_specs-fallback",
+	)
+	@app_commands.checks.has_permissions(administrator=True)
+	@commands.has_permissions(administrator=True)
+	async def snapshot(self, ctx: main.Context):
+		code = await self.create_snapshot(ctx)
 
-        await ctx.send("snapshot.create", code=code)
+		await ctx.send("snapshot.create", code=code)
 
-    @snapshot.command(name="load", description="ss_load_specs-description")
-    @app_commands.describe(code="ss_load_specs-args-code-description")
-    @app_commands.rename(code="ss_load_specs-args-code-name")
-    @app_commands.checks.has_permissions(administrator=True)
-    @commands.has_permissions(administrator=True)
-    async def load(self, ctx: main.Context, code: str):
-        payload = await self.get_snapshot(code)
-        if not payload:
-            return await ctx.send("snapshot.not_found")
+	@snapshot.command(name="load", description="ss_load_specs-description")
+	@app_commands.describe(code="ss_load_specs-args-code-description")
+	@app_commands.rename(code="ss_load_specs-args-code-name")
+	@app_commands.checks.has_permissions(administrator=True)
+	@commands.has_permissions(administrator=True)
+	async def load(self, ctx: main.Context, code: str):
+		payload = await self.get_snapshot(code)
+		if not payload:
+			return await ctx.send("snapshot.not_found")
 
-        old = await self.create_snapshot(ctx)
+		old = await self.create_snapshot(ctx)
 
-        await self.delete_all_channels(ctx)
-        await self.delete_all_roles(ctx)
-        await self.load_snapshot(ctx, payload)
+		await self.delete_all_channels(ctx)
+		await self.delete_all_roles(ctx)
+		await self.load_snapshot(ctx, payload)
 
-        if (
-            not ctx.guild.owner_id == ctx.author.id
-        ):  # prevent griefs by sending the code to the owner
-            alert = await self.custom_response("snapshot.owner_alert", ctx, code=old)
-            alert.pop("reply", None)
-            alert.pop("ephemeral", None)
-            alert.pop("delete_after", None)
-            await ctx.guild.owner.send(**alert)
+		if (
+			not ctx.guild.owner_id == ctx.author.id
+		):  # prevent griefs by sending the code to the owner
+			alert = await self.custom_response("snapshot.owner_alert", ctx, code=old)
+			alert.pop("reply", None)
+			alert.pop("ephemeral", None)
+			alert.pop("delete_after", None)
+			await ctx.guild.owner.send(**alert)
 
-        await ctx.send("snapshot.load")
+		await ctx.send("snapshot.load")
 
 
 async def setup(client):
-    await client.add_cog(Snapshot(client))
+	await client.add_cog(Snapshot(client))
