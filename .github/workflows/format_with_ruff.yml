@@ -1,0 +1,54 @@
+name: 🗞️ Format using Ruff
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.5"
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff Format
+        run: ruff format .
+
+      - name: Auto-commit on `dev` branch
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "🤖 chore: auto-format code using ruff"
+            git push
+          else
+            echo "Code was formatted successfully"
+          fi
+
+      - name: Fail check on PR if formatting needed
+        if: github.event_name == 'pull_request' && github.ref != 'refs/heads/dev'
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            echo "❌ Formatting issues found. Please run 'ruff format .' locally."
+            git diff
+            exit 1
+          else
+            echo "✅ Code is properly formatted."
+          fi
