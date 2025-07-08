@@ -1,4 +1,5 @@
 """Custom arguments to make user-specified responses easier to configure"""
+
 import datetime
 from dataclasses import dataclass, field
 from typing import Union, Optional, Literal, Sequence
@@ -6,6 +7,7 @@ from cpuinfo import get_cpu_info
 from emoji import demojize
 import discord
 import psutil
+
 
 class CustomColor:
 	"""Custom colors for formatting purposes.
@@ -28,7 +30,7 @@ class CustomColor:
 		self.__color = color or discord.Color.light_grey()
 
 	def __str__(self):
-		return f'#{self.__color.value:0>6X}'  # '#RRGGBB' - '#AB12CD'
+		return f"#{self.__color.value:0>6X}"  # '#RRGGBB' - '#AB12CD'
 
 	@property
 	def color(self) -> str:
@@ -45,14 +47,25 @@ class CustomColor:
 
 	@property
 	def image(self):
-		return f'https://dummyimage.com/500x500/{self.__color.value:0>6X}/000000&text=+'
+		return f"https://dummyimage.com/500x500/{self.__color.value:0>6X}/000000&text=+"
 
 	pic = picture = image
 
 	__repr__ = __str__
 
-DatetimeFormat = Literal["time", "seconds", "date", "month", "short", "long", "relative", discord.utils.TimestampStyle]
+
+DatetimeFormat = Literal[
+	"time",
+	"seconds",
+	"date",
+	"month",
+	"short",
+	"long",
+	"relative",
+	discord.utils.TimestampStyle,
+]
 """The format to use for Discord timestamps."""
+
 
 class Formattable:
 	def __init__(self, data, *, style: discord.utils.TimestampStyle):
@@ -61,7 +74,7 @@ class Formattable:
 		Parameters
 		----------
 		data: `FormatDateTime`
-			The datetime object to format.
+		        The datetime object to format.
 		"""
 		self._parent_data = data
 		self._style = style
@@ -75,6 +88,7 @@ class Formattable:
 
 	__str__ = __repr__
 
+
 class FormatDateTime:
 	"""Formats a datetime object into a dynamic Discord timestamp.
 
@@ -83,13 +97,19 @@ class FormatDateTime:
 	So for example, ``created_at``, ``created_at()`` and ``created_at("long")`` will all work. The one without the
 	brackets will always use the default style."""
 
-	def __init__(self, data: datetime.datetime, default_style: discord.utils.TimestampStyle):
+	def __init__(
+		self, data: datetime.datetime, default_style: discord.utils.TimestampStyle
+	):
 		self.data = data
 		self.default_style = default_style
 
 	@property
 	def timestamp(self) -> str:
-		return self.data.astimezone(datetime.timezone.utc).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+		return (
+			self.data.astimezone(datetime.timezone.utc)
+			.replace(tzinfo=None)
+			.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+		)
 
 	@property
 	def time(self) -> Formattable:
@@ -160,8 +180,10 @@ class FormatDateTime:
 	def __repr__(self) -> str:
 		return Formattable(self, style=self.default_style).value
 
+
 if __name__ == "__main__":
 	pass
+
 
 @dataclass
 class CustomUser:
@@ -192,13 +214,22 @@ class CustomUser:
 	def from_user(cls, user: discord.User):
 		"""Creates a ``CustomUser`` from a ``discord.User`` object."""
 		return cls(
-			_name=f"{user.name}#{user.discriminator}" if user.discriminator != "0" else user.name, id=user.id,
+			_name=f"{user.name}#{user.discriminator}"
+			if user.discriminator != "0"
+			else user.name,
+			id=user.id,
 			_discriminator=user.discriminator if user.discriminator != "0" else None,
 			global_name=user.global_name,
-			display_name=user.display_name, bot=user.bot, _color=CustomColor(user.accent_color),
-			_avatar=user.display_avatar.url, _decoration=user.avatar_decoration.url if user.avatar_decoration else "",
-			_banner=user.banner.url if user.banner else CustomColor(user.accent_color).image,
-			_created_at=user.created_at, mention=user.mention
+			display_name=user.display_name,
+			bot=user.bot,
+			_color=CustomColor(user.accent_color),
+			_avatar=user.display_avatar.url,
+			_decoration=user.avatar_decoration.url if user.avatar_decoration else "",
+			_banner=user.banner.url
+			if user.banner
+			else CustomColor(user.accent_color).image,
+			_created_at=user.created_at,
+			mention=user.mention,
 		)
 
 	@property
@@ -243,6 +274,7 @@ class CustomUser:
 	def __int__(self):
 		return self.id
 
+
 @dataclass
 class CustomMember(CustomUser):
 	_nickname: Optional[str] = field(repr=False)
@@ -254,13 +286,28 @@ class CustomMember(CustomUser):
 	@classmethod
 	def from_member(cls, member: discord.Member):
 		return cls(
-			_name=f"{member.name}#{member.discriminator}" if member.discriminator != "0" else member.name, id=member.id,
-			_discriminator=member.discriminator if member.discriminator != "0" else None, global_name=member.global_name, display_name=member.display_name,
-			_nickname=member.nick, bot=member.bot, _color=CustomColor(member.color),
-			_accent_color=CustomColor(member.accent_color), _avatar=member.display_avatar.url,
-			_decoration=member.avatar_decoration.url if member.avatar_decoration else None,
-			_banner=member.avatar_decoration.url if member.banner else None, _created_at=member.created_at,
-			_joined_at=member.joined_at, _roles=member.roles, mention=member.mention
+			_name=f"{member.name}#{member.discriminator}"
+			if member.discriminator != "0"
+			else member.name,
+			id=member.id,
+			_discriminator=member.discriminator
+			if member.discriminator != "0"
+			else None,
+			global_name=member.global_name,
+			display_name=member.display_name,
+			_nickname=member.nick,
+			bot=member.bot,
+			_color=CustomColor(member.color),
+			_accent_color=CustomColor(member.accent_color),
+			_avatar=member.display_avatar.url,
+			_decoration=member.avatar_decoration.url
+			if member.avatar_decoration
+			else None,
+			_banner=member.avatar_decoration.url if member.banner else None,
+			_created_at=member.created_at,
+			_joined_at=member.joined_at,
+			_roles=member.roles,
+			mention=member.mention,
 		)
 
 	@property
@@ -287,7 +334,7 @@ class CustomMember(CustomUser):
 	def roles(self) -> Optional[str]:
 		"""Returns the roles the user has (excluding @everyone)"""
 		self._roles.pop(0)
-		roles_string = ', '.join([role.mention for role in self._roles])
+		roles_string = ", ".join([role.mention for role in self._roles])
 		if len(roles_string) > 512:
 			return None
 		return roles_string
@@ -295,13 +342,14 @@ class CustomMember(CustomUser):
 	@property
 	def roles_reverse(self) -> Optional[str]:
 		self._roles.pop(0)
-		roles_string = ', '.join([role.mention for role in reversed(self._roles)])
+		roles_string = ", ".join([role.mention for role in reversed(self._roles)])
 		if len(roles_string) > 512:
 			return None
 		return roles_string
 
 	def __str__(self):
 		return self.display_name or self.name
+
 
 @dataclass
 class CustomRole:
@@ -336,13 +384,26 @@ class CustomRole:
 	@classmethod
 	def from_role(cls, role: discord.Role):
 		return cls(
-			name=role.name, id=role.id, hoist=role.hoist, position=role.position, managed=role.managed,
-			mentionable=role.mentionable, _default=role.is_default(), _bot=role.is_bot_managed(),
-			_boost=role.is_premium_subscriber(), _integration=role.is_integration(), _assignable=role.is_assignable(),
+			name=role.name,
+			id=role.id,
+			hoist=role.hoist,
+			position=role.position,
+			managed=role.managed,
+			mentionable=role.mentionable,
+			_default=role.is_default(),
+			_bot=role.is_bot_managed(),
+			_boost=role.is_premium_subscriber(),
+			_integration=role.is_integration(),
+			_assignable=role.is_assignable(),
 			_color=CustomColor(role.color),
-			icon=role.display_icon.url or role.display_icon if role.display_icon else None, _created_at=role.created_at,
-			mention=role.mention, _members=role.members,
-			_purchaseable=role.tags.is_available_for_purchase() if role.tags else False, _permissions=role.permissions
+			icon=role.display_icon.url or role.display_icon
+			if role.display_icon
+			else None,
+			_created_at=role.created_at,
+			mention=role.mention,
+			_members=role.members,
+			_purchaseable=role.tags.is_available_for_purchase() if role.tags else False,
+			_permissions=role.permissions,
 		)
 
 	@property
@@ -409,7 +470,9 @@ class CustomRole:
 	@property
 	def permissions(self):
 		"""Returns the role's permissions."""
-		return ", ".join([str(perm[0]).upper() for perm in self._permissions if perm[1]])[:1024]
+		return ", ".join(
+			[str(perm[0]).upper() for perm in self._permissions if perm[1]]
+		)[:1024]
 
 	def __str__(self):
 		return self.name
@@ -418,6 +481,7 @@ class CustomRole:
 		return self.id
 
 	# TODO: we need to add permissions somehow... no idea how, though
+
 
 @dataclass
 class CustomGuild:
@@ -445,7 +509,9 @@ class CustomGuild:
 	_rules_channel: Optional[discord.TextChannel] = field(repr=False)
 	_public_updates_channel: Optional[discord.TextChannel] = field(repr=False)
 	_preferred_locale: discord.Locale = field(repr=False)
-	_afk_channel: Optional[Union[discord.VoiceChannel, discord.StageChannel]] = field(repr=False)
+	_afk_channel: Optional[Union[discord.VoiceChannel, discord.StageChannel]] = field(
+		repr=False
+	)
 	"""Returns the guild's AFK channel."""
 	_afk_timeout: int = field(repr=False)
 	"""Returns the guild's AFK timeout."""
@@ -475,21 +541,48 @@ class CustomGuild:
 	@classmethod
 	def from_guild(cls, guild: discord.Guild):
 		return cls(
-			name=guild.name, id=guild.id, _icon=guild.icon, _banner=guild.banner, _splash=guild.splash,
-			_discovery_splash=guild.discovery_splash, description=guild.description, members=guild.member_count,
-			_owner=guild.owner, boosts=guild.premium_subscription_count, _created_at=guild.created_at,
-			_verification_level=guild.verification_level, _default_notifications=guild.default_notifications,
-			_explicit_content_filter=guild.explicit_content_filter, _mfa_level=guild.mfa_level,
-			_system_channel=guild.system_channel, _rules_channel=guild.rules_channel,
-			_public_updates_channel=guild.public_updates_channel, _preferred_locale=guild.preferred_locale,
-			_afk_channel=guild.afk_channel, _afk_timeout=guild.afk_timeout, _vanity_url=guild.vanity_url,
-			_premium_tier=guild.premium_tier, _premium_subscribers=guild.premium_subscribers,
-			_premium_subscriber_role=guild.premium_subscriber_role, _nsfw_level=guild.nsfw_level,
-			_channels=guild.channels, _voice_channels=guild.voice_channels, _stage_channels=guild.stage_channels,
-			_text_channels=guild.text_channels, _categories=guild.categories, _forums=guild.forums,
-			_threads=guild.threads, _roles=guild.roles, _emojis=guild.emojis, emoji_limit=guild.emoji_limit,
-			_stickers=guild.stickers, _sticker_limit=guild.sticker_limit, _bitrate_limit=guild.bitrate_limit,
-			_filesize_limit=guild.filesize_limit, _scheduled_events=guild.scheduled_events, _shard_id=guild.shard_id
+			name=guild.name,
+			id=guild.id,
+			_icon=guild.icon,
+			_banner=guild.banner,
+			_splash=guild.splash,
+			_discovery_splash=guild.discovery_splash,
+			description=guild.description,
+			members=guild.member_count,
+			_owner=guild.owner,
+			boosts=guild.premium_subscription_count,
+			_created_at=guild.created_at,
+			_verification_level=guild.verification_level,
+			_default_notifications=guild.default_notifications,
+			_explicit_content_filter=guild.explicit_content_filter,
+			_mfa_level=guild.mfa_level,
+			_system_channel=guild.system_channel,
+			_rules_channel=guild.rules_channel,
+			_public_updates_channel=guild.public_updates_channel,
+			_preferred_locale=guild.preferred_locale,
+			_afk_channel=guild.afk_channel,
+			_afk_timeout=guild.afk_timeout,
+			_vanity_url=guild.vanity_url,
+			_premium_tier=guild.premium_tier,
+			_premium_subscribers=guild.premium_subscribers,
+			_premium_subscriber_role=guild.premium_subscriber_role,
+			_nsfw_level=guild.nsfw_level,
+			_channels=guild.channels,
+			_voice_channels=guild.voice_channels,
+			_stage_channels=guild.stage_channels,
+			_text_channels=guild.text_channels,
+			_categories=guild.categories,
+			_forums=guild.forums,
+			_threads=guild.threads,
+			_roles=guild.roles,
+			_emojis=guild.emojis,
+			emoji_limit=guild.emoji_limit,
+			_stickers=guild.stickers,
+			_sticker_limit=guild.sticker_limit,
+			_bitrate_limit=guild.bitrate_limit,
+			_filesize_limit=guild.filesize_limit,
+			_scheduled_events=guild.scheduled_events,
+			_shard_id=guild.shard_id,
 		)
 
 	@property
@@ -527,32 +620,41 @@ class CustomGuild:
 	@property
 	def verification_level(self) -> str:
 		"""Returns the guild's verification level."""
-		mapping = { discord.VerificationLevel.none: r"{verification.none}",
+		mapping = {
+			discord.VerificationLevel.none: r"{verification.none}",
 			discord.VerificationLevel.low: r"{verification.low}",
 			discord.VerificationLevel.medium: r"{verification.medium}",
 			discord.VerificationLevel.high: r"{verification.high}",
-			discord.VerificationLevel.highest: r"{verification.highest}" }
+			discord.VerificationLevel.highest: r"{verification.highest}",
+		}
 		return mapping.get(mapping)
 
 	@property
 	def default_notifications(self) -> str:
 		"""Returns the guild's default notification level."""
-		mapping = { discord.NotificationLevel.all_messages: r"{notification.all_messages}",
-			discord.NotificationLevel.only_mentions: r"{notification.only_mentions}" }
+		mapping = {
+			discord.NotificationLevel.all_messages: r"{notification.all_messages}",
+			discord.NotificationLevel.only_mentions: r"{notification.only_mentions}",
+		}
 		return mapping.get(mapping)
 
 	@property
 	def explicit_content_filter(self) -> str:
 		"""Returns the guild's explicit content filter level."""
-		mapping = { discord.ContentFilter.disabled: r"{content_filter.disabled}",
+		mapping = {
+			discord.ContentFilter.disabled: r"{content_filter.disabled}",
 			discord.ContentFilter.no_role: r"{content_filter.no_role}",
-			discord.ContentFilter.all_members: r"{content_filter.all_members}" }
+			discord.ContentFilter.all_members: r"{content_filter.all_members}",
+		}
 		return mapping.get(mapping)
 
 	@property
 	def mfa_level(self) -> str:
 		"""Returns the guild's MFA level."""
-		mapping = { discord.MFALevel.disabled: r"{mfa.disabled}", discord.MFALevel.require_2fa: r"{mfa.require_2fa}", }
+		mapping = {
+			discord.MFALevel.disabled: r"{mfa.disabled}",
+			discord.MFALevel.require_2fa: r"{mfa.require_2fa}",
+		}
 		return mapping.get(mapping)
 
 	@property
@@ -604,15 +706,23 @@ class CustomGuild:
 	@property
 	def premium_subscriber_role(self) -> str:
 		"""Returns the guild's premium subscriber role."""
-		return self._premium_subscriber_role.mention if self._premium_subscriber_role else None
+		return (
+			self._premium_subscriber_role.mention
+			if self._premium_subscriber_role
+			else None
+		)
 
 	boost_role = premium_subscriber_role
 
 	@property
 	def nsfw_level(self) -> str:
 		"""Returns the guild's NSFW level."""
-		mapping = { discord.NSFWLevel.default: r"{nsfw.default}", discord.NSFWLevel.explicit: r"{nsfw.explicit}",
-			discord.NSFWLevel.safe: r"{nsfw.safe}", discord.NSFWLevel.age_restricted: r"{nsfw.age_restricted}" }
+		mapping = {
+			discord.NSFWLevel.default: r"{nsfw.default}",
+			discord.NSFWLevel.explicit: r"{nsfw.explicit}",
+			discord.NSFWLevel.safe: r"{nsfw.safe}",
+			discord.NSFWLevel.age_restricted: r"{nsfw.age_restricted}",
+		}
 		return mapping.get(mapping)
 
 	@property
@@ -700,6 +810,7 @@ class CustomGuild:
 	def __len__(self):
 		return self.members
 
+
 class IPAddress:
 	def __init__(self, data: dict[str, str]):
 		self._data = data
@@ -744,6 +855,7 @@ class IPAddress:
 	def loc(self) -> str:
 		return self._data.get("loc")
 
+
 class CPU:
 	@property
 	def name(self):
@@ -761,6 +873,7 @@ class CPU:
 		return self.name
 
 	cores = count = threads
+
 
 class RAM:
 	def __init__(self):
@@ -781,6 +894,7 @@ class RAM:
 	def __str__(self):
 		return self.usage
 
+
 class VPSProvider:
 	@property
 	def name(self):
@@ -792,6 +906,7 @@ class VPSProvider:
 
 	def __str__(self):
 		return f"[{self.name}]({self.url})"
+
 
 class Disk:
 	def __init__(self):
@@ -816,6 +931,7 @@ class Disk:
 	def __str__(self):
 		return f"{self.percent}%"
 
+
 class Network:
 	def __init__(self):
 		self._network = psutil.net_io_counters()
@@ -830,6 +946,7 @@ class Network:
 
 	def __str__(self):
 		return f"{self.sent} GB / {self.received} GB"
+
 
 class BotInfo:
 	def __init__(self, client: discord.Client):
@@ -868,13 +985,15 @@ class BotInfo:
 	def library_version(self):
 		return discord.__version__
 
+
 @dataclass
 class CustomMessage:
 	"""A class that represents a Discord message with useful formatting properties.
-	
+
 	This class is designed to be used in localization strings and provides
 	easy access to message properties that are commonly used in logs.
 	"""
+
 	id: int
 	"""Returns the message's ID."""
 	content: str
@@ -892,10 +1011,17 @@ class CustomMessage:
 	_mention_everyone: bool = field(repr=False)
 	_mentions: list[discord.Member] = field(repr=False)
 	_role_mentions: list[discord.Role] = field(repr=False)
-	_channel_mentions: list[discord.abc.GuildChannel | discord.Thread] = field(repr=False)
+	_channel_mentions: list[discord.abc.GuildChannel | discord.Thread] = field(
+		repr=False
+	)
 	_reference: Optional[discord.MessageReference] = field(repr=False)
 	_flags: discord.MessageFlags = field(repr=False)
-	_components: list[discord.ActionRow | discord.ui.Button | discord.SelectMenu | discord.ui.TextInput] = field(repr=False)
+	_components: list[
+		discord.ActionRow
+		| discord.ui.Button
+		| discord.SelectMenu
+		| discord.ui.TextInput
+	] = field(repr=False)
 	_poll: Optional[discord.Poll] = field(repr=False)
 
 	@classmethod
@@ -921,7 +1047,7 @@ class CustomMessage:
 			_reference=message.reference,
 			_flags=message.flags,
 			_components=message.components,
-			_poll=message.poll
+			_poll=message.poll,
 		)
 
 	@property
@@ -1025,7 +1151,6 @@ class CustomMessage:
 		return self.id
 
 
-
 @dataclass
 class CustomCategoryChannel:
 	name: str
@@ -1046,7 +1171,9 @@ class CustomCategoryChannel:
 	_jump_url: str
 	mention: str
 	"""Returns the category's mention string."""
-	_overwrites: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]
+	_overwrites: dict[
+		discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite
+	]
 	permissions_synced: bool
 	"""Returns whether or not the permissions are synced to the parent category."""
 
@@ -1122,6 +1249,7 @@ class CustomCategoryChannel:
 	def __str__(self) -> str:
 		return self.name
 
+
 @dataclass
 class CustomTextChannel:
 	name: str
@@ -1147,7 +1275,9 @@ class CustomTextChannel:
 	_jump_url: str
 	mention: str
 	"""Returns the channel's mention string."""
-	_overwrites: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]
+	_overwrites: dict[
+		discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite
+	]
 	permissions_synced: bool
 	"""Returns whether or not the permissions are synced to the parent category."""
 
@@ -1211,7 +1341,11 @@ class CustomTextChannel:
 	@property
 	def category(self) -> Optional[CustomCategoryChannel]:
 		"""Returns the channel's category."""
-		return CustomCategoryChannel.from_category(self._category) if self._category else None
+		return (
+			CustomCategoryChannel.from_category(self._category)
+			if self._category
+			else None
+		)
 
 	@property
 	def created_at(self) -> FormatDateTime:
@@ -1235,6 +1369,7 @@ class CustomTextChannel:
 	def __str__(self) -> str:
 		return self.name
 
+
 @dataclass
 class CustomVoiceChannel:
 	name: str
@@ -1257,7 +1392,9 @@ class CustomVoiceChannel:
 	_jump_url: str
 	mention: str
 	"""Returns the channel's mention string."""
-	_overwrites: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]
+	_overwrites: dict[
+		discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite
+	]
 	permissions_synced: bool
 	"""Returns whether or not the permissions are synced to the parent category."""
 	_scheduled_events: list[discord.ScheduledEvent]
@@ -1305,7 +1442,11 @@ class CustomVoiceChannel:
 	@property
 	def category(self) -> Optional[CustomCategoryChannel]:
 		"""Returns the channel's category."""
-		return CustomCategoryChannel.from_category(self._category) if self._category else None
+		return (
+			CustomCategoryChannel.from_category(self._category)
+			if self._category
+			else None
+		)
 
 	@property
 	def created_at(self) -> FormatDateTime:
@@ -1333,6 +1474,7 @@ class CustomVoiceChannel:
 
 	def __str__(self) -> str:
 		return self.name
+
 
 @dataclass
 class CustomStageChannel:
@@ -1362,7 +1504,9 @@ class CustomStageChannel:
 	_members: list[discord.Member]
 	mention: str
 	"""Returns the stage channel's mention string."""
-	_overwrites: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]
+	_overwrites: dict[
+		discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite
+	]
 	permissions_synced: bool
 	"""Returns whether or not the permissions are synced to the parent category."""
 	_scheduled_events: list[discord.ScheduledEvent]
@@ -1440,7 +1584,11 @@ class CustomStageChannel:
 	@property
 	def category(self) -> Optional[CustomCategoryChannel]:
 		"""Returns the channel's category.'"""
-		return CustomCategoryChannel.from_category(self._category) if self._category else None
+		return (
+			CustomCategoryChannel.from_category(self._category)
+			if self._category
+			else None
+		)
 
 	@property
 	def created_at(self) -> FormatDateTime:
@@ -1476,6 +1624,7 @@ class CustomStageChannel:
 	def __str__(self) -> str:
 		return self.name
 
+
 @dataclass
 class CustomPartialEmoji:
 	_name: Optional[str]
@@ -1495,7 +1644,7 @@ class CustomPartialEmoji:
 			_created_at=emoji.created_at,
 			_url=emoji.url,
 			_is_unicode=emoji.is_unicode_emoji(),
-			display=str(emoji)
+			display=str(emoji),
 		)
 
 	@property
@@ -1517,7 +1666,12 @@ class CustomPartialEmoji:
 	@property
 	def url(self) -> Optional[str]:
 		codepoints = "-".join(f"{ord(code):x}" for code in self._name)
-		return self._url if self._url != "" else f"https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/{codepoints}.png"
+		return (
+			self._url
+			if self._url != ""
+			else f"https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/{codepoints}.png"
+		)
+
 
 @dataclass
 class CustomEmoji(CustomPartialEmoji):
@@ -1538,7 +1692,7 @@ class CustomEmoji(CustomPartialEmoji):
 			_roles=emoji.roles,
 			_guild=emoji.guild,
 			_is_application_owned=emoji.is_application_owned(),
-			_is_unicode=False
+			_is_unicode=False,
 		)
 
 	@property
@@ -1562,6 +1716,7 @@ class CustomEmoji(CustomPartialEmoji):
 		return self._is_application_owned
 
 	application_owned = bot_owned = is_application_owned
+
 
 @dataclass
 class CustomForumChannel:
@@ -1590,7 +1745,9 @@ class CustomForumChannel:
 	_jump_url: str
 	mention: str
 	"""Returns a string to mention the channel."""
-	_overwrites: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]
+	_overwrites: dict[
+		discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite
+	]
 	permissions_synced: bool
 	"""Returns whether or not the permissions are synced to the parent category."""
 
@@ -1646,7 +1803,11 @@ class CustomForumChannel:
 
 	@property
 	def default_reaction_emoji(self) -> Optional[CustomPartialEmoji]:
-		return CustomPartialEmoji.from_emoji(self._default_reaction_emoji) if self._default_reaction_emoji else None
+		return (
+			CustomPartialEmoji.from_emoji(self._default_reaction_emoji)
+			if self._default_reaction_emoji
+			else None
+		)
 
 	@property
 	def members(self) -> int:
@@ -1668,7 +1829,11 @@ class CustomForumChannel:
 	@property
 	def category(self) -> Optional[CustomCategoryChannel]:
 		"""Returns the channel's category."""
-		return CustomCategoryChannel.from_category(self._category) if self._category else None
+		return (
+			CustomCategoryChannel.from_category(self._category)
+			if self._category
+			else None
+		)
 
 	@property
 	def created_at(self) -> FormatDateTime:
@@ -1691,6 +1856,7 @@ class CustomForumChannel:
 
 	def __str__(self) -> str:
 		return self.name
+
 
 @dataclass
 class CustomTemplate:
@@ -1721,7 +1887,7 @@ class CustomTemplate:
 			description=None,
 			_updated_at=None,
 			_is_dirty=None,
-			url=None
+			url=None,
 		)
 
 	@classmethod
@@ -1738,7 +1904,7 @@ class CustomTemplate:
 			description=template.description,
 			_updated_at=template.updated_at,
 			_is_dirty=template.is_dirty,
-			url=template.url
+			url=template.url,
 		)
 
 	@property

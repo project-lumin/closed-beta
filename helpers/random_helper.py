@@ -2,6 +2,7 @@
 
 import random
 
+
 def randbool() -> bool:
 	"""
 	Random boolean value, using `random.random`.
@@ -9,9 +10,10 @@ def randbool() -> bool:
 	Returns
 	-------
 	`bool`
-		True if `random.random` is less than 0.5, False otherwise.
+	        True if `random.random` is less than 0.5, False otherwise.
 	"""
 	return random.random() < 0.5
+
 
 if __name__ == "__main__":
 	print(randbool())

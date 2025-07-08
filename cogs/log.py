@@ -6,14 +6,22 @@ from discord import app_commands
 from helpers import *
 from main import MyClient, Context
 
+
 class LogCommands(commands.GroupCog, name="log"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
-	@commands.hybrid_group(name="log", fallback="log-specs_fallback", description="log-specs_description")
+	@commands.hybrid_group(
+		name="log", fallback="log-specs_fallback", description="log-specs_description"
+	)
 	@commands.has_permissions(manage_guild=True)
 	@app_commands.checks.has_permissions(manage_guild=True)
-	async def log_toggle(self, ctx: Context, state: Literal["on", "off"] = "on", channel: discord.TextChannel = None):
+	async def log_toggle(
+		self,
+		ctx: Context,
+		state: Literal["on", "off"] = "on",
+		channel: discord.TextChannel = None,
+	):
 		is_on = state == "on"
 		if is_on:
 			if not channel:
@@ -24,15 +32,20 @@ class LogCommands(commands.GroupCog, name="log"):
 				name=f"{ctx.me.display_name} - Log", avatar=await ctx.me.avatar.read()
 			)
 		else:
-			await self.client.db.execute("UPDATE log SET is_on = FALSE WHERE guild_id = $1", ctx.guild.id)
+			await self.client.db.execute(
+				"UPDATE log SET is_on = FALSE WHERE guild_id = $1", ctx.guild.id
+			)
 			await ctx.send("log.toggle.off")
 			return
 
 		await self.client.db.execute(
 			"INSERT INTO log (guild_id, webhook, channel, is_on) VALUES ($1, $2, $3, $4)"
 			" ON CONFLICT (guild_id) DO UPDATE"
-			" SET webhook = excluded.webhook, channel = excluded.channel, is_on = excluded.is_on", ctx.guild.id,
-			webhook.url, channel.id, is_on
+			" SET webhook = excluded.webhook, channel = excluded.channel, is_on = excluded.is_on",
+			ctx.guild.id,
+			webhook.url,
+			channel.id,
+			is_on,
 		)
 		await ctx.send(content="log.toggle.on")
 
@@ -45,7 +58,8 @@ class LogCommands(commands.GroupCog, name="log"):
 		else:
 			await self.client.db.execute(
 				"UPDATE log SET modules = array_append(modules, $1) WHERE guild_id = $2",
-				module, ctx.guild.id
+				module,
+				ctx.guild.id,
 			)
 
 		await ctx.send("log.module.add")
@@ -59,10 +73,12 @@ class LogCommands(commands.GroupCog, name="log"):
 		else:
 			await self.client.db.execute(
 				"UPDATE log SET modules = array_remove(modules, $1) WHERE guild_id = $2",
-				module, ctx.guild.id
+				module,
+				ctx.guild.id,
 			)
 
 		await ctx.send("log.module.add")
+
 
 class LogListeners(commands.Cog):
 	def __init__(self, client: MyClient) -> None:
@@ -91,14 +107,16 @@ class LogListeners(commands.Cog):
 		Parameters
 		----------
 		guild_id: `int`
-			The guild's ID
+		        The guild's ID
 
 		Returns
 		-------
 		Optional[`discord.Webhook`]
-			The webhook associated with the given ``guild_id``
+		        The webhook associated with the given ``guild_id``
 		"""
-		webhook = await self.client.db.fetchval("SELECT webhook FROM log WHERE guild_id = $1", guild_id)
+		webhook = await self.client.db.fetchval(
+			"SELECT webhook FROM log WHERE guild_id = $1", guild_id
+		)
 		if not webhook:
 			return None
 		return discord.Webhook.from_url(webhook, client=self.client)
@@ -110,7 +128,7 @@ class LogListeners(commands.Cog):
 		Parameters
 		----------
 		kwargs
-			Kwargs that will be passed during localization
+		        Kwargs that will be passed during localization
 		"""
 		if not await self.log_check(guild_id):
 			return
@@ -123,7 +141,9 @@ class LogListeners(commands.Cog):
 			return
 
 		custom_response = CustomResponse(self.client)
-		message: dict | str = await custom_response.get_message(key, self.client.get_guild(guild_id), **kwargs)
+		message: dict | str = await custom_response.get_message(
+			key, self.client.get_guild(guild_id), **kwargs
+		)
 		if isinstance(message, dict):
 			message.pop("delete_after", None)
 			message.pop("ephemeral", None)
@@ -132,12 +152,10 @@ class LogListeners(commands.Cog):
 			await webhook.send(content=message)
 
 	@overload
-	async def log_check(self, guild: int):
-		...
+	async def log_check(self, guild: int): ...
 
 	@overload
-	async def log_check(self, guild: discord.Guild):
-		...
+	async def log_check(self, guild: discord.Guild): ...
 
 	async def log_check(self, guild: Union[int, discord.Guild]) -> bool:
 		"""
@@ -146,12 +164,12 @@ class LogListeners(commands.Cog):
 		Parameters
 		----------
 		guild: Union[`int`, `discord.Guild`]
-			The guild to check
+		        The guild to check
 
 		Returns
 		-------
 		`bool`
-			Whether or not the guild should receive log messages
+		        Whether or not the guild should receive log messages
 		"""
 		if isinstance(guild, int):
 			guild_id = guild
@@ -162,15 +180,17 @@ class LogListeners(commands.Cog):
 		func_name = sys._getframe(1).f_code.co_name  # type: ignore
 
 		result = await self.client.db.fetchval(
-			"SELECT is_on FROM log WHERE guild_id = $1",
-			guild_id
+			"SELECT is_on FROM log WHERE guild_id = $1", guild_id
 		)
 		return result
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before: discord.Message, after: discord.Message):
 		if before.content != after.content:
-			await self.send_webhook(before.guild.id, "content", before=before.content, after=after.content)
+			await self.send_webhook(
+				before.guild.id, "content", before=before.content, after=after.content
+			)
+
 
 async def setup(client: MyClient) -> None:
 	await client.add_cog(LogCommands(client))

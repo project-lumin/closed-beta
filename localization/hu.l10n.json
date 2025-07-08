@@ -1794,5 +1794,55 @@
 				}
 			}
 		}
+	},
+	"giveaway": {
+		"message": {
+			"button": "🎉 {participants}",
+			"ended": {
+				"content": "Ez a nyereményjáték már véget ért!",
+				"ephemeral": true
+			},
+			"already_joined": {
+				"content": "Már csatlakoztál ehhez a nyereményjátékhoz!",
+				"ephemeral": true
+			},
+			"joined": {
+				"content": "Csatlakoztál a nyereményjátékhoz!",
+				"ephemeral": true
+			}
+		},
+		"end": {
+			"success": {
+				"content": "🎉 **Gratulálok,** {winners}! A nyereményjátéknak vége!"
+			},
+			"no_winners": {
+				"content": "Senki sem csatlakozott a nyereményjátékhoz..."
+			}
+		},
+		"start": {
+			"response": {
+				"embeds": [
+					{
+						"title": "🎉 Nyereményjáték!",
+						"description": "{prize}",
+						"fields": [
+							{
+								"name": "Nyertesek",
+								"value": "{winners}",
+								"inline": true
+							},
+							{
+								"name": "Vége",
+								"value": "{ends}",
+								"inline": true
+							}
+						],
+						"footer": {
+							"text": "Kattints a lenti gombra a csatlakozáshoz!"
+						}
+					}
+				]
+			}
+		}
 	}
 }
