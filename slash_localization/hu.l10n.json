@@ -507,5 +507,36 @@
 	"l10n_reload": "l10n_reload",
 	"l10n_reload_specs": {
 		"description": "Lokalizációs fájlok újratöltése (fejlesztői parancs)"
+	},
+	"giveaway": "nyereményjáték",
+	"gw_specs": {
+		"description": "Nyereményjáték indítása",
+		"fallback": "start",
+		"usage": "giveaway [hossz] (nyertesek száma) [nyeremény]",
+		"args": {
+			"winners": {
+				"name": "nyertesek",
+				"description": "A maximum nyertesek száma"
+			},
+			"duration": {
+				"name": "hossz",
+				"description": "A nyereményjáték hossza, pl. 1d"
+			},
+			"prize": {
+				"name": "nyeremény",
+				"description": "A nyeremény (kötelező)"
+			}
+		}
+	},
+	"end": "end",
+	"gw_end": {
+		"description": "Nyereményjáték lezárása az aktuális csatornában",
+		"usage": "giveaway end [üzenet_id]",
+		"args": {
+			"message_id": {
+				"name": "üzenet_id",
+				"description": "A nyereményjáték üzenetének ID-je"
+			}
+		}
 	}
 }

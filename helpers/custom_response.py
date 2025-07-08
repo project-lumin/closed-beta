@@ -1,21 +1,21 @@
 """A helper for custom messages."""
 
+import datetime
 import json
 import logging
 import pathlib
 import random
 import re
-from typing import Union, Any, overload, Optional, Type, Iterable, Dict, List, Tuple
+from typing import Any, Optional, Type, Union, overload
 
 import discord
-from discord.ext import localization, commands
-from typing import Type
+from .custom_args import CustomGuild, CustomMember, CustomUser
+from discord.ext import commands, localization
 
 from helpers import emojis
-from .custom_args import *
 
 logger = logging.getLogger(__name__)
-PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+\}$")
+PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+}$")
 
 
 class CustomResponse:

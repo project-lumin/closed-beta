@@ -507,5 +507,36 @@
 	"l10n_reload": "l10n_reload",
 	"l10n_reload_specs": {
 		"description": "Reload localization files (dev-only)"
+	},
+	"giveaway": "giveaway",
+	"gw_specs": {
+		"description": "Start a giveaway",
+		"fallback": "start",
+		"usage": "giveaway [duration] (winners) [prize]",
+		"args": {
+			"winners": {
+				"name": "winners",
+				"description": "The number of max winners"
+			},
+			"duration": {
+				"name": "duration",
+				"description": "The duration of the giveaway, e.x. 1d"
+			},
+			"prize": {
+				"name": "prize",
+				"description": "The giveaway prize (required)"
+			}
+		}
+	},
+	"end": "end",
+	"gw_end": {
+		"description": "End a giveaway (must be in current channel)",
+		"usage": "giveaway end [message_id]",
+		"args": {
+			"message_id": {
+				"name": "message_id",
+				"description": "The giveaway's message ID"
+			}
+		}
 	}
 }
