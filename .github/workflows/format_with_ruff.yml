@@ -26,6 +26,11 @@ jobs:
       - name: Install Ruff
         run: pip install ruff
 
+      - name: Show Ruff config
+        run: |
+          ruff config
+          cat pyproject.toml
+
       - name: Run Ruff Format
         run: ruff format .
 
