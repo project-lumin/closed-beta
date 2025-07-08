@@ -3,7 +3,6 @@ auto-report_stack-trace.txt
 
 # For beta purposes
 cogs/fun.py
-cogs/giveaway.py
 cogs/globalban.py
 cogs/globalban.i18n.json
 cogs/handlers.py
