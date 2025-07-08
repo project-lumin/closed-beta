@@ -32,7 +32,7 @@ jobs:
           cat pyproject.toml
 
       - name: Run Ruff Format
-        run: ruff format .
+        run: ruff format --config pyproject.toml .
 
       - name: Auto-commit on `dev` branch
         if: github.ref == 'refs/heads/dev'
