@@ -10,7 +10,7 @@ def randbool() -> bool:
 	Returns
 	-------
 	`bool`
-	        True if `random.random` is less than 0.5, False otherwise.
+	    True if `random.random` is less than 0.5, False otherwise.
 	"""
 	return random.random() < 0.5
 

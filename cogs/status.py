@@ -43,9 +43,7 @@ class Status(commands.Cog):
 
 	async def cog_load(self) -> None:
 		if self.client.is_ready():
-			logging.info(
-				"The status string was probably updated. Restarting the status loop."
-			)
+			logging.info("The status string was probably updated. Restarting the status loop.")
 			self.update_status.restart()
 
 

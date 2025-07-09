@@ -54,18 +54,14 @@ def update_slash_localizations():
 			with open(file_path, encoding="utf-8") as f:
 				data = json.load(f)
 				if not isinstance(data, dict):
-					raise ValueError(
-						f"Expected dict in {file_path}, got {type(data).__name__}"
-					)
+					raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
 				if lang not in slash_localizations:
 					slash_localizations[lang] = {}
 				slash_localizations[lang].update(data)
 		except Exception as e:
 			logger.warning(f"Failed to load {file_path}: {e}")
 	global slash_command_localization
-	slash_command_localization = localization.Localization(
-		slash_localizations, default_locale="en", separator="-"
-	)
+	slash_command_localization = localization.Localization(slash_localizations, default_locale="en", separator="-")
 
 
 if __name__ == "__main__":
@@ -89,23 +85,15 @@ class Command:
 
 	@classmethod
 	def from_ctx(cls, ctx: commands.Context):
-		prefix = (
-			ctx.prefix.replace(ctx.me.mention, f"@{ctx.me.display_name}")
-			if ctx.prefix
-			else "?!"
-		)
+		prefix = ctx.prefix.replace(ctx.me.mention, f"@{ctx.me.display_name}") if ctx.prefix else "?!"
 		if ctx.command and slash_command_localization:
 			usage = (
-				slash_command_localization(ctx.command.usage, ctx)
-				if ctx.command.usage
-				else ctx.command.qualified_name
+				slash_command_localization(ctx.command.usage, ctx) if ctx.command.usage else ctx.command.qualified_name
 			)
 			description = slash_command_localization(ctx.command.description, ctx)
 			return cls(
 				name=ctx.command.qualified_name,
-				description=description
-				if isinstance(description, str) and description
-				else "-",
+				description=description if isinstance(description, str) and description else "-",
 				usage=f"{prefix}{usage}",
 				prefix=prefix,
 			)
@@ -122,19 +110,11 @@ class Argument:
 	@classmethod
 	def from_param(cls, param: commands.Parameter, ctx: commands.Context):
 		if slash_command_localization:
-			localized_name = slash_command_localization(
-				param.displayed_name or param.name, ctx
-			)
-			description = (
-				slash_command_localization(param.description, ctx)
-				if param.description
-				else "-"
-			)
+			localized_name = slash_command_localization(param.displayed_name or param.name, ctx)
+			description = slash_command_localization(param.description, ctx) if param.description else "-"
 			return cls(
 				name=localized_name if isinstance(localized_name, str) else "arg",
-				description=description
-				if isinstance(description, str) and description
-				else "-",
+				description=description if isinstance(description, str) and description else "-",
 				default=param.default,
 				annotation=param.annotation,
 				required=param.required,
@@ -152,15 +132,11 @@ class Context(commands.Context):
 		embeds: Optional[Sequence[discord.Embed]] = None,
 		file: Optional[discord.File] = None,
 		files: Optional[Sequence[discord.File]] = None,
-		stickers: Optional[
-			Sequence[Union[discord.GuildSticker, discord.StickerItem]]
-		] = None,
+		stickers: Optional[Sequence[Union[discord.GuildSticker, discord.StickerItem]]] = None,
 		delete_after: Optional[float] = None,
 		nonce: Optional[Union[str, int]] = None,
 		allowed_mentions: Optional[discord.AllowedMentions] = None,
-		reference: Optional[
-			Union[discord.Message, discord.MessageReference, discord.PartialMessage]
-		] = None,
+		reference: Optional[Union[discord.Message, discord.MessageReference, discord.PartialMessage]] = None,
 		mention_author: Optional[bool] = None,
 		view: Optional[discord.ui.View] = None,
 		suppress_embeds: bool = False,
@@ -199,16 +175,10 @@ class Context(commands.Context):
 			"poll": poll,
 		}
 
-		locale_str = (
-			self.guild.preferred_locale
-			if self.guild and self.guild.preferred_locale
-			else "en"
-		)
+		locale_str = self.guild.preferred_locale if self.guild and self.guild.preferred_locale else "en"
 
 		if key is not None:
-			localized_payload = await self.bot.custom_response.get_message(
-				key, locale_str, **format_kwargs
-			)
+			localized_payload = await self.bot.custom_response.get_message(key, locale_str, **format_kwargs)
 		else:
 			localized_payload = content
 
@@ -243,8 +213,8 @@ class SlashCommandLocalizer(app_commands.Translator):
 		context: app_commands.TranslationContext,
 	) -> str | None:
 		if slash_command_localization:
-			localized: Union[str, list[str], dict[str, Any]] = (
-				slash_command_localization.translate(string.message, str(locale))
+			localized: Union[str, list[str], dict[str, Any]] = slash_command_localization.translate(
+				string.message, str(locale)
 			)
 			if isinstance(localized, (list, dict)):
 				return None
@@ -292,9 +262,7 @@ class MyClient(commands.AutoShardedBot):
 			loop=self.loop,
 			member_cache_flags=discord.MemberCacheFlags.from_intents(intents),
 			max_messages=20000,
-			allowed_contexts=app_commands.AppCommandContext(
-				guild=True, dm_channel=True, private_channel=True
-			),
+			allowed_contexts=app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True),
 			allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
 		)
 		self.custom_response = custom_response.CustomResponse(self)
@@ -309,9 +277,7 @@ class MyClient(commands.AutoShardedBot):
 			return "?"
 		if not message.guild:
 			return "?!"
-		prefix = await self.db.fetchrow(
-			"SELECT * FROM guilds WHERE guild_id = $1", message.guild.id
-		)
+		prefix = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", message.guild.id)
 		if not prefix:
 			return commands.when_mentioned_or("?!")(self, message)
 		else:
@@ -321,9 +287,7 @@ class MyClient(commands.AutoShardedBot):
 				return prefix["prefix"]
 
 	async def on_guild_join(self, guild: discord.Guild):
-		row = await self.db.fetchrow(
-			"SELECT * FROM guilds WHERE guild_id = $1", guild.id
-		)
+		row = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", guild.id)
 		if not row:
 			await self.db.execute("INSERT INTO guilds (guild_id) VALUES ($1)", guild.id)
 
@@ -345,21 +309,15 @@ class MyClient(commands.AutoShardedBot):
 		await self.load_cogs()
 		await self.tree.set_translator(SlashCommandLocalizer())
 		self.session = aiohttp.ClientSession(
-			connector=aiohttp.TCPConnector(
-				resolver=aiohttp.AsyncResolver(), family=socket.AF_INET
-			)
+			connector=aiohttp.TCPConnector(resolver=aiohttp.AsyncResolver(), family=socket.AF_INET)
 		)
 		end = perf_counter() - benchmark
 		logger.info(f"Initial setup hook complete in {end:.2f}s")
 
 	@staticmethod
 	async def db_connection_init(connection: asyncpg.connection.Connection):
-		await connection.set_type_codec(
-			"jsonb", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
-		)
-		await connection.set_type_codec(
-			"json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
-		)
+		await connection.set_type_codec("jsonb", encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
+		await connection.set_type_codec("json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
 
 	async def database_initialization(self):
 		logger.info("Connecting to database...")
@@ -430,9 +388,7 @@ class MyClient(commands.AutoShardedBot):
 
 		cogs = Path("./cogs").glob("*.py")
 		for cog in cogs:
-			if (
-				cog.stem in allowed
-			):  # if you're having issues with cogs not loading, check this list
+			if cog.stem in allowed:  # if you're having issues with cogs not loading, check this list
 				await self.load_extension(f"cogs.{cog.stem}")
 				logger.info(f"Loaded extension {cog.name}")
 		end = perf_counter() - benchmark
@@ -442,9 +398,7 @@ class MyClient(commands.AutoShardedBot):
 		if not hasattr(self, "uptime"):
 			self.uptime = discord.utils.utcnow()
 		logger.info("Bot is ready!")
-		logger.info(
-			f"Servers: {len(self.guilds)}, Commands: {len(self.commands)}, Shards: {self.shard_count}"
-		)
+		logger.info(f"Servers: {len(self.guilds)}, Commands: {len(self.commands)}, Shards: {self.shard_count}")
 		logger.info(f"Loaded cogs: {', '.join([cog for cog in self.cogs])}")
 		logger.info(f"discord-localization v{localization.__version__}")
 
@@ -473,9 +427,7 @@ class MyClient(commands.AutoShardedBot):
 					command=command,
 					parameter=parameter,
 				)
-			case (
-				commands.BotMissingPermissions() | app_commands.BotMissingPermissions()
-			):
+			case commands.BotMissingPermissions() | app_commands.BotMissingPermissions():
 				error: commands.BotMissingPermissions
 				permissions = [
 					(await self.custom_response(f"permissions.{permission}", ctx))
@@ -527,17 +479,13 @@ class MyClient(commands.AutoShardedBot):
 			case commands.CommandNotFound() | app_commands.CommandNotFound():
 				return
 			case discord.RateLimited():
-				channel: discord.TextChannel = await self.fetch_channel(
-					1268260404677574697
-				)
+				channel: discord.TextChannel = await self.fetch_channel(1268260404677574697)
 				webhook: discord.Webhook | None = discord.utils.get(
 					await channel.webhooks(),
 					name=f"{self.user.display_name} Rate Limit",
 				)
 				if not webhook:
-					webhook = await channel.create_webhook(
-						name=f"{self.user.display_name} Rate Limit"
-					)
+					webhook = await channel.create_webhook(name=f"{self.user.display_name} Rate Limit")
 				await webhook.send(
 					content=f"# ⚠️ RATE LIMIT\n**Guild:** {ctx.guild.name} / {ctx.guild.id}\n**User:** {ctx.author} / {ctx.author.id}\n**Command:** {ctx.command} {'- failed' if ctx.command_failed else ''}\n**Error:** {error}"
 				)
@@ -545,22 +493,16 @@ class MyClient(commands.AutoShardedBot):
 			case _:
 				# if the error is unknown, log it
 				channel: discord.TextChannel = (
-					ctx.channel
-					if DEBUG and ctx and ctx.channel
-					else await self.fetch_channel(1268260404677574697)
+					ctx.channel if DEBUG and ctx and ctx.channel else await self.fetch_channel(1268260404677574697)
 				)
-				stack = "".join(
-					traceback.format_exception(type(error), error, error.__traceback__)
-				)
+				stack = "".join(traceback.format_exception(type(error), error, error.__traceback__))
 				# if stack is more than 1700 characters, turn it into a .txt file and store it as an attachment
 				too_long = len(stack) > 1700
 				file: discord.File | None = None
 				if too_long:
 					with open("auto-report_stack-trace.txt", "w") as f:
 						f.write(stack)
-					file = discord.File(
-						fp="auto-report_stack-trace.txt", filename="error.txt"
-					)
+					file = discord.File(fp="auto-report_stack-trace.txt", filename="error.txt")
 					stack = "The stack trace was too long to send in a message, so it was saved as a file."
 				webhook: discord.Webhook = discord.utils.get(
 					await channel.webhooks(), name=f"{self.user.display_name} Errors"
@@ -584,14 +526,10 @@ class MyClient(commands.AutoShardedBot):
 				)
 				raise error
 
-	async def on_command_error(
-		self, ctx: Context, error: discord.errors.DiscordException
-	):
+	async def on_command_error(self, ctx: Context, error: discord.errors.DiscordException):
 		await self.handle_error(ctx, error)
 
-	async def on_app_command_error(
-		self, interaction: discord.Interaction, error: app_commands.AppCommandError
-	):
+	async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
 		await self.handle_error(await Context.from_interaction(interaction), error)
 
 
@@ -602,19 +540,12 @@ client = MyClient()
 @client.before_invoke
 async def before_invoke(ctx: commands.Context):
 	if ctx.guild:
-		is_set_up = await client.db.fetchrow(
-			"SELECT * FROM guilds WHERE guild_id = $1", ctx.guild.id
-		)
+		is_set_up = await client.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", ctx.guild.id)
 		if not is_set_up:
-			await client.db.execute(
-				"INSERT INTO guilds (guild_id) VALUES ($1)", ctx.guild.id
-			)
+			await client.db.execute("INSERT INTO guilds (guild_id) VALUES ($1)", ctx.guild.id)
 	try:
 		# Signals that the bot is still thinking / performing a task
-		if (
-			ctx.interaction
-			and ctx.interaction.type == discord.InteractionType.application_command
-		):
+		if ctx.interaction and ctx.interaction.type == discord.InteractionType.application_command:
 			await ctx.interaction.response.defer(thinking=True)  # type: ignore
 		else:
 			await ctx.message.add_reaction(emojis.LOADING)
@@ -630,9 +561,7 @@ async def after_invoke(ctx: commands.Context):
 		pass
 
 
-@client.hybrid_command(
-	name="reload", description="reload_specs-description", usage="reload_specs-usage"
-)
+@client.hybrid_command(name="reload", description="reload_specs-description", usage="reload_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="reload_specs-args-cog-description")
 @app_commands.rename(cog="reload_specs-args-cog-name")
@@ -647,9 +576,7 @@ async def reload(ctx: commands.Context, cog: str):
 		await ctx.reply(content=f"Failed to reload extension `{cog}`: {e}")
 
 
-@client.hybrid_command(
-	name="load", description="load_specs-description", usage="load_specs-usage"
-)
+@client.hybrid_command(name="load", description="load_specs-description", usage="load_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="load_specs-args-cog-description")
 @app_commands.rename(cog="load_specs-args-cog-name")
@@ -664,9 +591,7 @@ async def load(ctx: commands.Context, cog: str):
 		await ctx.reply(content=f"Failed to load extension `{cog}`: {e}")
 
 
-@client.hybrid_command(
-	name="unload", description="unload_specs-description", usage="unload_specs-usage"
-)
+@client.hybrid_command(name="unload", description="unload_specs-description", usage="unload_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="unload_specs-args-cog-description")
 @app_commands.rename(cog="unload_specs-args-cog-name")
@@ -695,17 +620,13 @@ async def l10nreload(ctx: commands.Context, path: str = "./localization"):
 	logger.info(f"{ctx.author.name} reloaded localization files.")
 
 
-@client.hybrid_command(
-	name="sync", description="sync_specs-description", usage="sync_specs-usage"
-)
+@client.hybrid_command(name="sync", description="sync_specs-description", usage="sync_specs-usage")
 @commands.is_owner()
 @app_commands.describe(
 	guilds="sync_specs-args-guilds-description",
 	scope="sync_specs-args-scope-description",
 )
-@app_commands.rename(
-	guilds="sync_specs-args-guilds-name", scope="sync_specs-args-scope-name"
-)
+@app_commands.rename(guilds="sync_specs-args-guilds-name", scope="sync_specs-args-scope-name")
 @app_commands.choices(
 	scope=[
 		app_commands.Choice(name="sync_specs-args-scope-local", value="~"),
@@ -756,9 +677,7 @@ async def sync(
 				guilds_synced += 1
 
 		end = time.perf_counter() - benchmark
-		await ctx.reply(
-			content=f"Synced the tree to **{guilds_synced}/{len(guilds)}** guilds, took **{end:.2f}s**"
-		)
+		await ctx.reply(content=f"Synced the tree to **{guilds_synced}/{len(guilds)}** guilds, took **{end:.2f}s**")
 
 
 async def start():
