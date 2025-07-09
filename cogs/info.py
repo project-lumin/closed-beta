@@ -24,11 +24,7 @@ class Info(commands.Cog):
 	async def info(
 		self,
 		ctx: Context,
-		argument: discord.User
-		| discord.abc.GuildChannel
-		| discord.Role
-		| discord.Emoji
-		| discord.PartialEmoji,
+		argument: discord.User | discord.abc.GuildChannel | discord.Role | discord.Emoji | discord.PartialEmoji,
 	):
 		if isinstance(argument, discord.User):
 			await ctx.invoke(self.info.get_command("user"), argument)  # type: ignore
@@ -44,9 +40,7 @@ class Info(commands.Cog):
 	@info.command(name="user", description="userinfo_specs-description")
 	@app_commands.rename(user="userinfo_specs-args-user-name")
 	@app_commands.describe(user="userinfo_specs-args-user-description")
-	async def user(
-		self, ctx: Context, user: discord.Member | discord.User | None = None
-	):
+	async def user(self, ctx: Context, user: discord.Member | discord.User | None = None):
 		user = user or ctx.author
 
 		if not ctx.guild:
@@ -100,13 +94,9 @@ class Info(commands.Cog):
 		except commands.BadArgument:
 			emoji = discord.PartialEmoji.from_str(emoji)
 		if isinstance(emoji, discord.Emoji):
-			await ctx.send(
-				"info.emoji.custom_emoji", emoji=CustomEmoji.from_emoji(emoji)
-			)
+			await ctx.send("info.emoji.custom_emoji", emoji=CustomEmoji.from_emoji(emoji))
 		elif isinstance(emoji, discord.PartialEmoji) and emoji.name in EMOJI_DATA:
-			await ctx.send(
-				"info.emoji.unicode_emoji", emoji=CustomPartialEmoji.from_emoji(emoji)
-			)
+			await ctx.send("info.emoji.unicode_emoji", emoji=CustomPartialEmoji.from_emoji(emoji))
 		else:
 			raise commands.BadArgument("emoji")
 
@@ -116,26 +106,18 @@ class Info(commands.Cog):
 	@app_commands.describe(channel="chinfo_specs-args-channel-description")
 	async def channel(self, ctx: Context, channel: discord.abc.GuildChannel):
 		if isinstance(channel, discord.TextChannel):
-			await ctx.send(
-				"info.channel.text", channel=CustomTextChannel.from_channel(channel)
-			)
+			await ctx.send("info.channel.text", channel=CustomTextChannel.from_channel(channel))
 		elif isinstance(channel, discord.VoiceChannel):
-			await ctx.send(
-				"info.channel.voice", channel=CustomVoiceChannel.from_channel(channel)
-			)
+			await ctx.send("info.channel.voice", channel=CustomVoiceChannel.from_channel(channel))
 		elif isinstance(channel, discord.CategoryChannel):
 			await ctx.send(
 				"info.channel.category",
 				category=CustomCategoryChannel.from_category(channel),
 			)
 		elif isinstance(channel, discord.ForumChannel):
-			await ctx.send(
-				"info.channel.forum", channel=CustomForumChannel.from_channel(channel)
-			)
+			await ctx.send("info.channel.forum", channel=CustomForumChannel.from_channel(channel))
 		elif isinstance(channel, discord.StageChannel):
-			await ctx.send(
-				"info.channel.stage", channel=CustomStageChannel.from_channel(channel)
-			)
+			await ctx.send("info.channel.stage", channel=CustomStageChannel.from_channel(channel))
 		else:
 			raise commands.BadArgument("channel")
 
@@ -144,9 +126,7 @@ class Info(commands.Cog):
 	@app_commands.describe(pokemon_name="pokeinfo_specs-args-pokemon-description")
 	async def pokemon(self, ctx: Context, pokemon_name: str):
 		try:
-			pokemon = await asyncio.get_event_loop().run_in_executor(
-				None, lambda: pypokedex.get(name=pokemon_name)
-			)  # type: ignore
+			pokemon = await asyncio.get_event_loop().run_in_executor(None, lambda: pypokedex.get(name=pokemon_name))  # type: ignore
 		except requests.HTTPError:
 			raise commands.BadArgument("pokemon")
 		pokemon.type = "\n".join(pokemon.types)
@@ -169,16 +149,12 @@ class Info(commands.Cog):
 		if template_code:
 			try:
 				template_obj = await self.client.fetch_template(template_code)
-				await ctx.send(
-					"info.template", template=CustomTemplate.from_template(template_obj)
-				)
+				await ctx.send("info.template", template=CustomTemplate.from_template(template_obj))
 				return
 			except discord.NotFound:
 				pass
 
-		template_code = await self.client.db.fetchrow(
-			"SELECT * FROM snapshots WHERE code = $1", template.lower()
-		)
+		template_code = await self.client.db.fetchrow("SELECT * FROM snapshots WHERE code = $1", template.lower())
 		if template_code:
 			return await ctx.send(
 				"info.template",

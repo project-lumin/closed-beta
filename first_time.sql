@@ -190,3 +190,21 @@ create table if not exists log
 alter table log
     owner to lumin;
 
+create table if not exists giveaways
+(
+    id         serial,
+    guild_id   numeric                                              not null,
+    channel_id numeric                                              not null,
+    message_id numeric                                              not null,
+    author_id  numeric                                              not null,
+    role_id    numeric,
+    prize      text,
+    winners    integer default 1                                    not null,
+    ends_at    timestamp                                            not null,
+    ended      boolean,
+    won_by     numeric[],
+    entered    numeric[]
+);
+
+alter table giveaways
+    owner to lumin;

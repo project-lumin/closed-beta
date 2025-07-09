@@ -6,9 +6,7 @@ import discord
 
 
 class Pagination(discord.ui.View):
-	def __init__(
-		self, pages: list[dict], user: discord.User, timeout: Optional[int] = None
-	):
+	def __init__(self, pages: list[dict], user: discord.User, timeout: Optional[int] = None):
 		self.page = 0
 		self.pages = pages
 		self.user = user
@@ -18,9 +16,7 @@ class Pagination(discord.ui.View):
 		return interaction.user == self.user
 
 	@discord.ui.button(emoji="◀️", style=discord.ButtonStyle.gray, custom_id="prev")
-	async def prev_button(
-		self, interaction: discord.Interaction, button: discord.ui.Button
-	):
+	async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
 		if self.page > 0:
 			self.page -= 1
 		else:
@@ -32,9 +28,7 @@ class Pagination(discord.ui.View):
 		await interaction.edit_original_response(**self.pages[self.page], view=view)
 
 	@discord.ui.button(emoji="▶️", style=discord.ButtonStyle.gray, custom_id="next")
-	async def next_button(
-		self, interaction: discord.Interaction, button: discord.ui.Button
-	):
+	async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
 		if self.page < len(self.pages) - 1:
 			self.page += 1
 		else:

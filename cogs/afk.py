@@ -14,9 +14,7 @@ from main import MyClient
 class AFK(commands.Cog):
 	def __init__(self, client: MyClient):
 		self.client: MyClient = client
-		self.custom_response: custom_response.CustomResponse = (
-			custom_response.CustomResponse(client)
-		)
+		self.custom_response: custom_response.CustomResponse = custom_response.CustomResponse(client)
 
 	@commands.Cog.listener("on_message")
 	async def check_afk(self, message: discord.Message) -> None:
@@ -71,9 +69,7 @@ class AFK(commands.Cog):
 				text = await self.custom_response(
 					"afk.reason",
 					ctx,
-					user=CustomUser.from_user(user)
-					if isinstance(user, discord.User)
-					else CustomMember.from_user(user),
+					user=CustomUser.from_user(user) if isinstance(user, discord.User) else CustomMember.from_user(user),
 					reason=row["message"],
 				)
 				if isinstance(text, dict):
@@ -84,9 +80,7 @@ class AFK(commands.Cog):
 		final_message = "\n".join(afk_lines)
 		await ctx.reply(final_message)
 
-	@commands.hybrid_command(
-		name="afk", description="afk_specs-description", usage="afk_specs-usage"
-	)
+	@commands.hybrid_command(name="afk", description="afk_specs-description", usage="afk_specs-usage")
 	@app_commands.rename(reason="afk_specs-args-reason-name")
 	@app_commands.describe(reason="afk_specs-args-reason-description")
 	async def afk(self, ctx: main.Context, reason: Optional[str] = None):
@@ -112,11 +106,7 @@ class AFK(commands.Cog):
 			)
 			try:
 				await ctx.author.edit(
-					nick=(
-						await self.custom_response(
-							"afk.name", ctx, nickname=ctx.author.display_name
-						)
-					)
+					nick=(await self.custom_response("afk.name", ctx, nickname=ctx.author.display_name))
 				)
 			except discord.errors.Forbidden:
 				pass
@@ -147,11 +137,7 @@ class AFK(commands.Cog):
 			)
 			try:
 				await ctx.author.edit(
-					nick=(
-						await self.custom_response(
-							"afk.name", ctx, nickname=ctx.author.display_name
-						)
-					)
+					nick=(await self.custom_response("afk.name", ctx, nickname=ctx.author.display_name))
 				)
 			except discord.Forbidden:
 				pass

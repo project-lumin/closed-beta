@@ -156,9 +156,7 @@ def convert_to_query(
 	"""
 	processed_filters = {}
 	for key, value in filters.items():
-		if isinstance(
-			value, (discord.User, discord.Guild, discord.Member, discord.Message)
-		):
+		if isinstance(value, (discord.User, discord.Guild, discord.Member, discord.Message)):
 			processed_filters[f"{key}_id"] = value.id
 		else:
 			processed_filters[key] = value

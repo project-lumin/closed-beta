@@ -40,9 +40,7 @@ class Case:
 		self._moderator: discord.User = moderator
 		self.expires: datetime.datetime | None = expires
 		self.message: str | None = message
-		self.length: str | None = (
-			discord.utils.format_dt(self.expires, "R") if self.expires else self.expires
-		)
+		self.length: str | None = discord.utils.format_dt(self.expires, "R") if self.expires else self.expires
 		self._created: datetime.datetime = created or datetime.datetime.now()
 
 	def __repr__(self):
@@ -80,9 +78,7 @@ class Case:
 		return datetime.datetime.now() - self.expires
 
 	@classmethod
-	def from_dict(
-		cls, data: dict, client: discord.Client, get_type: bool = False
-	) -> Self:
+	def from_dict(cls, data: dict, client: discord.Client, get_type: bool = False) -> Self:
 		"""Create a `Case` from a dictionary.
 
 		Parameters
@@ -139,9 +135,7 @@ class Case:
 		list[`Case`]
 		        The list of cases.
 		"""
-		return await cls.from_db(
-			db, client, guild, limit=limit, get_type=get_type, user=user
-		)
+		return await cls.from_db(db, client, guild, limit=limit, get_type=get_type, user=user)
 
 	@classmethod
 	async def from_moderator(
@@ -273,14 +267,7 @@ class Case:
 		self,
 	) -> dict[
 		str,
-		CaseType
-		| int
-		| discord.Guild
-		| discord.Member
-		| discord.User
-		| str
-		| datetime.datetime
-		| None,
+		CaseType | int | discord.Guild | discord.Member | discord.User | str | datetime.datetime | None,
 	]:
 		"""Convert the `Case` to a dictionary."""
 		return {
@@ -447,9 +434,7 @@ class Warn(Case):
 	async def after_creation(self) -> None:
 		"""Notifies the user about the warning."""
 		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message(
-			"mod.warn.notify", self._guild, warn=self
-		)
+		message = await self._custom_response.get_message("mod.warn.notify", self._guild, warn=self)
 
 		try:
 			if isinstance(message, dict):
@@ -460,9 +445,7 @@ class Warn(Case):
 	async def after_deletion(self) -> None:
 		"""Notifies the user about the removal of the warning."""
 		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message(
-			"mod.warn.unwarned", self._guild, warn=self
-		)
+		message = await self._custom_response.get_message("mod.warn.unwarned", self._guild, warn=self)
 
 		try:
 			if isinstance(message, dict):
@@ -498,9 +481,7 @@ class Kick(Case):
 	async def before_creation(self) -> None:
 		"""Notifies the user about the kick."""
 		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message(
-			"mod.kick.notify", self._guild, kick=self
-		)
+		message = await self._custom_response.get_message("mod.kick.notify", self._guild, kick=self)
 
 		try:
 			if isinstance(message, dict):
@@ -551,9 +532,7 @@ class Mute(Case):
 	async def after_creation(self) -> None:
 		"""Notifies the user about the mute."""
 		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message(
-			"mod.mute.notify", self._guild, mute=self
-		)
+		message = await self._custom_response.get_message("mod.mute.notify", self._guild, mute=self)
 
 		try:
 			if isinstance(message, dict):
@@ -572,9 +551,7 @@ class Mute(Case):
 	async def after_deletion(self) -> None:
 		"""Notifies the user about the unmute."""
 		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message(
-			"mod.unmute.notify", self._guild, mute=self
-		)
+		message = await self._custom_response.get_message("mod.unmute.notify", self._guild, mute=self)
 
 		try:
 			if isinstance(message, dict):
@@ -595,16 +572,12 @@ class Ban(Case):
 		message: str | None = None,
 		created: datetime.datetime = datetime.datetime.now(),
 	):
-		super().__init__(
-			CaseType.BAN, _id, guild, user, moderator, created, reason, expires, message
-		)
+		super().__init__(CaseType.BAN, _id, guild, user, moderator, created, reason, expires, message)
 
 	async def before_creation(self) -> None:
 		"""Notifies the user about the ban."""
 		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message(
-			"mod.ban.notify", self._guild, ban=self
-		)
+		message = await self._custom_response.get_message("mod.ban.notify", self._guild, ban=self)
 
 		try:
 			if isinstance(message, dict):
@@ -614,9 +587,7 @@ class Ban(Case):
 
 	async def after_creation(self) -> None:
 		"""Bans the user."""
-		await self._guild.ban(
-			self._user, reason=f"Banned by {self._moderator}", delete_message_days=0
-		)
+		await self._guild.ban(self._user, reason=f"Banned by {self._moderator}", delete_message_days=0)
 
 	async def before_deletion(self) -> None:
 		"""Unbans the user."""
@@ -629,9 +600,7 @@ class Ban(Case):
 		"""Notifies the user about the unban."""
 		if self._guild.get_member(self._user.id):  # to avoid spamming non-members
 			self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-			message = await self._custom_response.get_message(
-				"mod.unban.notify", self._guild, ban=self
-			)
+			message = await self._custom_response.get_message("mod.unban.notify", self._guild, ban=self)
 
 			try:
 				if isinstance(message, dict):
@@ -673,9 +642,7 @@ class Moderation(commands.GroupCog, name="mod"):
 	async def before_case_removal(self):
 		await self.client.wait_until_ready()  # we have to wait for guild cache
 
-	@commands.hybrid_command(
-		name="warn", description="warn_specs-description", usage="warn_specs-usage"
-	)
+	@commands.hybrid_command(name="warn", description="warn_specs-description", usage="warn_specs-usage")
 	@app_commands.rename(
 		user="warn_specs-args-member-name",
 		expires="warn_specs-args-duration-name",
@@ -702,18 +669,11 @@ class Moderation(commands.GroupCog, name="mod"):
 			)
 		except commands.MemberNotFound:
 			if not ctx.message.reference:
-				reason = " ".join(
-					[user, expires, reason] if reason else [user, expires]
-				)
+				reason = " ".join([user, expires, reason] if reason else [user, expires])
 			else:
 				raise commands.MemberNotFound(str(user))
 		try:
-			expires = (
-				datetime.datetime.now()
-				+ datetime.timedelta(seconds=convert_time(expires))
-				if expires
-				else None
-			)
+			expires = datetime.datetime.now() + datetime.timedelta(seconds=convert_time(expires)) if expires else None
 		except (ValueError, TypeError):
 			reason = " ".join([expires, reason] if reason else [expires])
 			expires = None
@@ -744,9 +704,7 @@ class Moderation(commands.GroupCog, name="mod"):
 
 	@commands.bot_has_permissions(moderate_members=True)
 	@app_commands.checks.bot_has_permissions(moderate_members=True)
-	@commands.hybrid_command(
-		name="mute", description="mute_specs-description", usage="mute_specs-usage"
-	)
+	@commands.hybrid_command(name="mute", description="mute_specs-description", usage="mute_specs-usage")
 	@app_commands.rename(
 		user="mute_specs-args-user-name",
 		expires="mute_specs-args-expires-name",
@@ -768,9 +726,7 @@ class Moderation(commands.GroupCog, name="mod"):
 		reason: str = None,
 	):
 		try:
-			expires = datetime.datetime.now() + datetime.timedelta(
-				seconds=convert_time(expires)
-			)
+			expires = datetime.datetime.now() + datetime.timedelta(seconds=convert_time(expires))
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 		if user == ctx.me:
@@ -811,9 +767,7 @@ class Moderation(commands.GroupCog, name="mod"):
 				self.client,
 				ctx.guild,
 				user=user,
-				expires=user.timed_out_until.astimezone(datetime.timezone.utc).replace(
-					tzinfo=None
-				),
+				expires=user.timed_out_until.astimezone(datetime.timezone.utc).replace(tzinfo=None),
 			)
 			if cases:
 				for case in cases:
@@ -831,21 +785,15 @@ class Moderation(commands.GroupCog, name="mod"):
 
 	@commands.bot_has_permissions(kick_members=True)
 	@app_commands.checks.bot_has_permissions(kick_members=True)
-	@commands.hybrid_command(
-		name="kick", description="kick_specs-description", usage="kick_specs-usage"
-	)
-	@app_commands.rename(
-		user="kick_specs-args-user-name", reason="kick_specs-args-reason-name"
-	)
+	@commands.hybrid_command(name="kick", description="kick_specs-description", usage="kick_specs-usage")
+	@app_commands.rename(user="kick_specs-args-user-name", reason="kick_specs-args-reason-name")
 	@app_commands.describe(
 		user="kick_specs-args-user-description",
 		reason="kick_specs-args-reason-description",
 	)
 	@app_commands.checks.has_permissions(kick_members=True)
 	@commands.has_permissions(kick_members=True)
-	async def kick(
-		self, ctx: main.Context, user: discord.Member, *, reason: str = None
-	):
+	async def kick(self, ctx: main.Context, user: discord.Member, *, reason: str = None):
 		if user == ctx.me:
 			return await ctx.send("mod.kick.errors.bot")
 		kick = Kick(
@@ -867,9 +815,7 @@ class Moderation(commands.GroupCog, name="mod"):
 
 	@commands.bot_has_permissions(ban_members=True)
 	@app_commands.checks.bot_has_permissions(ban_members=True)
-	@commands.hybrid_command(
-		name="ban", description="ban_specs-description", usage="ban_specs-usage"
-	)
+	@commands.hybrid_command(name="ban", description="ban_specs-description", usage="ban_specs-usage")
 	@app_commands.rename(
 		user="ban_specs-args-user-name",
 		reason="ban_specs-args-reason-name",
@@ -891,12 +837,7 @@ class Moderation(commands.GroupCog, name="mod"):
 		reason: str = None,
 	):
 		try:
-			expires = (
-				datetime.datetime.now()
-				+ datetime.timedelta(seconds=convert_time(expires))
-				if expires
-				else None
-			)
+			expires = datetime.datetime.now() + datetime.timedelta(seconds=convert_time(expires)) if expires else None
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 		if user == ctx.me:
@@ -921,9 +862,7 @@ class Moderation(commands.GroupCog, name="mod"):
 
 	@commands.bot_has_permissions(ban_members=True)
 	@app_commands.checks.bot_has_permissions(ban_members=True)
-	@commands.hybrid_command(
-		name="unban", description="unban_specs-description", usage="unban_specs-usage"
-	)
+	@commands.hybrid_command(name="unban", description="unban_specs-description", usage="unban_specs-usage")
 	@app_commands.rename(user="unban_specs-args-user-name")
 	@app_commands.describe(user="unban_specs-args-user-description")
 	@app_commands.checks.has_permissions(ban_members=True)
@@ -969,18 +908,13 @@ class Cases(commands.Cog):
 		except ValueError:
 			raise commands.BadArgument
 
-		case = await Case.from_id(
-			self.client.db, self.client, ctx.guild, case_id, get_type=True
-		)
+		case = await Case.from_id(self.client.db, self.client, ctx.guild, case_id, get_type=True)
 		if not case:
 			return await ctx.send("mod.info.errors.not_found", case_id=case_id)
 
 		# since we need the case's information but we don't want to duplicate db calls,
 		# we check inside the actual command
-		if (
-			case._user.id != ctx.author.id
-			and not ctx.author.guild_permissions.moderate_members
-		):  # type: ignore
+		if case._user.id != ctx.author.id and not ctx.author.guild_permissions.moderate_members:  # type: ignore
 			raise commands.MissingPermissions(["moderate_members"])
 
 		await ctx.send("mod.info.response", case=case)
@@ -1002,29 +936,19 @@ class Cases(commands.Cog):
 			case_id = int(case_id)
 		except ValueError:
 			raise commands.BadArgument
-		case = await Case.from_id(
-			self.client.db, self.client, ctx.guild, case_id, get_type=True
-		)
+		case = await Case.from_id(self.client.db, self.client, ctx.guild, case_id, get_type=True)
 		if not case:
 			return await ctx.send("mod.delete.errors.not_found", case_id=case_id)
 
 		match case.type:  # type: ignore
 			case CaseType.WARN:
-				case = await Warn.from_id(
-					self.client.db, self.client, ctx.guild, case_id
-				)
+				case = await Warn.from_id(self.client.db, self.client, ctx.guild, case_id)
 			case CaseType.MUTE:
-				case = await Mute.from_id(
-					self.client.db, self.client, ctx.guild, case_id
-				)
+				case = await Mute.from_id(self.client.db, self.client, ctx.guild, case_id)
 			case CaseType.KICK:
-				case = await Kick.from_id(
-					self.client.db, self.client, ctx.guild, case_id
-				)
+				case = await Kick.from_id(self.client.db, self.client, ctx.guild, case_id)
 			case CaseType.BAN:
-				case = await Ban.from_id(
-					self.client.db, self.client, ctx.guild, case_id
-				)
+				case = await Ban.from_id(self.client.db, self.client, ctx.guild, case_id)
 		case._custom_response = self.custom_response
 		await case.delete(self.client.db)  # type: ignore
 
@@ -1049,15 +973,9 @@ class Cases(commands.Cog):
 	)
 	@app_commands.choices(
 		value=[
-			app_commands.Choice(
-				name="caseedit_specs-args-value-expires", value="expires"
-			),
-			app_commands.Choice(
-				name="caseedit_specs-args-value-reason", value="reason"
-			),
-			app_commands.Choice(
-				name="caseedit_specs-args-value-message", value="message"
-			),
+			app_commands.Choice(name="caseedit_specs-args-value-expires", value="expires"),
+			app_commands.Choice(name="caseedit_specs-args-value-reason", value="reason"),
+			app_commands.Choice(name="caseedit_specs-args-value-message", value="message"),
 		]
 	)
 	@app_commands.checks.has_permissions(moderate_members=True)
@@ -1074,17 +992,13 @@ class Cases(commands.Cog):
 			case_id = int(case_id)
 		except ValueError:
 			raise commands.BadArgument
-		case: Case = await Case.from_id(
-			self.client.db, self.client, ctx.guild, case_id, get_type=True
-		)
+		case: Case = await Case.from_id(self.client.db, self.client, ctx.guild, case_id, get_type=True)
 		if case is None:
 			return await ctx.send("mod.edit.errors.not_found", case_id=case_id)
 
 		if value == "expires":
 			try:
-				new_value = datetime.datetime.now() + datetime.timedelta(
-					seconds=convert_time(new_value)
-				)
+				new_value = datetime.datetime.now() + datetime.timedelta(seconds=convert_time(new_value))
 			except (ValueError, TypeError):
 				return await ctx.send("mod.edit.errors.invalid_time", case_id=case_id)
 
@@ -1113,15 +1027,10 @@ class Cases(commands.Cog):
 
 		# since we need the case's information but we don't want to duplicate db calls,
 		# we check inside the actual command
-		if (
-			user.id != ctx.author.id
-			and not ctx.author.guild_permissions.moderate_members
-		):
+		if user.id != ctx.author.id and not ctx.author.guild_permissions.moderate_members:
 			raise commands.MissingPermissions(["moderate_members"])
 
-		message: (
-			dict | str | list | int | float
-		) = await self.custom_response.get_message(
+		message: dict | str | list | int | float = await self.custom_response.get_message(
 			"mod.list.response", ctx, cases=cases
 		)
 		if not isinstance(message, dict):
@@ -1139,9 +1048,7 @@ class Cases(commands.Cog):
 				return await ctx.send(**message)
 			embeds[0].clear_fields()
 			for case in cases:
-				formatted = discord.ext.localization.Localization.format_strings(
-					template, case=case
-				)
+				formatted = discord.ext.localization.Localization.format_strings(template, case=case)
 				embeds[0].add_field(**formatted)
 
 		await ctx.send(**message)
