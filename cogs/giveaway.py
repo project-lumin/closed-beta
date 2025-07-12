@@ -51,7 +51,7 @@ class Giveaway(commands.Cog):
 		if time_until_end > 0 and not right_now:
 			await asyncio.sleep(time_until_end)
 
-		channel = self.client.get_channel(channel_id)
+		channel = await self.client.fetch_channel(channel_id)
 		if not channel:
 			return
 
