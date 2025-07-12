@@ -81,7 +81,6 @@ class Giveaway(commands.Cog):
 				response = await self.custom_response("giveaway.end.no_winners", ctx or message)
 				await message.reply(**response)
 
-
 			await self.client.db.execute(
 				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2",
 				winner_ids,
