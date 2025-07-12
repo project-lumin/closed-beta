@@ -66,16 +66,11 @@ class Giveaway(commands.Cog):
 				participants = [user.id async for user in reaction.users() if user.id != self.client.user.id]
 
 			winners = []
+			winner_ids = []
 			if participants:
 				num_winners = self.active_giveaways[message_id]["winners"]
 				winner_ids = random.sample(participants, min(num_winners, len(participants)))
 				winners = [f"<@{winner_id}>" for winner_id in winner_ids]
-
-				await self.client.db.execute(
-					"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2",
-					winner_ids,
-					message_id,
-				)
 
 			if winners:
 				response = await self.custom_response(
@@ -86,6 +81,12 @@ class Giveaway(commands.Cog):
 				response = await self.custom_response("giveaway.end.no_winners", ctx or message)
 				await message.reply(**response)
 
+
+			await self.client.db.execute(
+				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2",
+				winner_ids,
+				message_id,
+			)
 			del self.active_giveaways[message_id]
 
 		except discord.NotFound:
