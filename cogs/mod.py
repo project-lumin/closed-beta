@@ -1,13 +1,13 @@
 from enum import Enum
-from typing import Self
+from typing import Self, Any, Literal
 
 import asyncpg
 import discord
 from discord import app_commands
-from discord.ext import commands, tasks
-
+from discord.ext import commands
+import datetime
 import main
-from helpers import *
+from helpers import FormatDateTime, CustomMember, CustomGuild, CustomUser, custom_response, convert_to_query, convert_time
 from main import MyClient
 from copy import deepcopy
 
@@ -301,7 +301,7 @@ class Case:
 		db: `asyncpg.Pool`
 		        The database connection pool.
 		"""
-		if not self._user in self._guild.members:
+		if self._user not in self._guild.members:
 			return
 
 		await self.before_deletion()
@@ -329,7 +329,7 @@ class Case:
 		`Case`
 		        The created case.
 		"""
-		if not self._user in self._guild.members:
+		if self._user not in self._guild.members:
 			return None
 
 		await self.before_creation()
@@ -616,16 +616,22 @@ class Moderation(commands.GroupCog, name="mod"):
 		self.client = client
 		self.custom_response = custom_response.CustomResponse(client, "mod")
 
-	@tasks.loop(seconds=5)
 	async def case_removal(self):
+		await self.client.wait_until_ready()
+
 		case_rows = await self.client.db.fetch(
 			"SELECT * FROM cases WHERE expires IS NOT NULL AND expires <= $1",
 			datetime.datetime.now(),
 		)
-		if not case_rows:
-			return
 		for row in case_rows:
 			case = Case.from_dict(row, self.client, get_type=True)
+
+			if not case._guild:
+				continue
+
+			if not case._guild.chunked:
+				await case._guild.chunk()
+
 			match case.type:
 				case CaseType.WARN:
 					case = Warn.from_dict(row, self.client)
@@ -636,11 +642,9 @@ class Moderation(commands.GroupCog, name="mod"):
 				case CaseType.BAN:
 					case = Ban.from_dict(row, self.client)
 			await case.delete(self.client.db)
-		self.case_removal.stop()
 
-	@case_removal.before_loop
-	async def before_case_removal(self):
-		await self.client.wait_until_ready()  # we have to wait for guild cache
+	async def cog_load(self):
+		self.client.loop.create_task(self.case_removal())
 
 	@commands.hybrid_command(name="warn", description="warn_specs-description", usage="warn_specs-usage")
 	@app_commands.rename(
@@ -697,11 +701,6 @@ class Moderation(commands.GroupCog, name="mod"):
 
 		await ctx.send("mod.warn.response", warn=warn)
 
-		if self.case_removal.is_running():
-			self.case_removal.restart()
-		else:
-			self.case_removal.start()
-
 	@commands.bot_has_permissions(moderate_members=True)
 	@app_commands.checks.bot_has_permissions(moderate_members=True)
 	@commands.hybrid_command(name="mute", description="mute_specs-description", usage="mute_specs-usage")
@@ -744,11 +743,6 @@ class Moderation(commands.GroupCog, name="mod"):
 
 		await ctx.send("mod.mute.response", mute=mute)
 
-		if self.case_removal.is_running():
-			self.case_removal.restart()
-		else:
-			self.case_removal.start()
-
 	@commands.bot_has_permissions(moderate_members=True)
 	@app_commands.checks.bot_has_permissions(moderate_members=True)
 	@commands.hybrid_command(
@@ -778,11 +772,6 @@ class Moderation(commands.GroupCog, name="mod"):
 
 		await ctx.send("mod.unmute.response", user=CustomMember.from_member(user))
 
-		if self.case_removal.is_running():
-			self.case_removal.restart()
-		else:
-			self.case_removal.start()
-
 	@commands.bot_has_permissions(kick_members=True)
 	@app_commands.checks.bot_has_permissions(kick_members=True)
 	@commands.hybrid_command(name="kick", description="kick_specs-description", usage="kick_specs-usage")
@@ -807,11 +796,6 @@ class Moderation(commands.GroupCog, name="mod"):
 		await kick.create(self.client.db)
 
 		await ctx.send("mod.kick.response", kick=kick)
-
-		if self.case_removal.is_running():
-			self.case_removal.restart()
-		else:
-			self.case_removal.start()
 
 	@commands.bot_has_permissions(ban_members=True)
 	@app_commands.checks.bot_has_permissions(ban_members=True)
@@ -855,11 +839,6 @@ class Moderation(commands.GroupCog, name="mod"):
 
 		await ctx.send("mod.ban.response", ban=ban)
 
-		if self.case_removal.is_running():
-			self.case_removal.restart()
-		else:
-			self.case_removal.start()
-
 	@commands.bot_has_permissions(ban_members=True)
 	@app_commands.checks.bot_has_permissions(ban_members=True)
 	@commands.hybrid_command(name="unban", description="unban_specs-description", usage="unban_specs-usage")
@@ -880,11 +859,6 @@ class Moderation(commands.GroupCog, name="mod"):
 				pass
 
 		await ctx.send("mod.unban.response", user=CustomUser.from_user(user))
-
-		if self.case_removal.is_running():
-			self.case_removal.restart()
-		else:
-			self.case_removal.start()
 
 
 @commands.guild_only()
@@ -1007,11 +981,6 @@ class Cases(commands.Cog):
 		await case.edit(self.client.db, new_case)
 
 		await ctx.send("mod.edit.response", case=case)
-
-		if Moderation.case_removal.is_running():
-			Moderation.case_removal.restart()
-		else:
-			Moderation.case_removal.start()
 
 	@case.command(
 		name="list",
