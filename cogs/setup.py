@@ -10,16 +10,12 @@ class Setup(commands.Cog):
 
 	@commands.hybrid_command(name="prefix", description="prefix_specs-description")
 	@commands.has_permissions(administrator=True)
-	@app_commands.rename(
-		prefix="prefix_specs-args-prefix-name", mention="prefix_specs-args-mention-name"
-	)
+	@app_commands.rename(prefix="prefix_specs-args-prefix-name", mention="prefix_specs-args-mention-name")
 	@app_commands.describe(
 		prefix="prefix_specs-args-prefix-description",
 		mention="prefix_specs-args-mention-description",
 	)
-	async def prefix(
-		self, ctx: main.Context, prefix: str, mention: Optional[bool] = True
-	):
+	async def prefix(self, ctx: main.Context, prefix: str, mention: Optional[bool] = True):
 		if len(prefix) > 10:
 			return await ctx.send("setup.prefix.errors.long", prefix=prefix, limit=10)
 		await self.client.db.execute(

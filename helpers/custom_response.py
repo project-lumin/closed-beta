@@ -9,7 +9,7 @@ import re
 from typing import Any, Optional, Type, Union, overload
 
 import discord
-from .custom_args import CustomGuild, CustomMember, CustomUser
+from .custom_args import CustomGuild, CustomMember
 from discord.ext import commands, localization
 
 from helpers import emojis
@@ -21,9 +21,7 @@ PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+}$")
 class CustomResponse:
 	"""A class to handle custom responses."""
 
-	def __init__(
-		self, client: discord.Client | Type[discord.Client], name: Optional[str] = None
-	) -> None:
+	def __init__(self, client: discord.Client | Type[discord.Client], name: Optional[str] = None) -> None:
 		"""A custom message instance.
 
 		Parameters
@@ -62,9 +60,7 @@ class CustomResponse:
 		"""
 		if isinstance(data, dict) and (data.get("embed") or data.get("embeds")):
 			if len(data.get("embeds", [])) > 10:
-				raise ValueError(
-					f"The maximum number of embeds is 10. You have {len(data['embeds'])} embeds."
-				)
+				raise ValueError(f"The maximum number of embeds is 10. You have {len(data['embeds'])} embeds.")
 			if data.get("embed") and not data.get("embeds"):
 				data["embeds"] = [data["embed"]]
 
@@ -114,9 +110,7 @@ class CustomResponse:
 				with open(file_path, encoding="utf-8") as f:
 					data = json.load(f)
 					if not isinstance(data, dict):
-						raise ValueError(
-							f"Expected dict in {file_path}, got {type(data).__name__}"
-						)
+						raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
 					if lang not in temp_dict:
 						temp_dict[lang] = {}
 					temp_dict[lang].update(data)
@@ -128,9 +122,7 @@ class CustomResponse:
 	async def get_message(
 		self,
 		name: str,
-		locale: Union[
-			str, discord.Locale, discord.Guild, discord.Interaction, commands.Context
-		],
+		locale: Union[str, discord.Locale, discord.Guild, discord.Interaction, commands.Context],
 		*,
 		convert_embeds: bool = True,
 		**kwargs: Any,
@@ -156,13 +148,11 @@ class CustomResponse:
 		original = locale
 
 		if isinstance(locale, (discord.Interaction, commands.Context)):
-			locale = (
-				locale.guild.preferred_locale
-				if (locale.guild and locale.guild.preferred_locale)
-				else "en"
-			)
+			locale = locale.guild.preferred_locale if (locale.guild and locale.guild.preferred_locale) else "en"
 		elif isinstance(locale, discord.Guild):
 			locale = locale.preferred_locale or "en"
+		elif isinstance(locale, discord.Message):
+			locale = locale.guild.preferred_locale or "en" if locale.guild else "en"
 		else:
 			locale = str(locale)
 
@@ -176,41 +166,36 @@ class CustomResponse:
 
 		context_formatting = {
 			"author": CustomMember.from_member(original.author)
-			if isinstance(original, (discord.Interaction, commands.Context))
+			if isinstance(original, commands.Context)
+			else CustomMember.from_member(original.user)
+			if isinstance(original, discord.Interaction)
 			else None,
 			"guild": (
 				CustomGuild.from_guild(original.guild)
-				if isinstance(original, (discord.Interaction, commands.Context))
-				and hasattr(original, "guild")
+				if isinstance(original, (discord.Interaction, commands.Context)) and hasattr(original, "guild")
 				else CustomGuild.from_guild(original)
 				if isinstance(original, discord.Guild)
 				else None
 			),
-			"now": datetime.datetime.now(datetime.timezone.utc).strftime(
-				"%Y-%m-%dT%H:%M:%S.%fZ"
-			),
+			"now": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
 		}
 
 		if DEBUG:
 			self.load_localizations("../localization")
 
-		payload = localization.Localization(
-			self.localizations, default_locale="en"
-		).localize(name, locale, **kwargs, random=r"{random}", **context_formatting)
+		payload = localization.Localization(self.localizations, default_locale="en").localize(
+			name, locale, **kwargs, random=r"{random}", **context_formatting
+		)
 
 		if isinstance(payload, dict):
 			if random_value := payload.get("random"):
-				payload = localization.Localization.format_strings(
-					payload, random=random.choice(random_value)
-				)
+				payload = localization.Localization.format_strings(payload, random=random.choice(random_value))
 			payload.pop("random", None)
 			payload = self.convert_embeds(payload) if convert_embeds else payload
 
 			if payload.get("reply"):
 				payload["reference"] = (
-					original.message
-					if isinstance(original, (discord.Interaction, commands.Context))
-					else None
+					original.message if isinstance(original, (discord.Interaction, commands.Context)) else None
 				)
 			payload.pop("reply", None)
 

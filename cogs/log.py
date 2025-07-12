@@ -11,9 +11,7 @@ class LogCommands(commands.GroupCog, name="log"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
-	@commands.hybrid_group(
-		name="log", fallback="log-specs_fallback", description="log-specs_description"
-	)
+	@commands.hybrid_group(name="log", fallback="log-specs_fallback", description="log-specs_description")
 	@commands.has_permissions(manage_guild=True)
 	@app_commands.checks.has_permissions(manage_guild=True)
 	async def log_toggle(
@@ -28,13 +26,9 @@ class LogCommands(commands.GroupCog, name="log"):
 				raise commands.MissingRequiredArgument(ctx.command.params["channel"])
 			webhook = discord.utils.get(
 				await channel.webhooks(), name=f"{ctx.me.display_name} - Log"
-			) or await channel.create_webhook(
-				name=f"{ctx.me.display_name} - Log", avatar=await ctx.me.avatar.read()
-			)
+			) or await channel.create_webhook(name=f"{ctx.me.display_name} - Log", avatar=await ctx.me.avatar.read())
 		else:
-			await self.client.db.execute(
-				"UPDATE log SET is_on = FALSE WHERE guild_id = $1", ctx.guild.id
-			)
+			await self.client.db.execute("UPDATE log SET is_on = FALSE WHERE guild_id = $1", ctx.guild.id)
 			await ctx.send("log.toggle.off")
 			return
 
@@ -52,9 +46,7 @@ class LogCommands(commands.GroupCog, name="log"):
 	@log_toggle.command(name="add")
 	async def log_module_add(self, ctx: Context, module: str):
 		if module == "all":
-			await self.client.db.execute(
-				"UPDATE log SET modules = DEFAULT WHERE guild_id = $1", ctx.guild.id
-			)
+			await self.client.db.execute("UPDATE log SET modules = DEFAULT WHERE guild_id = $1", ctx.guild.id)
 		else:
 			await self.client.db.execute(
 				"UPDATE log SET modules = array_append(modules, $1) WHERE guild_id = $2",
@@ -67,9 +59,7 @@ class LogCommands(commands.GroupCog, name="log"):
 	@log_toggle.command(name="remove")
 	async def log_module_remove(self, ctx: Context, module: str):
 		if module == "all":
-			await self.client.db.execute(
-				"UPDATE log SET modules = ARRAY[] WHERE guild_id = $1", ctx.guild.id
-			)
+			await self.client.db.execute("UPDATE log SET modules = ARRAY[] WHERE guild_id = $1", ctx.guild.id)
 		else:
 			await self.client.db.execute(
 				"UPDATE log SET modules = array_remove(modules, $1) WHERE guild_id = $2",
@@ -114,9 +104,7 @@ class LogListeners(commands.Cog):
 		Optional[`discord.Webhook`]
 		        The webhook associated with the given ``guild_id``
 		"""
-		webhook = await self.client.db.fetchval(
-			"SELECT webhook FROM log WHERE guild_id = $1", guild_id
-		)
+		webhook = await self.client.db.fetchval("SELECT webhook FROM log WHERE guild_id = $1", guild_id)
 		if not webhook:
 			return None
 		return discord.Webhook.from_url(webhook, client=self.client)
@@ -141,9 +129,7 @@ class LogListeners(commands.Cog):
 			return
 
 		custom_response = CustomResponse(self.client)
-		message: dict | str = await custom_response.get_message(
-			key, self.client.get_guild(guild_id), **kwargs
-		)
+		message: dict | str = await custom_response.get_message(key, self.client.get_guild(guild_id), **kwargs)
 		if isinstance(message, dict):
 			message.pop("delete_after", None)
 			message.pop("ephemeral", None)
@@ -179,17 +165,13 @@ class LogListeners(commands.Cog):
 		# retreive calling function name
 		func_name = sys._getframe(1).f_code.co_name  # type: ignore
 
-		result = await self.client.db.fetchval(
-			"SELECT is_on FROM log WHERE guild_id = $1", guild_id
-		)
+		result = await self.client.db.fetchval("SELECT is_on FROM log WHERE guild_id = $1", guild_id)
 		return result
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before: discord.Message, after: discord.Message):
 		if before.content != after.content:
-			await self.send_webhook(
-				before.guild.id, "content", before=before.content, after=after.content
-			)
+			await self.send_webhook(before.guild.id, "content", before=before.content, after=after.content)
 
 
 async def setup(client: MyClient) -> None:
