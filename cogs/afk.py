@@ -69,7 +69,9 @@ class AFK(commands.Cog):
 				text = await self.custom_response(
 					"afk.reason",
 					ctx,
-					user=CustomUser.from_user(user) if isinstance(user, discord.User) else CustomMember.from_member(user),
+					user=CustomUser.from_user(user)
+					if isinstance(user, discord.User)
+					else CustomMember.from_member(user),
 					reason=row["message"],
 				)
 				if isinstance(text, dict):

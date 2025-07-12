@@ -173,5 +173,6 @@ class Giveaway(commands.Cog):
 
 		await self.end_giveaway(ctx, message_id, ctx.channel.id, True)
 
+
 async def setup(bot):
 	await bot.add_cog(Giveaway(bot))
