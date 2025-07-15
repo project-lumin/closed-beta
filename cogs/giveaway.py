@@ -88,6 +88,12 @@ class Giveaway(commands.Cog):
 			)
 			del self.active_giveaways[message_id]
 
+			await self.client.db.execute(
+				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2",
+				winner_ids,
+				message_id,
+			)
+
 		except discord.NotFound:
 			await self.client.db.execute("DELETE FROM giveaways WHERE message_id = $1", message_id)
 		except Exception as e:
