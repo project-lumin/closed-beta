@@ -685,7 +685,9 @@ class Moderation(commands.GroupCog, name="mod"):
 			else:
 				raise commands.MemberNotFound(str(user))
 		try:
-			expires = datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
+			expires = (
+				datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
+			)
 		except (ValueError, TypeError):
 			reason = " ".join([expires, reason] if reason else [expires])
 			expires = None
@@ -829,7 +831,9 @@ class Moderation(commands.GroupCog, name="mod"):
 		reason: str = None,
 	):
 		try:
-			expires = datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
+			expires = (
+				datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
+			)
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 		if user == ctx.me:
