@@ -6,7 +6,7 @@ from typing import Optional
 import discord
 
 
-def convert_time(time: str) -> int:
+def text_to_seconds(time: str) -> int:
 	"""
 	Converts text into seconds. ex.: 5m = 300, 1d3min = 86400
 
@@ -97,7 +97,7 @@ def convert_time(time: str) -> int:
 	return total_seconds
 
 
-def convert_time_to_text(seconds: int) -> str:
+def seconds_to_text(seconds: int) -> str:
 	"""
 	Converts seconds into a human-readable format. ex.: 300 = 5m, 86400 = 1d
 
@@ -178,3 +178,14 @@ def convert_to_query(
 		query_parameters.append(limit)
 
 	return query, query_parameters
+
+def text_to_emoji(text: str) -> list[str]:
+	"""Converts a string to an emoji."""
+	base = 0x1f1e6
+	result = []
+	for char in text.upper():
+		if "A" <= char <= "Z":
+			result.append(chr(base + ord(char) - ord("A")))
+		else:
+			result.append(char)
+	return result

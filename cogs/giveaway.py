@@ -112,7 +112,7 @@ class Giveaway(commands.Cog):
 	)
 	async def giveaway(self, ctx: Context, duration: str, winners: str = None, *, prize: str = None):
 		try:
-			end_time = datetime.now() + timedelta(seconds=helpers.convert_time(duration))
+			end_time = datetime.now() + timedelta(seconds=helpers.text_to_seconds(duration))
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 
