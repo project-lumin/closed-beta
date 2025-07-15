@@ -14,7 +14,6 @@ cogs/nevnap.py
 cogs/poll.py
 cogs/raid.py
 cogs/report.py
-cogs/say.py
 cogs/serverstats_v2.py
 cogs/setup.i18n.json
 cogs/tickets.py

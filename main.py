@@ -379,6 +379,7 @@ class MyClient(commands.AutoShardedBot):
 			"giveaway",
 			"info",
 			"mod",
+			"say",
 			"setup",
 			"snapshot",
 			"status",
@@ -456,7 +457,7 @@ class MyClient(commands.AutoShardedBot):
 				)
 			case commands.CommandOnCooldown():
 				error: commands.CommandOnCooldown
-				retry_after = helpers.convert_time_to_text(int(error.retry_after))
+				retry_after = helpers.seconds_to_text(int(error.retry_after))
 				await ctx.send(
 					"errors.command_on_cooldown",
 					command=command,

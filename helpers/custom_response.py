@@ -199,6 +199,14 @@ class CustomResponse:
 				)
 			payload.pop("reply", None)
 
+			if allowed_mentions := payload.get("allowed_mentions"):
+				if "all" in allowed_mentions:
+					payload["allowed_mentions"] = discord.AllowedMentions.all()
+				elif "none" in allowed_mentions:
+					payload["allowed_mentions"] = discord.AllowedMentions.none()
+				else:
+					payload["allowed_mentions"] = discord.AllowedMentions(**allowed_mentions)
+
 			if payload.get("ephemeral") or payload.get("delete_after"):
 				if not isinstance(original, discord.Interaction):
 					payload.pop("ephemeral", None)

@@ -538,5 +538,111 @@
 				"description": "The giveaway's message ID"
 			}
 		}
+	},
+	"say": "say",
+	"say_specs": {
+		"description": "Make the bot say something",
+		"fallback": "message",
+		"usage": "say [message: 1...2000]",
+		"args": {
+			"message": {
+				"name": "message",
+				"description": "The message you want the bot to say"
+			}
+		}
+	},
+	"chsay_specs": {
+		"description": "Make the bot say something in a specific channel",
+		"usage": "say channel [channel] [message: 1...2000]",
+		"args": {
+			"channel": {
+				"name": "channel",
+				"description": "The channel for the message"
+			},
+			"message": {
+				"name": "message",
+				"description": "The message you want the bot to say"
+			}
+		}
+	},
+	"edit": "edit",
+	"editmsg_specs": {
+		"description": "Edit a message sent by the bot",
+		"usage": "say edit [message] [content: 1...2000]",
+		"args": {
+			"link": {
+				"name": "message_link",
+				"description": "The message's link"
+			},
+			"content": {
+				"name": "content",
+				"description": "The new content of the message"
+			}
+		}
+	},
+	"ascii": "ascii",
+	"asciisay_specs": {
+		"description": "Send a string with ASCII art",
+		"usage": "say ascii [message: 1...20]",
+		"args": {
+			"message": {
+				"name": "message",
+				"description": "The message to transform to ASCII art"
+			}
+		}
+	},
+	"emojisay_specs": {
+		"description": "Say a message with discord emojis",
+		"usage": "say emoji [message: 1...20]",
+		"args": {
+			"message": {
+				"name": "message",
+				"description": "The message to transform to emojis"
+			}
+		}
+	},
+	"achievement": "achievement",
+	"mcsay_specs": {
+		"description": "Say a message in the format of a Minecraft achievement",
+		"usage": "say achievement [message: 1...50]",
+		"args": {
+			"message": {
+				"name": "message",
+				"description": "The message to transform to a Minecraft achievement"
+			}
+		}
+	},
+	"qr": "qr",
+	"qr_specs": {
+		"description": "Make a QR code",
+		"usage": "say qr [data: 1...500]",
+		"args": {
+			"data": {
+				"name": "data",
+				"description": "The data to feed into the QR code"
+			}
+		}
+	},
+	"reverse": "reverse",
+	"reversesay_specs": {
+		"description": "Reverse a message",
+		"usage": "say reverse [message: 1...2000]",
+		"args": {
+			"msg": {
+				"name": "message",
+				"description": "The message to reverse"
+			}
+		}
+	},
+	"clap": "clap",
+	"clapsay_specs": {
+		"description": "Clap👏a👏message👏with👏emojis",
+		"usage": "say clap [message: 1...500]",
+		"args": {
+			"message": {
+				"name": "message",
+				"description": "The👏message👏to👏clap"
+			}
+		}
 	}
 }

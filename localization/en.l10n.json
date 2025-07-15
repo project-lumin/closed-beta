@@ -1844,5 +1844,48 @@
 				]
 			}
 		}
+	},
+	"say": {
+		"message": {
+			"content": "{message}"
+		},
+		"edit": {
+			"content": "Message edited successfully."
+		},
+		"ascii": {
+			"content": "```\n{ascii}```"
+		},
+		"emoji": {
+			"content": "{emoji}"
+		},
+		"achievement": {
+			"title": "Achievement Get!",
+			"response": {
+				"embeds": [
+					{
+						"title": "Achievement Get!",
+						"image": {
+							"url": "{achievement}"
+						}
+					}
+				]
+			}
+		},
+		"qr": {
+			"embeds": [
+				{
+					"title": "QR code",
+					"image": {
+						"url": "{qr}"
+					}
+				}
+			]
+		},
+		"reverse": {
+			"content": "{message}"
+		},
+		"clap": {
+			"content": "{message}"
+		}
 	}
 }

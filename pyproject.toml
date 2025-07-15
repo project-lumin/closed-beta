@@ -21,6 +21,7 @@ dependencies = [
     "py-cpuinfo>=9.0.0",
     "emoji>=2.14.1",
     "pypokedex>=1.6.0",
+    "art>=6.5",
 ]
 
 [tool.setuptools]

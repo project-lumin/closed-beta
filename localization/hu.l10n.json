@@ -1844,5 +1844,48 @@
 				]
 			}
 		}
+	},
+	"say": {
+		"message": {
+			"content": "{message}"
+		},
+		"edit": {
+			"content": "Az üzenet sikeresen szerkesztve lett."
+		},
+		"ascii": {
+			"content": "```\n{ascii}```"
+		},
+		"emoji": {
+			"content": "{emoji}"
+		},
+		"achievement": {
+			"title": "Teljesítmény elérve!",
+			"response": {
+				"embeds": [
+					{
+						"title": "Teljesítmény elérve!",
+						"image": {
+							"url": "{achievement}"
+						}
+					}
+				]
+			}
+		},
+		"qr": {
+			"embeds": [
+				{
+					"title": "QR kód",
+					"image": {
+						"url": "{qr}"
+					}
+				}
+			]
+		},
+		"reverse": {
+			"content": "{message}"
+		},
+		"clap": {
+			"content": "{message}"
+		}
 	}
 }
