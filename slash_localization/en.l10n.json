@@ -597,7 +597,7 @@
 		"args": {
 			"message": {
 				"name": "message",
-				"description": "The message to transform to ASCII art"
+				"description": "The message to transform to emojis"
 			}
 		}
 	},
