@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+
+from helpers import CustomResponse
 from main import MyClient, Context
 from helpers.regex import DISCORD_MESSAGE_URL
 from helpers.convert import text_to_emoji
@@ -11,6 +13,7 @@ from urllib.parse import quote_plus
 class Say(commands.Cog):
 	def __init__(self, client: MyClient):
 		self.client: MyClient = client
+		self.custom_response: CustomResponse = CustomResponse(client)
 
 	@commands.hybrid_group(name="say", description="say_specs-description", fallback="say_specs-fallback", usage="say_specs-usage")
 	@commands.has_permissions(manage_messages=True)
@@ -68,7 +71,8 @@ class Say(commands.Cog):
 	@app_commands.describe(message="mcsay_specs-args-message-description")
 	async def achievement_say(self, ctx: Context, *, message: commands.Range[str, 1, 50]):
 		icon = random.randint(1, 29)
-		achievement_title = quote_plus("Achievement Get!")  # TODO: make this localization available
+		localized_title = await self.custom_response("say.achievement.title", ctx)
+		achievement_title = quote_plus(localized_title)
 		achievement_text = quote_plus(message)
 		url = f"https://skinmc.net/achievement/{icon}/{achievement_title}/{achievement_text}"
 		await ctx.send("say.achievement.response", achievement=url)
