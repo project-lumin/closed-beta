@@ -538,5 +538,111 @@
 				"description": "A nyereményjáték üzenetének ID-je"
 			}
 		}
+	},
+	"say": "say",
+	"say_specs": {
+		"description": "Mondass ki valamit a bottal",
+		"fallback": "üzenet",
+		"usage": "say [üzenet: 1...2000]",
+		"args": {
+			"message": {
+				"name": "üzenet",
+				"description": "Az üzenet, amit ki szeretnél mondatni a bottal"
+			}
+		}
+	},
+	"chsay_specs": {
+		"description": "Mondass ki valamit a bottal egy specifikus csatornában",
+		"usage": "say channel [csatorna] [üzenet: 1...2000]",
+		"args": {
+			"channel": {
+				"name": "csatorna",
+				"description": "A cél csatorna"
+			},
+			"message": {
+				"name": "üzenet",
+				"description": "Az üzenet, amit ki szeretnél mondatni a bottal"
+			}
+		}
+	},
+	"edit": "edit",
+	"editmsg_specs": {
+		"description": "Szerkeszd át a bot egyik üzenetét",
+		"usage": "say edit [üzenet_link] [tartalom: 1...2000]",
+		"args": {
+			"link": {
+				"name": "üzenet_link",
+				"description": "Az üzenet linkje"
+			},
+			"content": {
+				"name": "tartalom",
+				"description": "Az üzenet új tartalma"
+			}
+		}
+	},
+	"ascii": "ascii",
+	"asciisay_specs": {
+		"description": "Szöveg ASCII-vá alakítása",
+		"usage": "say ascii [szöveg: 1...20]",
+		"args": {
+			"message": {
+				"name": "szöveg",
+				"description": "A szöveg, amit át szeretnél alakítani ASCII-vá"
+			}
+		}
+	},
+	"emojisay_specs": {
+		"description": "Üzenet átalakítása Discord emojikká",
+		"usage": "say emoji [üzenet: 1...20]",
+		"args": {
+			"message": {
+				"name": "üzenet",
+				"description": "Az üzenet, amit át szeretnél alakítani emojikká"
+			}
+		}
+	},
+	"achievement": "achievement",
+	"mcsay_specs": {
+		"description": "Szöveg megjelenítése Minecraft teljesítményként",
+		"usage": "say achievement [szöveg: 1...50]",
+		"args": {
+			"message": {
+				"name": "szöveg",
+				"description": "A Minecraft teljesítmény tartalma"
+			}
+		}
+	},
+	"qr": "qr",
+	"qr_specs": {
+		"description": "QR-kód készítése",
+		"usage": "say qr [adat: 1...500]",
+		"args": {
+			"data": {
+				"name": "adat",
+				"description": "A QR-kód tartalma"
+			}
+		}
+	},
+	"reverse": "reverse",
+	"reversesay_specs": {
+		"description": "Üzenet megfordítása",
+		"usage": "say reverse [üzenet: 1...2000]",
+		"args": {
+			"msg": {
+				"name": "üzenet",
+				"description": "A megfordítandó üzenet"
+			}
+		}
+	},
+	"clap": "clap",
+	"clapsay_specs": {
+		"description": "Üzenet👏tapsolása",
+		"usage": "say clap [üzenet: 1...500]",
+		"args": {
+			"message": {
+				"name": "üzenet",
+				"description": "Az👏üzenet👏amit👏tapsolni👏szeretnél"
+			}
+		}
 	}
 }
