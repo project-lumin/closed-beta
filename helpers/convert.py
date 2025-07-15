@@ -179,9 +179,10 @@ def convert_to_query(
 
 	return query, query_parameters
 
+
 def text_to_emoji(text: str) -> list[str]:
 	"""Converts a string to an emoji."""
-	base = 0x1f1e6
+	base = 0x1F1E6
 	result = []
 	for char in text.upper():
 		if "A" <= char <= "Z":
