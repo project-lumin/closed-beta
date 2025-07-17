@@ -264,6 +264,7 @@ class MyClient(commands.AutoShardedBot):
 			max_messages=20000,
 			allowed_contexts=app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True),
 			allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
+			allowed_mentions=discord.AllowedMentions(everyone=False, roles=False)
 		)
 		self.custom_response = custom_response.CustomResponse(self)
 
