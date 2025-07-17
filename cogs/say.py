@@ -10,12 +10,15 @@ from art import text2art
 import random
 from urllib.parse import quote_plus
 
+
 class Say(commands.Cog):
 	def __init__(self, client: MyClient):
 		self.client: MyClient = client
 		self.custom_response: CustomResponse = CustomResponse(client)
 
-	@commands.hybrid_group(name="say", description="say_specs-description", fallback="say_specs-fallback", usage="say_specs-usage")
+	@commands.hybrid_group(
+		name="say", description="say_specs-description", fallback="say_specs-fallback", usage="say_specs-usage"
+	)
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="say_specs-args-message-name")
 	@app_commands.describe(message="say_specs-args-message-description")
@@ -25,14 +28,18 @@ class Say(commands.Cog):
 	@say.command(name="channel", description="chsay_specs-description", usage="chsay_specs-usage")
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(channel="chsay_specs-args-channel-name", message="chsay_specs-args-message-name")
-	@app_commands.describe(channel="chsay_specs-args-channel-description", message="chsay_specs-args-message-description")
+	@app_commands.describe(
+		channel="chsay_specs-args-channel-description", message="chsay_specs-args-message-description"
+	)
 	async def channel_say(self, ctx: Context, channel: discord.TextChannel, *, message: commands.Range[str, 1, 2000]):
 		await channel.send(message, allowed_mentions=discord.AllowedMentions.none())
 
 	@say.command(name="edit", description="editmsg_specs-description", usage="editmsg_specs-usage")
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message_link="editmsg_specs-args-link-name", content="editmsg_specs-args-content-name")
-	@app_commands.describe(message_link="editmsg_specs-args-link-description", content="editmsg_specs-args-content-description")
+	@app_commands.describe(
+		message_link="editmsg_specs-args-link-description", content="editmsg_specs-args-content-description"
+	)
 	async def edit_message(self, ctx: Context, message_link: str, *, content: commands.Range[str, 1, 2000]):
 		match = DISCORD_MESSAGE_URL.search(message_link)
 		try:
