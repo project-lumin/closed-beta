@@ -1887,5 +1887,401 @@
 		"clap": {
 			"content": "{message}"
 		}
+	},
+	"log": {
+		"on_invite_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "Invite Created",
+						"description": "Invite `{invite.code}` was created for {invite.channel.mention} by {invite.author.mention}.",
+						"fields": [
+							{
+								"name": "Max Uses",
+								"value": "{invite.max_uses}",
+								"inline": true
+							},
+							{
+								"name": "Expires",
+								"value": "{invite.expires}",
+								"inline": true
+							},
+							{
+								"name": "Temporary membership",
+								"value": "{invite.temporary}",
+								"inline": true
+							}
+						],
+						"color": 5763719
+					}
+				]
+			}
+		},
+		"on_invite_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Invite Deleted",
+						"description": "Invite `{invite.code}` for {invite.channel.mention} was deleted by {invite.author.mention}.",
+						"color": 15548997
+					}
+				]
+			}
+		},
+		"on_guild_channel_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "Channel Created",
+						"description": "Channel {channel.mention} (`{channel.name}`) was created by {created_by.mention}.",
+						"color": 5763719
+					}
+				]
+			}
+		},
+		"on_guild_channel_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Channel Deleted",
+						"description": "Channel `{channel.name}` was deleted by {deleted_by.mention}.",
+						"color": 15548997
+					}
+				]
+			}
+		},
+		"on_guild_channel_pins_update": {
+			"pins": {
+				"embeds": [
+					{
+						"title": "Channel Pins Updated",
+						"description": "The pins in {channel.mention} were updated.",
+						"fields": [
+							{
+								"name": "Last pinned message",
+								"value": "{last_pin}",
+								"inline": true
+							}
+						],
+						"color": 2067276
+					}
+				]
+			}
+		},
+		"on_guild_channel_update": {
+			"name": {
+				"embeds": [
+					{
+						"title": "Channel Name Updated",
+						"description": "The name of {after.mention} was updated by {updated_by.mention}.",
+						"fields": [
+							{
+								"name": "Previous name",
+								"value": "`{before.name}`",
+								"inline": true
+							},
+							{
+								"name": "New name",
+								"value": "`{after.name}`",
+								"inline": true
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"topic": {
+				"embeds": [
+					{
+						"title": "Channel Topic Updated",
+						"description": "The topic of {after.mention} was updated {updated_by.mention}.",
+						"fields": [
+							{
+								"name": "Before",
+								"value": "```\n{before.topic}\n```",
+								"inline": false
+							},
+							{
+								"name": "After",
+								"value": "```\n{after.topic}\n```",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"nsfw": {
+				"embeds": [
+					{
+						"title": "Channel NSFW Status Updated",
+						"description": "The NSFW status of {after.mention} was updated {updated_by.mention}.",
+						"fields": [
+							{
+								"name": "NSFW?",
+								"value": "{after.nsfw}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"slowmode_delay": {
+				"embeds": [
+					{
+						"title": "Channel Slowmode Updated",
+						"description": "The slowmode of {after.mention} was changed from `{before.slowmode_delay}s` to `{after.slowmode_delay}s` {updated_by.mention}.",
+						"color": 3447003
+					}
+				]
+			},
+			"permissions": {
+				"embeds": [
+					{
+						"title": "Channel Permissions Updated",
+						"description": "Permissions for {channel.mention} were updated {updated_by.mention}.\n\n{diff}",
+						"color": 3447003
+					}
+				]
+			},
+			"position": {
+				"embeds": [
+					{
+						"title": "Channel Position Updated",
+						"description": "{after.mention} was moved from position `{before.position}` to `{after.position}`.",
+						"color": 3447003
+					}
+				]
+			}
+		},
+		"on_automod_rule_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "AutoMod Rule Created",
+						"color": 3066993,
+						"fields": [
+							{
+								"name": "Rule Name",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "Rule ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Created By",
+								"value": "{rule.creator.mention}",
+								"inline": true
+							},
+							{
+								"name": "Trigger",
+								"value": "`{rule.trigger_type}`",
+								"inline": true
+							},
+							{
+								"name": "Actions",
+								"value": "{rule.actions}",
+								"inline": true
+							},
+							{
+								"name": "Enabled",
+								"value": "{rule.enabled}",
+								"inline": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_rule_update": {
+			"update": {
+				"embeds": [
+					{
+						"title": "AutoMod Rule Updated",
+						"color": 3447003,
+						"fields": [
+							{
+								"name": "Rule Name",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "Rule ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Enabled",
+								"value": "{rule.enabled}",
+								"inline": true
+							},
+							{
+								"name": "Actions",
+								"value": "{rule.actions}",
+								"inline": true
+							},
+							{
+								"name": "Exempt Roles",
+								"value": "{rule.exempt_roles}"
+							},
+							{
+								"name": "Exempt Channels",
+								"value": "{rule.exempt_channels}"
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_rule_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "AutoMod Rule Deleted",
+						"color": 15158332,
+						"fields": [
+							{
+								"name": "Rule Name",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "Rule ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Originally Created By",
+								"value": "{rule.creator.mention}",
+								"inline": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_action": {
+			"action": {
+				"embeds": [
+					{
+						"title": "AutoMod Action Executed",
+						"color": 15105570,
+						"description": "A message by {execution.member.mention} was flagged.",
+						"fields": [
+							{
+								"name": "Member",
+								"value": "{execution.member.mention} (`{execution.member.id}`)",
+								"inline": true
+							},
+							{
+								"name": "Action Taken",
+								"value": "`{execution.action_types}`",
+								"inline": true
+							},
+							{
+								"name": "In Channel",
+								"value": "{execution.channel}",
+								"inline": true
+							},
+							{
+								"name": "Triggered By",
+								"value": "`{execution.rule_trigger_type}`",
+								"inline": true
+							},
+							{
+								"name": "Matched Keyword",
+								"value": "```\n{execution.matched_keyword}\n```"
+							},
+							{
+								"name": "Full Matched Content",
+								"value": "```\n{execution.matched_content}\n```"
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_message_edit": {
+			"content": {
+				"embeds": [
+					{
+						"title": "Message Edited",
+						"description": "A message from {after.author.mention} in {after.channel.mention} was edited. [Jump to message]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Before",
+								"value": "```\n{before.content}\n```"
+							},
+							{
+								"name": "After",
+								"value": "```\n{after.content}\n```"
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"embeds": {
+				"embeds": [
+					{
+						"title": "Message Embeds Updated",
+						"description": "Embeds in a message from {after.author.mention} in {after.channel.mention} were updated. [Jump to message]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Number of embeds before",
+								"value": "{before.embeds}",
+								"inline": false
+							},
+							{
+								"name": "Number of embeds after",
+								"value": "{after.embeds}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"attachments": {
+				"embeds": [
+					{
+						"title": "Message Attachments Updated",
+						"description": "Attachments in a message from {after.author.mention} in {after.channel.mention} were updated. [Jump to message]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Number of attachments before",
+								"value": "{before.attachments}",
+								"inline": false
+							},
+							{
+								"name": "Number of attachments after",
+								"value": "{after.attachments}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"pinned": {
+				"embeds": [
+					{
+						"title": "Message Pin Status Updated",
+						"description": "The pin status of a message from {after.author.mention} in {after.channel.mention} was updated. [Jump to message]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Pinned?",
+								"value": "{after.pinned}"
+							}
+						],
+						"color": 3447003
+					}
+				]
+			}
+		}
 	}
 }

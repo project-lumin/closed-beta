@@ -7,6 +7,7 @@ from cpuinfo import get_cpu_info
 from emoji import demojize
 import discord
 import psutil
+from .convert import seconds_to_text
 
 
 class CustomColor:
@@ -605,7 +606,7 @@ class CustomGuild:
 			discord.VerificationLevel.high: r"{verification.high}",
 			discord.VerificationLevel.highest: r"{verification.highest}",
 		}
-		return mapping.get(mapping)
+		return mapping.get(mapping)  # type: ignore
 
 	@property
 	def default_notifications(self) -> str:
@@ -614,7 +615,7 @@ class CustomGuild:
 			discord.NotificationLevel.all_messages: r"{notification.all_messages}",
 			discord.NotificationLevel.only_mentions: r"{notification.only_mentions}",
 		}
-		return mapping.get(mapping)
+		return mapping.get(mapping)  # type: ignore
 
 	@property
 	def explicit_content_filter(self) -> str:
@@ -624,7 +625,7 @@ class CustomGuild:
 			discord.ContentFilter.no_role: r"{content_filter.no_role}",
 			discord.ContentFilter.all_members: r"{content_filter.all_members}",
 		}
-		return mapping.get(mapping)
+		return mapping.get(mapping)  # type: ignore
 
 	@property
 	def mfa_level(self) -> str:
@@ -633,7 +634,7 @@ class CustomGuild:
 			discord.MFALevel.disabled: r"{mfa.disabled}",
 			discord.MFALevel.require_2fa: r"{mfa.require_2fa}",
 		}
-		return mapping.get(mapping)
+		return mapping.get(mapping)  # type: ignore
 
 	@property
 	def system_channel(self) -> str:
@@ -697,7 +698,7 @@ class CustomGuild:
 			discord.NSFWLevel.safe: r"{nsfw.safe}",
 			discord.NSFWLevel.age_restricted: r"{nsfw.age_restricted}",
 		}
-		return mapping.get(mapping)
+		return mapping.get(mapping)  # type: ignore
 
 	@property
 	def channels(self) -> int:
@@ -958,166 +959,6 @@ class BotInfo:
 	@property
 	def library_version(self):
 		return discord.__version__
-
-
-@dataclass
-class CustomMessage:
-	"""A class that represents a Discord message with useful formatting properties.
-
-	This class is designed to be used in localization strings and provides
-	easy access to message properties that are commonly used in logs.
-	"""
-
-	id: int
-	"""Returns the message's ID."""
-	content: str
-	"""Returns the message's content."""
-	_embeds: list[discord.Embed] = field(repr=False)
-	_attachments: list[discord.Attachment] = field(repr=False)
-	_stickers: list[discord.StickerItem] = field(repr=False)
-	_author: CustomMember = field(repr=False)
-	_channel: discord.TextChannel = field(repr=False)
-	_guild: CustomGuild = field(repr=False)
-	_created_at: datetime.datetime = field(repr=False)
-	_edited_at: Optional[datetime.datetime] = field(repr=False)
-	_pinned: bool = field(repr=False)
-	_tts: bool = field(repr=False)
-	_mention_everyone: bool = field(repr=False)
-	_mentions: list[discord.Member] = field(repr=False)
-	_role_mentions: list[discord.Role] = field(repr=False)
-	_channel_mentions: list[discord.abc.GuildChannel | discord.Thread] = field(repr=False)
-	_reference: Optional[discord.MessageReference] = field(repr=False)
-	_flags: discord.MessageFlags = field(repr=False)
-	_components: list[discord.ActionRow | discord.ui.Button | discord.SelectMenu | discord.ui.TextInput] = field(
-		repr=False
-	)
-	_poll: Optional[discord.Poll] = field(repr=False)
-
-	@classmethod
-	def from_message(cls, message: discord.Message):
-		"""Creates a CustomMessage from a discord.Message object."""
-		return cls(
-			id=message.id,
-			content=message.content,
-			_embeds=message.embeds,
-			_attachments=message.attachments,
-			_stickers=message.stickers,
-			_author=CustomMember.from_user(message.author),
-			_channel=message.channel,
-			_guild=CustomGuild.from_guild(message.guild) if message.guild else None,
-			_created_at=message.created_at,
-			_edited_at=message.edited_at,
-			_pinned=message.pinned,
-			_tts=message.tts,
-			_mention_everyone=message.mention_everyone,
-			_mentions=message.mentions,
-			_role_mentions=message.role_mentions,
-			_channel_mentions=message.channel_mentions,  # type: ignore
-			_reference=message.reference,
-			_flags=message.flags,
-			_components=message.components,
-			_poll=message.poll,
-		)
-
-	@property
-	def embeds(self) -> int:
-		"""Returns the number of embeds in the message."""
-		return len(self._embeds)
-
-	@property
-	def attachments(self) -> int:
-		"""Returns the number of attachments in the message."""
-		return len(self._attachments)
-
-	@property
-	def stickers(self) -> int:
-		"""Returns the number of stickers in the message."""
-		return len(self._stickers)
-
-	@property
-	def author(self) -> CustomMember:
-		"""Returns the message's author."""
-		return self._author
-
-	@property
-	def channel(self) -> str:
-		"""Returns the message's channel mention."""
-		return self._channel.mention
-
-	@property
-	def guild(self) -> CustomGuild:
-		"""Returns the message's guild."""
-		return self._guild
-
-	@property
-	def created_at(self):
-		"""Returns the date the message was created as a Discord timestamp."""
-		return FormatDateTime(self._created_at, "F")
-
-	created = created_at
-
-	@property
-	def edited_at(self):
-		"""Returns the date the message was edited as a Discord timestamp."""
-		return FormatDateTime(self._edited_at, "F") if self._edited_at else None
-
-	edited = edited_at
-
-	@property
-	def pinned(self) -> bool:
-		"""Returns whether the message is pinned."""
-		return self._pinned
-
-	@property
-	def tts(self) -> bool:
-		"""Returns whether the message is TTS."""
-		return self._tts
-
-	@property
-	def mention_everyone(self) -> bool:
-		"""Returns whether the message mentions everyone."""
-		return self._mention_everyone
-
-	@property
-	def mentions(self) -> int:
-		"""Returns the number of user mentions in the message."""
-		return len(self._mentions)
-
-	@property
-	def role_mentions(self) -> int:
-		"""Returns the number of role mentions in the message."""
-		return len(self._role_mentions)
-
-	@property
-	def channel_mentions(self) -> int:
-		"""Returns the number of channel mentions in the message."""
-		return len(self._channel_mentions)
-
-	@property
-	def reference(self) -> Optional[str]:
-		"""Returns the message's reference if it exists."""
-		return self._reference.message_id if self._reference else None
-
-	@property
-	def flags(self) -> int:
-		"""Returns the message's flags as an integer."""
-		return self._flags.value
-
-	@property
-	def components(self) -> int:
-		"""Returns the number of components in the message."""
-		return len(self._components)
-
-	@property
-	def poll(self) -> bool:
-		"""Returns whether the message has a poll."""
-		return bool(self._poll)
-
-	def __str__(self):
-		return self.content
-
-	def __int__(self):
-		return self.id
 
 
 @dataclass
@@ -1642,6 +1483,7 @@ class CustomEmoji(CustomPartialEmoji):
 			_guild=emoji.guild,
 			_is_application_owned=emoji.is_application_owned(),
 			_is_unicode=False,
+			display=f"<:{emoji.name}:{'a' if emoji.animated else ''}{emoji.id}>" if emoji.id else f":{emoji.name}:",
 		)
 
 	@property
@@ -1797,6 +1639,190 @@ class CustomForumChannel:
 		return self.name
 
 
+def convert_to_custom_channel(channel: Optional[discord.abc.GuildChannel]):
+	if channel:
+		if isinstance(channel, discord.TextChannel):
+			return CustomTextChannel.from_channel(channel)
+		elif isinstance(channel, discord.VoiceChannel):
+			return CustomVoiceChannel.from_channel(channel)
+		elif isinstance(channel, discord.StageChannel):
+			return CustomStageChannel.from_channel(channel)
+		elif isinstance(channel, discord.ForumChannel):
+			return CustomForumChannel.from_channel(channel)
+	return None
+
+CustomChannel = Union[CustomTextChannel, CustomVoiceChannel, CustomStageChannel, CustomForumChannel]
+
+
+@dataclass
+class CustomMessage:
+	"""A class that represents a Discord message with useful formatting properties.
+
+	This class is designed to be used in localization strings and provides
+	easy access to message properties that are commonly used in logs.
+	"""
+
+	id: int
+	"""Returns the message's ID."""
+	content: str
+	"""Returns the message's content."""
+	_embeds: list[discord.Embed] = field(repr=False)
+	_attachments: list[discord.Attachment] = field(repr=False)
+	_stickers: list[discord.StickerItem] = field(repr=False)
+	_author: discord.User | discord.Member = field(repr=False)
+	_channel: Optional[discord.TextChannel] = field(repr=False)
+	_guild: Optional[discord.Guild] = field(repr=False)
+	_created_at: datetime.datetime = field(repr=False)
+	_edited_at: Optional[datetime.datetime] = field(repr=False)
+	_pinned: bool = field(repr=False)
+	_tts: bool = field(repr=False)
+	_mention_everyone: bool = field(repr=False)
+	_mentions: list[discord.Member] = field(repr=False)
+	_role_mentions: list[discord.Role] = field(repr=False)
+	_channel_mentions: list[discord.abc.GuildChannel | discord.Thread] = field(repr=False)
+	_reference: Optional[discord.MessageReference] = field(repr=False)
+	_flags: discord.MessageFlags = field(repr=False)
+	_components: list[discord.ActionRow | discord.ui.Button | discord.SelectMenu | discord.ui.TextInput] = field(
+		repr=False
+	)
+	_jump_url: str = field(repr=False)
+	_poll: Optional[discord.Poll] = field(repr=False)
+
+	@classmethod
+	def from_message(cls, message: discord.Message):
+		"""Creates a CustomMessage from a discord.Message object."""
+		return cls(
+			id=message.id,
+			content=message.content,
+			_embeds=message.embeds,
+			_attachments=message.attachments,
+			_stickers=message.stickers,
+			_author=message.author,
+			_channel=message.channel,
+			_guild=message.guild,
+			_created_at=message.created_at,
+			_edited_at=message.edited_at,
+			_pinned=message.pinned,
+			_tts=message.tts,
+			_mention_everyone=message.mention_everyone,
+			_mentions=message.mentions,
+			_role_mentions=message.role_mentions,
+			_channel_mentions=message.channel_mentions,  # type: ignore
+			_reference=message.reference,
+			_flags=message.flags,
+			_components=message.components,
+			_jump_url=message.jump_url,
+			_poll=message.poll,
+		)
+
+	@property
+	def jump_url(self) -> str:
+		"""Returns the message's jump URL."""
+		return self._jump_url
+
+	url = jump_url
+
+	@property
+	def embeds(self) -> int:
+		"""Returns the number of embeds in the message."""
+		return len(self._embeds)
+
+	@property
+	def attachments(self) -> int:
+		"""Returns the number of attachments in the message."""
+		return len(self._attachments)
+
+	@property
+	def stickers(self) -> int:
+		"""Returns the number of stickers in the message."""
+		return len(self._stickers)
+
+	@property
+	def author(self) -> CustomMember:
+		"""Returns the message's author."""
+		return CustomMember.from_member(self._author) if isinstance(self._author, discord.Member) else CustomUser.from_user(self._author)
+
+	@property
+	def channel(self) -> Optional[CustomChannel]:
+		"""Returns the message's channel mention."""
+		return convert_to_custom_channel(self._channel)
+
+	@property
+	def guild(self) -> CustomGuild:
+		"""Returns the message's guild."""
+		return CustomGuild.from_guild(self._guild) if self._guild else None
+
+	@property
+	def created_at(self):
+		"""Returns the date the message was created as a Discord timestamp."""
+		return FormatDateTime(self._created_at, "F")
+
+	created = created_at
+
+	@property
+	def edited_at(self):
+		"""Returns the date the message was edited as a Discord timestamp."""
+		return FormatDateTime(self._edited_at, "F") if self._edited_at else None
+
+	edited = edited_at
+
+	@property
+	def pinned(self) -> bool:
+		"""Returns whether the message is pinned."""
+		return self._pinned
+
+	@property
+	def tts(self) -> bool:
+		"""Returns whether the message is TTS."""
+		return self._tts
+
+	@property
+	def mention_everyone(self) -> bool:
+		"""Returns whether the message mentions everyone."""
+		return self._mention_everyone
+
+	@property
+	def mentions(self) -> int:
+		"""Returns the number of user mentions in the message."""
+		return len(self._mentions)
+
+	@property
+	def role_mentions(self) -> int:
+		"""Returns the number of role mentions in the message."""
+		return len(self._role_mentions)
+
+	@property
+	def channel_mentions(self) -> int:
+		"""Returns the number of channel mentions in the message."""
+		return len(self._channel_mentions)
+
+	@property
+	def reference(self) -> Optional[str]:
+		"""Returns the message's reference if it exists."""
+		return self._reference.jump_url if self._reference else None
+
+	@property
+	def flags(self) -> int:
+		"""Returns the message's flags as an integer."""
+		return self._flags.value
+
+	@property
+	def components(self) -> int:
+		"""Returns the number of components in the message."""
+		return len(self._components)
+
+	@property
+	def poll(self) -> bool:
+		"""Returns whether the message has a poll."""
+		return bool(self._poll)
+
+	def __str__(self):
+		return self.content
+
+	def __int__(self):
+		return self.id
+
+
 @dataclass
 class CustomTemplate:
 	name: str
@@ -1871,3 +1897,254 @@ class CustomTemplate:
 		return self._is_dirty
 
 	unsynced = dirty = is_dirty
+
+
+@dataclass
+class CustomInvite:
+	"""A class that represents a Discord invite with useful formatting properties."""
+	code: str
+	"""Returns the invite's code."""
+	url: str
+	"""Returns the invite's URL."""
+	_inviter: Optional[discord.User] = field(repr=False)
+	_created_at: Optional[datetime.datetime] = field(repr=False)
+	_max_age: Optional[int] = field(repr=False)
+	max_uses: Optional[int]
+	"""Returns the maximum number of uses for the invite."""
+	temporary: Optional[bool]
+	"""Returns whether the invite is temporary."""
+	_channel: Optional[discord.abc.GuildChannel]
+	uses: Optional[int]
+	"""Returns the number of times the invite has been used."""
+
+	@classmethod
+	def from_invite(cls, invite: discord.Invite):
+		return cls(
+			code=invite.code,
+			url=invite.url,
+			_inviter=invite.inviter,
+			_created_at=invite.created_at,
+			_max_age=invite.max_age,
+			max_uses=invite.max_uses,
+			temporary=invite.temporary,
+			_channel=invite.channel,
+			uses=invite.uses,
+		)
+
+	@classmethod
+	def from_audit_log_diff(cls, audit_data: discord.AuditLogDiff):
+		return cls(
+			code=audit_data.code,
+			url=f"https://discord.gg/{audit_data.code}",
+			_inviter=audit_data.inviter,
+			_created_at=None,  # Not available in audit log diff for deletes
+			_max_age=audit_data.max_age,
+			max_uses=audit_data.max_uses,
+			temporary=audit_data.temporary,
+			_channel=audit_data.channel,
+			uses=audit_data.uses,
+		)
+
+	@property
+	def max_age(self) -> Optional[FormatDateTime]:
+		"""Returns the invite's max age as a relative timestamp or a human-readable duration."""
+		if self._max_age == 0:
+			return None
+
+		if self._created_at:
+			expires = self._created_at + datetime.timedelta(seconds=self._max_age)
+			return FormatDateTime(expires, "R")
+
+		return None
+
+	expires = max_age
+
+	@property
+	def inviter(self) -> Optional[CustomUser]:
+		"""Returns the user who created the invite."""
+		return CustomUser.from_user(self._inviter) if self._inviter else None
+
+	author = inviter
+
+	@property
+	def created_at(self) -> Optional[FormatDateTime]:
+		"""Returns the date the invite was created as a Discord timestamp. This is not available in ``on_invite_delete`` events."""
+		return FormatDateTime(self._created_at, "f") if self._created_at else None
+
+	created = created_at
+
+	@property
+	def channel(self) -> Optional[CustomChannel]:
+		"""Returns the channel the invite is for."""
+		return convert_to_custom_channel(self._channel)
+
+	def __str__(self) -> str:
+		return self.code
+
+
+@dataclass
+class CustomRuleAction:
+	type: str
+	"""Returns the action's type."""
+	_channel: Optional[discord.TextChannel] = field(repr=False)
+	_duration: Optional[datetime.timedelta] = field(repr=False)
+
+	@classmethod
+	def from_action(cls, action: discord.AutoModRuleAction, guild: discord.Guild):
+		channel = guild.get_channel(action.channel_id) if action.channel_id else None
+		return cls(type=action.type.name, _channel=channel, _duration=action.duration)  # type: ignore
+
+	@property
+	def channel(self) -> Optional[Union[CustomTextChannel, CustomVoiceChannel, CustomStageChannel, CustomForumChannel]]:
+		"""Returns the channel the action is sent to."""
+		return convert_to_custom_channel(self._channel)
+
+	@property
+	def duration(self) -> Optional[str]:
+		"""Returns the duration of the timeout."""
+		return seconds_to_text(int(self._duration.total_seconds())) if self._duration else None
+
+
+@dataclass
+class CustomAutoModRule:
+	name: str
+	"""Returns the rule's name."""
+	id: int
+	"""Returns the rule's ID."""
+	enabled: bool
+	"""Returns whether the rule is enabled."""
+	trigger_type: str
+	"""Returns the rule's trigger type."""
+	_creator: discord.Member = field(repr=False)
+	_guild: discord.Guild = field(repr=False)
+	_actions: list[discord.AutoModRuleAction] = field(repr=False)
+	_exempt_roles: list[discord.Role] = field(repr=False)
+	_exempt_channels: list[discord.abc.GuildChannel] = field(repr=False)
+	_created_at: datetime.datetime = field(repr=False)
+
+	@classmethod
+	async def from_rule(cls, rule: discord.AutoModRule):
+		creator = rule.guild.get_member(rule.creator_id) or await rule.guild.fetch_member(rule.creator_id)
+		return cls(
+			name=rule.name,
+			id=rule.id,
+			enabled=rule.enabled,
+			trigger_type=rule.trigger.type.name,  # type: ignore
+			_creator=creator,
+			_guild=rule.guild,
+			_actions=rule.actions,
+			_exempt_roles=rule.exempt_roles,
+			_exempt_channels=rule.exempt_channels,
+			_created_at=discord.utils.snowflake_time(rule.id),
+		)
+
+	@property
+	def creator(self) -> CustomMember:
+		"""Returns the rule's creator."""
+		return CustomMember.from_member(self._creator)
+
+	@property
+	def guild(self) -> CustomGuild:
+		"""Returns the rule's guild."""
+		return CustomGuild.from_guild(self._guild)
+
+	@property
+	def actions(self) -> str:
+		"""Returns the rule's actions."""
+		if not self._actions:
+			return "None"
+
+		action_strings = []
+		for action in self._actions:
+			if action.type.name == "send_alert_message":  # type: ignore
+				channel = self._guild.get_channel(action.channel_id)
+				if channel:
+					action_strings.append(f"Send Alert to {channel.mention}")
+				else:
+					action_strings.append("Send Alert (Channel not found)")
+			elif action.type.name == "timeout":  # type: ignore
+				duration_seconds = action.duration.total_seconds()
+				minutes, seconds = divmod(duration_seconds, 60)
+				hours, minutes = divmod(minutes, 60)
+				days, hours = divmod(hours, 24)
+
+				duration_str = ""
+				if days > 0:
+					duration_str += f"{int(days)}d "
+				if hours > 0:
+					duration_str += f"{int(hours)}h "
+				if minutes > 0:
+					duration_str += f"{int(minutes)}m "
+				if seconds > 0:
+					duration_str += f"{int(seconds)}s"
+
+				action_strings.append(f"Timeout ({duration_str.strip()})")
+			else:
+				action_strings.append(action.type.name.replace("_", " ").title())  # type: ignore
+
+		return ", ".join(action_strings)
+
+	@property
+	def exempt_roles(self) -> str:
+		"""Returns the rule's exempt roles."""
+		return ", ".join([role.mention for role in self._exempt_roles]) if self._exempt_roles else "None"
+
+	@property
+	def exempt_channels(self) -> str:
+		"""Returns the rule's exempt channels."""
+		return ", ".join([channel.mention for channel in self._exempt_channels]) if self._exempt_channels else "None"
+
+	@property
+	def created_at(self) -> FormatDateTime:
+		"""Returns when the rule was created."""
+		return FormatDateTime(self._created_at, "f")
+
+	def __str__(self) -> str:
+		return self.name
+
+@dataclass
+class CustomAutoModAction:
+	_action: discord.AutoModRuleAction = field(repr=False)
+	rule_trigger_type: str = field(repr=False)
+	"""The trigger type of the rule that was executed."""
+	rule_id: int = field(repr=False)
+	"""The ID of the rule that was executed."""
+	_guild: discord.Guild = field(repr=False)
+	_member: discord.Member = field(repr=False)
+	channel: Optional[str] = field(repr=False)
+	"""The channel where the action was executed."""
+	message_id: Optional[int] = field(repr=False)
+	"""The ID of the message that triggered the action."""
+	matched_keyword: Optional[str] = field(repr=False)
+	"""The keyword that was matched."""
+	matched_content: Optional[str] = field(repr=False)
+	"""The content that was matched."""
+
+	@classmethod
+	def from_action(cls, execution: discord.AutoModAction):
+		return cls(
+			_action=execution.action,
+			rule_trigger_type=execution.rule_trigger_type.name,  # type: ignore
+			rule_id=execution.rule_id,
+			_guild=execution.guild,
+			_member=execution.member,
+			channel=execution.channel.mention if execution.channel else None,
+			message_id=execution.message_id,
+			matched_keyword=execution.matched_keyword,
+			matched_content=execution.matched_content,
+		)
+
+	@property
+	def action(self) -> CustomRuleAction:
+		"""Returns the action that was taken."""
+		return CustomRuleAction.from_action(self._action, self._guild)
+
+	@property
+	def guild(self) -> CustomGuild:
+		"""Returns the guild where the action was executed."""
+		return CustomGuild.from_guild(self._guild)
+
+	@property
+	def member(self) -> CustomMember:
+		"""Returns the member who triggered the action."""
+		return CustomMember.from_member(self._member)
