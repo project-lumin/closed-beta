@@ -10,6 +10,7 @@ from main import Command, Context, MyClient
 
 class HelpCommand(commands.HelpCommand):
 	context: Context
+
 	def __init__(self):
 		super().__init__()
 		self.custom_response = None
@@ -27,7 +28,7 @@ class HelpCommand(commands.HelpCommand):
 
 			if get_origin(annotation) is Literal:
 				literals = get_args(annotation)
-				param_str = '|'.join(map(str, literals))
+				param_str = "|".join(map(str, literals))
 
 			elif get_origin(annotation) is commands.Range:
 				args = get_args(annotation)
@@ -44,9 +45,9 @@ class HelpCommand(commands.HelpCommand):
 					elif typ is str:
 						param_str = f"{param.name}: {end}..."
 
-			if param.default is param.empty: # required parameter
+			if param.default is param.empty:  # required parameter
 				param_str = f"[{param_str}]"
-			else: # optional parameter
+			else:  # optional parameter
 				param_str = f"({param_str})"
 
 			signature.append(param_str)
@@ -86,16 +87,16 @@ class HelpCommand(commands.HelpCommand):
 			cog_name = await self.custom_response(f"cogs.{group_or_cog.qualified_name.lower()}", self.context)
 			message = await self.custom_response(
 				"help.cog",
-			    self.context,
+				self.context,
 				cog=cog_name,
-				commands=len(await self.filter_commands(group_or_cog.get_commands(), sort=True))
+				commands=len(await self.filter_commands(group_or_cog.get_commands(), sort=True)),
 			)
 		elif isinstance(group_or_cog, commands.Group):
 			message = await self.custom_response(
 				"help.group",
-			    self.context,
-			    group=Command.from_command(group_or_cog, self.context),
-			    commands=len(await self.filter_commands(group_or_cog.commands, sort=True))
+				self.context,
+				group=Command.from_command(group_or_cog, self.context),
+				commands=len(await self.filter_commands(group_or_cog.commands, sort=True)),
 			)
 		else:
 			raise commands.BadArgument
@@ -134,6 +135,7 @@ class HelpCommand(commands.HelpCommand):
 	async def send_error_message(self, error: str, /) -> None:
 		await self.context.send("errors.command_not_found", command=Command.from_ctx(self.context))
 
+
 class Help(commands.Cog, command_attrs=dict(hidden=True)):
 	def __init__(self, client: MyClient):
 		self.client = client
@@ -141,6 +143,7 @@ class Help(commands.Cog, command_attrs=dict(hidden=True)):
 		help_command.custom_response = client.custom_response
 		help_command.cog = self
 		self.client.help_command = help_command
+
 
 async def setup(client: MyClient):
 	await client.add_cog(Help(client))
