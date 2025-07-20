@@ -36,7 +36,7 @@ class Status(commands.Cog, command_attrs=dict(hidden=True)):
 			activity=discord.CustomActivity(
 				name=f"{len(self.client.guilds)} servers | ?!{random.choice([command.qualified_name for command in self.client.commands])}"
 			),
-			status=discord.Status.online,
+			status=discord.Status.online,  # type: ignore
 		)
 
 	async def cog_unload(self) -> None:
