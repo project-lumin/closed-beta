@@ -24,7 +24,8 @@ class Status(commands.Cog, command_attrs=dict(hidden=True)):
 
 	@commands.Cog.listener()
 	async def on_connect(self):
-		logging.info("Status update started.")
+		self.update_status.restart()
+		logging.info("Status update restarted.")
 
 	@tasks.loop(seconds=30)
 	async def update_status(self):
@@ -44,7 +45,7 @@ class Status(commands.Cog, command_attrs=dict(hidden=True)):
 	async def cog_load(self) -> None:
 		if self.client.is_ready():
 			logging.info("The status string was probably updated. Restarting the status loop.")
-			self.update_status.restart()
+			await self.on_connect()
 
 
 async def setup(client: commands.AutoShardedBot):
