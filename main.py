@@ -295,14 +295,16 @@ class MyClient(commands.AutoShardedBot):
 			return "?"
 		if not message.guild:
 			return "?!"
-		row = await self.db.fetchrow(
+		prefix, mention = await self.db.fetchval(
 			"SELECT prefix, mention FROM guilds WHERE guild_id = $1", message.guild.id
 		)
-		prefix, mention = row.get("prefix", "?!"), row.get("mention", True)
-		if mention:
-			return commands.when_mentioned_or(prefix)(self, message)
+		if not prefix:
+			return commands.when_mentioned_or("?!")(self, message)
 		else:
-			return prefix
+			if mention:
+				return commands.when_mentioned_or(prefix)(self, message)
+			else:
+				return prefix
 
 	async def on_guild_join(self, guild: discord.Guild):
 		row = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", guild.id)
