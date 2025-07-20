@@ -1,7 +1,7 @@
 # Lumin
 
 [![Crowdin](https://badges.crowdin.net/project-lumin/localized.svg)](https://crowdin.com/project/project-lumin)
-![GitHub Release](https://img.shields.io/github/v/release/project-lumin/closed-beta)
+[![GitHub Release](https://img.shields.io/github/v/release/project-lumin/closed-beta)](https://github.com/project-lumin/closed-beta/releases/latest)
 ![GitHub Stars](https://img.shields.io/github/stars/project-lumin/closed-beta?style=flat)
 [![Discord](https://img.shields.io/discord/572077459189792769?label=discord
 )](https://discord.gg/s8zBYQk)
@@ -37,13 +37,7 @@
     - This installs all dependencies from `pyproject.toml`
     - `uvloop` will be included automatically on supported platforms
 
-3. **Create a `.env` file** in the project root with the following keys:
-   ```
-   TOKEN=your-bot-token
-   DB_HOST=localhost
-   DB_PASSWORD=your-db-password
-   DB_PORT=5432
-   ```
+3. **Create a `.env` file** in the project root (follow the `.env.example` template)
 
 4. **Install PostgreSQL**, then:
     - Create a user named `lumin` with the password you defined above
@@ -57,12 +51,11 @@
 
 ## Contributor Notice
 
-1. We use **ClickUp** for internal task management (external contributors won’t have access).
-    - You're welcome to contribute via PRs — we’ll review and respond!
+1. You're welcome to contribute via PRs — we’ll review and respond!
 
 2. We're subclassing `commands.Context`. You’ll find this in `main.py`:
     - Import with `import main`, and use `main.Context`
-    - This makes localization easier — check the docstring for details
+    - This makes localization easier - check the docstring for details
 
 3. The default language is **English**
     - New commands/features must include English-localized messages

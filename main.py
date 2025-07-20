@@ -245,12 +245,12 @@ class MyClient(commands.AutoShardedBot):
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None  # type: ignore
 		self.ready_event = asyncio.Event()
-		self.devs = [
+		self.owner_ids = {
 			648168353453572117,  # pearoo
 			657350415511322647,  # liba
 			452133888047972352,  # aki26
 			1051181672508444683,  # sarky
-		]
+		}
 		super().__init__(
 			command_prefix=self.get_prefix,  # type: ignore
 			heartbeat_timeout=150.0,
@@ -264,7 +264,7 @@ class MyClient(commands.AutoShardedBot):
 			max_messages=20000,
 			allowed_contexts=app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True),
 			allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
-			allowed_mentions=discord.AllowedMentions(everyone=False, roles=False)
+			allowed_mentions=discord.AllowedMentions(everyone=False, roles=False),
 		)
 		self.custom_response = custom_response.CustomResponse(self)
 
@@ -278,21 +278,23 @@ class MyClient(commands.AutoShardedBot):
 			return "?"
 		if not message.guild:
 			return "?!"
-		prefix = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", message.guild.id)
+		prefix, mention = await self.db.fetchval(
+			"SELECT prefix, mention FROM guilds WHERE guild_id = $1", message.guild.id
+		)
 		if not prefix:
 			return commands.when_mentioned_or("?!")(self, message)
 		else:
-			if prefix["mention"]:
-				return commands.when_mentioned_or(prefix["prefix"])(self, message)
+			if mention:
+				return commands.when_mentioned_or(prefix)(self, message)
 			else:
-				return prefix["prefix"]
+				return prefix
 
 	async def on_guild_join(self, guild: discord.Guild):
 		row = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", guild.id)
 		if not row:
 			await self.db.execute("INSERT INTO guilds (guild_id) VALUES ($1)", guild.id)
 
-	async def get_context(  # type: ignore # pyright is crying because of mismatched arguments, we can disregard it
+	async def get_context(
 		self,
 		origin: Union[discord.Message, discord.Interaction],
 		/,
@@ -344,7 +346,7 @@ class MyClient(commands.AutoShardedBot):
 		benchmark = perf_counter()
 		database_exists = await self.db.fetchval(
 			"SELECT 1 FROM information_schema.schemata WHERE schema_name = 'public'"
-		)  # type: ignore
+		)
 		if not database_exists:
 			await self.db.execute("CREATE DATABASE lumin_beta OWNER lumin")
 			logger.info("Created database 'lumin'!")
@@ -379,14 +381,13 @@ class MyClient(commands.AutoShardedBot):
 			"economy",
 			"giveaway",
 			"info",
+			"log",
 			"mod",
 			"say",
 			"setup",
 			"snapshot",
 			"status",
 		]
-		if DEBUG:
-			allowed.extend(("log",))
 
 		cogs = Path("./cogs").glob("*.py")
 		for cog in cogs:
