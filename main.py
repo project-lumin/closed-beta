@@ -381,14 +381,13 @@ class MyClient(commands.AutoShardedBot):
 			"economy",
 			"giveaway",
 			"info",
+			"log",
 			"mod",
 			"say",
 			"setup",
 			"snapshot",
 			"status",
 		]
-		if DEBUG:
-			allowed.extend(("log",))
 
 		cogs = Path("./cogs").glob("*.py")
 		for cog in cogs:
