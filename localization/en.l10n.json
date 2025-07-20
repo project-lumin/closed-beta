@@ -1889,6 +1889,22 @@
 		}
 	},
 	"log": {
+		"toggle": {
+			"on": {
+				"content": "Logging is now enabled in {channel.mention}."
+			},
+			"off": {
+				"content": "Logging is now disabled."
+			}
+		},
+		"module": {
+			"add": {
+				"content": "Module `{module}` has been added to the logging system."
+			},
+			"remove": {
+				"content": "Module `{module}` has been removed from the logging system."
+			}
+		},
 		"on_invite_create": {
 			"create": {
 				"embeds": [
@@ -2031,7 +2047,7 @@
 				"embeds": [
 					{
 						"title": "Channel Slowmode Updated",
-						"description": "The slowmode of {after.mention} was changed from `{before.slowmode_delay}s` to `{after.slowmode_delay}s` {updated_by.mention}.",
+						"description": "The slowmode of {after.mention} was changed from `{before.slowmode_delay}s` to `{after.slowmode_delay}s` by {updated_by.mention}.",
 						"color": 3447003
 					}
 				]
@@ -2040,7 +2056,7 @@
 				"embeds": [
 					{
 						"title": "Channel Permissions Updated",
-						"description": "Permissions for {channel.mention} were updated {updated_by.mention}.\n\n{diff}",
+						"description": "Permissions for {channel.mention} were updated by {updated_by.mention}.\n\n{diff}",
 						"color": 3447003
 					}
 				]

@@ -1887,5 +1887,417 @@
 		"clap": {
 			"content": "{message}"
 		}
+	},
+	"log": {
+		"toggle": {
+			"on": {
+				"content": "Logolás bekapcsolva a(z) {channel.mention} csatornában."
+			},
+			"off": {
+				"content": "Logolás kikapcsolva."
+			}
+		},
+		"module": {
+			"add": {
+				"content": "A(z) `{module}` modul hozzá lett adva a log rendszerhez."
+			},
+			"remove": {
+				"content": "A(z) `{module}` modul el lett távolítva a log rendszerből."
+			}
+		},
+		"on_invite_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "Meghívó létrehozva",
+						"description": "Egy meghívó `{invite.code}` kóddal a(z) {invite.channel.mention} csatornába elkészült {invite.author.mention} által.",
+						"fields": [
+							{
+								"name": "Max használat",
+								"value": "{invite.max_uses}",
+								"inline": true
+							},
+							{
+								"name": "Lejár",
+								"value": "{invite.expires}",
+								"inline": true
+							},
+							{
+								"name": "Ideiglenes tagság",
+								"value": "{invite.temporary}",
+								"inline": true
+							}
+						],
+						"color": 5763719
+					}
+				]
+			}
+		},
+		"on_invite_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Meghívó törölve",
+						"description": "A(z) `{invite.code}` kóddal rendelkező, {invite.channel.mention} csatornába szóló meghívót törölte {invite.author.mention}.",
+						"color": 15548997
+					}
+				]
+			}
+		},
+		"on_guild_channel_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "Csatorna létrehozva",
+						"description": "{channel.mention} (`{channel.name}`) létre lett hozva {created_by.mention} által.",
+						"color": 5763719
+					}
+				]
+			}
+		},
+		"on_guild_channel_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Csatorna törölve",
+						"description": "A(z) `{channel.name}` törölve lett {deleted_by.mention} által.",
+						"color": 15548997
+					}
+				]
+			}
+		},
+		"on_guild_channel_pins_update": {
+			"pins": {
+				"embeds": [
+					{
+						"title": "Csatorna kitűzött üzenetei frissítve",
+						"description": "A(z) {channel.mention} kitűzött üzenetei frissítve lettek.",
+						"fields": [
+							{
+								"name": "Legutolsó kitűzött üzenet",
+								"value": "{last_pin}",
+								"inline": true
+							}
+						],
+						"color": 2067276
+					}
+				]
+			}
+		},
+		"on_guild_channel_update": {
+			"name": {
+				"embeds": [
+					{
+						"title": "Csatorna neve frissítve",
+						"description": "A(z) {after.mention} csatorna nevét frissítette {updated_by.mention}.",
+						"fields": [
+							{
+								"name": "Előző név",
+								"value": "`{before.name}`",
+								"inline": true
+							},
+							{
+								"name": "Új név",
+								"value": "`{after.name}`",
+								"inline": true
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"topic": {
+				"embeds": [
+					{
+						"title": "Csatorna téma frissítve",
+						"description": "A(z) {after.mention} csatorna témáját frissítette {updated_by.mention}.",
+						"fields": [
+							{
+								"name": "Előző téma",
+								"value": "```\n{before.topic}\n```",
+								"inline": false
+							},
+							{
+								"name": "Új téma",
+								"value": "```\n{after.topic}\n```",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"nsfw": {
+				"embeds": [
+					{
+						"title": "Csatorna NSFW státusz frissítve",
+						"description": "A(z) {after.mention} csatorna NSFW státuszát frissítette {updated_by.mention}.",
+						"fields": [
+							{
+								"name": "NSFW?",
+								"value": "{after.nsfw}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"slowmode_delay": {
+				"embeds": [
+					{
+						"title": "Csatorna lassítás frissítve",
+						"description": "A(z) {after.mention} csatorna lassítását megváltoztatta {updated_by.mention}: `{before.slowmode_delay}s` -> `{after.slowmode_delay}s`",
+						"color": 3447003
+					}
+				]
+			},
+			"permissions": {
+				"embeds": [
+					{
+						"title": "Csatorna jogosultságok frissítve",
+						"description": "A(z) {channel.mention} csatorna jogosultságait frissítette {updated_by.mention}.\n\n{diff}",
+						"color": 3447003
+					}
+				]
+			},
+			"position": {
+				"embeds": [
+					{
+						"title": "Csatorna pozíció frissítve",
+						"description": "A(z) {after.mention} csatorna pozíciója megváltozott: `{before.position}` -> `{after.position}`",
+						"color": 3447003
+					}
+				]
+			}
+		},
+		"on_automod_rule_create": {
+			"create": {
+				"embeds": [
+					{
+						"title": "AutoMod szabály létrehozva",
+						"color": 3066993,
+						"fields": [
+							{
+								"name": "Név",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Készítette",
+								"value": "{rule.creator.mention}",
+								"inline": true
+							},
+							{
+								"name": "Észlelési mód",
+								"value": "`{rule.trigger_type}`",
+								"inline": true
+							},
+							{
+								"name": "Következmények",
+								"value": "{rule.actions}",
+								"inline": true
+							},
+							{
+								"name": "Bekapcsolva?",
+								"value": "{rule.enabled}",
+								"inline": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_rule_update": {
+			"update": {
+				"embeds": [
+					{
+						"title": "AutoMod szabály frissítve",
+						"color": 3447003,
+						"fields": [
+							{
+								"name": "Név",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Bekapcsolva?",
+								"value": "{rule.enabled}",
+								"inline": true
+							},
+							{
+								"name": "Következmények",
+								"value": "{rule.actions}",
+								"inline": true
+							},
+							{
+								"name": "Kivételezett rangok",
+								"value": "{rule.exempt_roles}"
+							},
+							{
+								"name": "Kivételezett csatornák",
+								"value": "{rule.exempt_channels}"
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_rule_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "AutoMod szabály törölve",
+						"color": 15158332,
+						"fields": [
+							{
+								"name": "Név",
+								"value": "{rule.name}",
+								"inline": true
+							},
+							{
+								"name": "ID",
+								"value": "`{rule.id}`",
+								"inline": true
+							},
+							{
+								"name": "Eredetileg létrehozta",
+								"value": "{rule.creator.mention}",
+								"inline": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_automod_action": {
+			"action": {
+				"embeds": [
+					{
+						"title": "AutoMod végrehajtva",
+						"color": 15105570,
+						"description": "Egy üzenet {execution.member.mention} által bejelzett.",
+						"fields": [
+							{
+								"name": "Tag",
+								"value": "{execution.member.mention} (`{execution.member.id}`)",
+								"inline": true
+							},
+							{
+								"name": "Következmény",
+								"value": "`{execution.action_types}`",
+								"inline": true
+							},
+							{
+								"name": "Csatorna",
+								"value": "{execution.channel}",
+								"inline": true
+							},
+							{
+								"name": "Bejelzett erre",
+								"value": "`{execution.rule_trigger_type}`",
+								"inline": true
+							},
+							{
+								"name": "Kulcsszó",
+								"value": "```\n{execution.matched_keyword}\n```"
+							},
+							{
+								"name": "Teljes tartalom",
+								"value": "```\n{execution.matched_content}\n```"
+							}
+						]
+					}
+				]
+			}
+		},
+		"on_message_edit": {
+			"content": {
+				"embeds": [
+					{
+						"title": "Üzenet szerkesztve",
+						"description": "{after.author.mention} üzenete a(z) {after.channel.mention} csatornában szerkesztve lett. [Ugrás az üzenethez]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Előtte",
+								"value": "```\n{before.content}\n```"
+							},
+							{
+								"name": "Utána",
+								"value": "```\n{after.content}\n```"
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"embeds": {
+				"embeds": [
+					{
+						"title": "Üzenet beágyazásai frissítve",
+						"description": "{after.author.mention} üzenetének beágyazásai a(z) {after.channel.mention} csatornában frissítve lettek. [Ugrás az üzenethez]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Beágyazások száma előtte",
+								"value": "{before.embeds}",
+								"inline": false
+							},
+							{
+								"name": "Beágyazások száma utána",
+								"value": "{after.embeds}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"attachments": {
+				"embeds": [
+					{
+						"title": "Üzenet csatolmányai frissítve",
+						"description": "{after.author.mention} üzenetének csatolmányai a(z) {after.channel.mention} csatornában frissítve lettek. [Ugrás az üzenethez]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Csatolmányok száma előtte",
+								"value": "{before.attachments}",
+								"inline": false
+							},
+							{
+								"name": "Csatolmányok száma utána",
+								"value": "{after.attachments}",
+								"inline": false
+							}
+						],
+						"color": 3447003
+					}
+				]
+			},
+			"pinned": {
+				"embeds": [
+					{
+						"title": "Üzenet kitűzése frissítve",
+						"description": "{after.author.mention} üzenetének kitűzése frissítve lett a(z) {after.channel.mention} csatornában. [Ugrás az üzenethez]({after.jump_url})",
+						"fields": [
+							{
+								"name": "Kitűzve?",
+								"value": "{after.pinned}"
+							}
+						],
+						"color": 3447003
+					}
+				]
+			}
+		}
 	}
 }

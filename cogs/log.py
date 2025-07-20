@@ -15,11 +15,12 @@ from helpers import (
 	FormatDateTime,
 	convert_to_custom_channel,
 	CustomUser,
+	CustomTextChannel,
 )
 from main import MyClient, Context
 
 
-class LogCommands(commands.GroupCog, name="log"):
+class LogCommands(commands.Cog):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
@@ -53,7 +54,7 @@ class LogCommands(commands.GroupCog, name="log"):
 			channel.id,
 			is_on,
 		)
-		await ctx.send(content="log.toggle.on")
+		await ctx.send(content="log.toggle.on", channel=CustomTextChannel.from_channel(channel))
 
 	@log_toggle.command(name="add")
 	async def log_module_add(self, ctx: Context, module: str):
@@ -66,7 +67,7 @@ class LogCommands(commands.GroupCog, name="log"):
 				ctx.guild.id,
 			)
 
-		await ctx.send("log.module.add")
+		await ctx.send("log.module.add", module=module)
 
 	@log_toggle.command(name="remove")
 	async def log_module_remove(self, ctx: Context, module: str):
@@ -79,7 +80,7 @@ class LogCommands(commands.GroupCog, name="log"):
 				ctx.guild.id,
 			)
 
-		await ctx.send("log.module.add")
+		await ctx.send("log.module.remove", module=module)
 
 
 class LogListeners(commands.Cog):
@@ -112,7 +113,9 @@ class LogListeners(commands.Cog):
 	) -> Optional[CustomUser]:
 		"""Retreives the actor from the audit logs for a specific action on a channel or role."""
 		try:
-			async for entry in guild.audit_logs(limit=15, action=actions if isinstance(actions, (discord.AuditLogAction, int)) else discord.abc.MISSING):
+			async for entry in guild.audit_logs(
+				limit=15, action=actions if isinstance(actions, (discord.AuditLogAction, int)) else discord.abc.MISSING
+			):
 				target_channel_matches = False
 				if (
 					entry.target
@@ -298,9 +301,19 @@ class LogListeners(commands.Cog):
 				after=CustomMessage.from_message(after),
 			)
 		if before.attachments != after.attachments:
-			await self.send_webhook(before.guild.id, "attachments", before=CustomMessage.from_message(before), after=CustomMessage.from_message(after))
+			await self.send_webhook(
+				before.guild.id,
+				"attachments",
+				before=CustomMessage.from_message(before),
+				after=CustomMessage.from_message(after),
+			)
 		if before.pinned != after.pinned:
-			await self.send_webhook(before.guild.id, "pinned", before=CustomMessage.from_message(before), after=CustomMessage.from_message(after))
+			await self.send_webhook(
+				before.guild.id,
+				"pinned",
+				before=CustomMessage.from_message(before),
+				after=CustomMessage.from_message(after),
+			)
 
 	@commands.Cog.listener()
 	async def on_automod_rule_create(self, rule: discord.AutoModRule):
@@ -350,9 +363,7 @@ class LogListeners(commands.Cog):
 	async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
 		custom_channel = convert_to_custom_channel(channel)
 		if custom_channel:
-			created_by = await self._get_actor(
-				channel.guild, channel.id, discord.AuditLogAction.channel_create
-			)
+			created_by = await self._get_actor(channel.guild, channel.id, discord.AuditLogAction.channel_create)
 			await self.send_webhook(channel.guild.id, "create", channel=custom_channel, created_by=created_by)
 
 	@commands.Cog.listener()
@@ -368,7 +379,9 @@ class LogListeners(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_guild_channel_pins_update(
-		self, channel: Union[discord.TextChannel, discord.VoiceChannel, discord.Thread], last_pin: Optional[datetime.datetime]
+		self,
+		channel: Union[discord.TextChannel, discord.VoiceChannel, discord.Thread],
+		last_pin: Optional[datetime.datetime],
 	):
 		custom_channel = convert_to_custom_channel(channel)
 		if custom_channel:
@@ -392,7 +405,10 @@ class LogListeners(commands.Cog):
 			if hasattr(custom_before, attr) and hasattr(custom_after, attr):
 				if getattr(custom_before, attr) != getattr(custom_after, attr):
 					updated_by = await self._get_actor(
-						after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute=attr  # type: ignore
+						after.guild,
+						after.id,
+						discord.AuditLogAction.channel_update,
+						changed_attribute=attr
 					)
 					await self.send_webhook(
 						before.guild.id, attr, before=custom_before, after=custom_after, updated_by=updated_by
@@ -402,17 +418,23 @@ class LogListeners(commands.Cog):
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="name"
 			)
-			await self.send_webhook(before.guild.id, "name", before=custom_before, after=custom_after, updated_by=updated_by)
+			await self.send_webhook(
+				before.guild.id, "name", before=custom_before, after=custom_after, updated_by=updated_by
+			)
 		if custom_before.topic != custom_after.topic:
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="topic"
 			)
-			await self.send_webhook(before.guild.id, "topic", before=custom_before, after=custom_after, updated_by=updated_by)
+			await self.send_webhook(
+				before.guild.id, "topic", before=custom_before, after=custom_after, updated_by=updated_by
+			)
 		if custom_before.nsfw != custom_after.nsfw:
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="nsfw"
 			)
-			await self.send_webhook(before.guild.id, "nsfw", before=custom_before, after=custom_after, updated_by=updated_by)
+			await self.send_webhook(
+				before.guild.id, "nsfw", before=custom_before, after=custom_after, updated_by=updated_by
+			)
 		if custom_before.slowmode_delay != custom_after.slowmode_delay:
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="slowmode_delay"
@@ -421,9 +443,7 @@ class LogListeners(commands.Cog):
 				before.guild.id, "slowmode", before=custom_before, after=custom_after, updated_by=updated_by
 			)
 		if custom_before.position != custom_after.position:
-			await self.send_webhook(
-				before.guild.id, "position", before=custom_before, after=custom_after
-			)
+			await self.send_webhook(before.guild.id, "position", before=custom_before, after=custom_after)
 
 		if before.overwrites != after.overwrites:
 			actions_to_check = [
@@ -437,6 +457,7 @@ class LogListeners(commands.Cog):
 				await self.send_webhook(
 					before.guild.id, "permissions", diff=diff_string, updated_by=updated_by, channel=custom_after
 				)
+
 
 async def setup(client: MyClient) -> None:
 	await client.add_cog(LogCommands(client))

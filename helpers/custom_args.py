@@ -1651,6 +1651,7 @@ def convert_to_custom_channel(channel: Optional[discord.abc.GuildChannel]):
 			return CustomForumChannel.from_channel(channel)
 	return None
 
+
 CustomChannel = Union[CustomTextChannel, CustomVoiceChannel, CustomStageChannel, CustomForumChannel]
 
 
@@ -1740,7 +1741,11 @@ class CustomMessage:
 	@property
 	def author(self) -> CustomMember:
 		"""Returns the message's author."""
-		return CustomMember.from_member(self._author) if isinstance(self._author, discord.Member) else CustomUser.from_user(self._author)
+		return (
+			CustomMember.from_member(self._author)
+			if isinstance(self._author, discord.Member)
+			else CustomUser.from_user(self._author)
+		)
 
 	@property
 	def channel(self) -> Optional[CustomChannel]:
@@ -1902,6 +1907,7 @@ class CustomTemplate:
 @dataclass
 class CustomInvite:
 	"""A class that represents a Discord invite with useful formatting properties."""
+
 	code: str
 	"""Returns the invite's code."""
 	url: str
@@ -2101,6 +2107,7 @@ class CustomAutoModRule:
 
 	def __str__(self) -> str:
 		return self.name
+
 
 @dataclass
 class CustomAutoModAction:
