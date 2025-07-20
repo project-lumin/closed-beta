@@ -1602,6 +1602,15 @@
 		"view_guild_insights": "View Server Insights"
 	},
 	"errors": {
+		"command_not_found": {
+			"embeds": [
+				{
+					"title": "Command not found",
+					"description": "The command you tried to run does not exist.",
+					"color": 13369344
+				}
+			]
+		},
 		"missing_required_argument": {
 			"embeds": [
 				{
@@ -2298,6 +2307,79 @@
 					}
 				]
 			}
+		}
+	},
+	"cogs": {
+		"afk": "AFK",
+		"basic": "Basic",
+		"economy": "Economy",
+		"giveaway": "Giveaway",
+		"help": "Help",
+		"information": "Information",
+		"logging": "Logging",
+		"moderation": "Moderation",
+		"say": "Says",
+		"setup": "Setup",
+		"snapshot": "Snapshots",
+		"status": "Status"
+	},
+	"help": {
+		"bot": {
+			"embeds": [
+				{
+					"title": "Help",
+					"description": "Here is a list of groups and commands you can use with the bot.\nUse `{prefix}help (group)` to get more information about a specific group.",
+					"fields": [
+						{
+							"name": "{module}",
+							"value": "{commands} commands",
+							"inline": true
+						}
+					]
+				}
+			]
+		},
+		"cog": {
+			"embeds": [
+				{
+					"title": "{cog} Help",
+					"description": "This module contains {commands} commands.",
+					"fields": [
+						{
+							"name": "{command.usage}",
+							"value": "{command.description}"
+						}
+					]
+				}
+			]
+		},
+		"group": {
+			"embeds": [
+				{
+					"title": "{group.prefix}{group.name} Help",
+					"description": "This group contains {commands} commands.",
+					"fields": [
+						{
+							"name": "{command.usage}",
+							"value": "{command.description}"
+						}
+					]
+				}
+			]
+		},
+		"command": {
+			"embeds": [
+				{
+					"title": "{command.usage}",
+					"description": "{command.description}",
+					"fields": [
+						{
+							"name": "Aliases",
+							"value": "{command.aliases}"
+						}
+					]
+				}
+			]
 		}
 	}
 }

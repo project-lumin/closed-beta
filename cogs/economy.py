@@ -2,11 +2,12 @@ import random
 
 import discord
 from discord import app_commands
-from discord.ext import commands, localization
+from discord.ext import commands
 
 from helpers import custom_response, random_helper
-from helpers.custom_args import *
+from helpers.custom_args import CustomRole, CustomUser, CustomMember
 from main import MyClient, Context
+from typing import Literal, Optional, Union
 
 
 class ShopItem:
@@ -302,7 +303,7 @@ class EconomyHelper:
 
 @app_commands.guild_only()
 @commands.guild_only()
-class Economy(commands.GroupCog, group_name="economy"):
+class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	def __init__(self, client):
 		self.client: MyClient = client
 		self.helper = EconomyHelper(client)
@@ -339,7 +340,7 @@ class Economy(commands.GroupCog, group_name="economy"):
 		await ctx.send(**message)
 
 	@commands.hybrid_command(name="work", description="work_specs-description")
-	@commands.cooldown(1, 3600, commands.BucketType.user)
+	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
 	async def work(self, ctx: Context):
 		amount: int = random.randint(300, 1500)
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
@@ -354,7 +355,7 @@ class Economy(commands.GroupCog, group_name="economy"):
 		await ctx.send("crime", amount=amount)
 
 	@commands.hybrid_command(name="daily", description="daily_specs-description")
-	@commands.cooldown(1, 86400, commands.BucketType.user)
+	@commands.cooldown(1, 86400, commands.BucketType.user)  # type: ignore
 	async def daily(self, ctx: Context):
 		amount = 5000
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
@@ -435,7 +436,7 @@ class Economy(commands.GroupCog, group_name="economy"):
 			await ctx.send("removemoney.errors.positive")
 
 	@commands.hybrid_command(name="luck", description="luck_specs-description")
-	@commands.cooldown(1, 3600, commands.BucketType.user)
+	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
 	async def luck(self, ctx: Context):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 		minimum_balance = 1000
@@ -505,7 +506,7 @@ class Economy(commands.GroupCog, group_name="economy"):
 	@app_commands.rename(bet="slots_specs-args-bet-name")
 	@app_commands.describe(bet="slots_specs-args-bet-description")
 	@commands.hybrid_command(name="slots", description="slots_specs-description", usage="slots_specs-usage")
-	@commands.cooldown(1, 3600, commands.BucketType.user)
+	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
 	async def slots(self, ctx: Context, bet: int):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 
@@ -600,8 +601,7 @@ class Economy(commands.GroupCog, group_name="economy"):
 		await ctx.send("withdraw.success", amount=amount)
 
 
-# noinspection PyTypeChecker
-class Shop(commands.Cog):
+class Shop(commands.Cog, name="Shop"):
 	def __init__(self, client):
 		self.client: MyClient = client
 		self.helper = EconomyHelper(client)

@@ -1,7 +1,20 @@
 {
+	"member": "tag",
+	"amount": "mennyiség",
+	"bet": "tét",
+	"ip_addr": "ip_cím",
+	"on": "be",
+	"off": "ki",
+	"mod": "mod",
+	"delete": "törlés",
+	"economy": "economy",
+	"account": "fiók",
+	"cash": "készpénz",
+	"bank": "bank",
+	"…": "...",
 	"global": {
-		"member": "gjndogfvjrdesn",
-		"amount": "ghnjmdolkifv",
+		"member": "tag",
+		"amount": "mennyiség",
 		"account": "fiók",
 		"cash": "készpénz",
 		"bank": "bank",
@@ -642,6 +655,55 @@
 			"message": {
 				"name": "üzenet",
 				"description": "Az👏üzenet👏amit👏tapsolni👏szeretnél"
+			}
+		}
+	},
+	"log": "log",
+	"log_specs": {
+		"description": "Naplózás beállítása a szerveren",
+		"usage": "log [on|off] (csatorna)",
+		"fallback": "set",
+		"args": {
+			"state": {
+				"name": "állapot",
+				"description": "A naplózás állapota (on/off)"
+			},
+			"channel": {
+				"name": "csatorna",
+				"description": "Hová naplózzon a bot?"
+			}
+		}
+	},
+	"add": "add",
+	"logadd_specs": {
+		"description": "Modul hozzáadása a naplózási rendszerhez",
+		"usage": "log add [modul]",
+		"args": {
+			"module": {
+				"name": "modul",
+				"description": "A modul, amit hozzá szeretnél adni a naplózási rendszerhez"
+			}
+		}
+	},
+	"remove": "remove",
+	"logremove_specs": {
+		"description": "Modul eltávolítása a naplózási rendszerből",
+		"usage": "log remove [modul]",
+		"args": {
+			"module": {
+				"name": "modul",
+				"description": "A modul, amit el szeretnél távolítani a naplózási rendszerből"
+			}
+		}
+	},
+	"l10nreload": "l10nreload",
+	"l10nreload_specs": {
+		"description": "Lokalizációs fájlok újratöltése (dev-only)",
+		"usage": "l10nreload (útvonal)",
+		"args": {
+			"path": {
+				"name": "útvonal",
+				"description": "A lokalizációs fájlok mappája (alap: ./localization)"
 			}
 		}
 	}

@@ -619,7 +619,7 @@ class Ban(Case):
 
 @commands.guild_only()
 @app_commands.guild_only()
-class Moderation(commands.GroupCog, name="mod"):
+class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 		self.custom_response = custom_response.CustomResponse(client, "mod")
@@ -875,7 +875,7 @@ class Moderation(commands.GroupCog, name="mod"):
 
 @commands.guild_only()
 @app_commands.guild_only()
-class Cases(commands.Cog):
+class Cases(commands.Cog, name="Cases"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 		self.custom_response = custom_response.CustomResponse(client, "mod")

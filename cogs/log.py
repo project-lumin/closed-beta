@@ -20,13 +20,19 @@ from helpers import (
 from main import MyClient, Context
 
 
-class LogCommands(commands.Cog):
+class LogCommands(commands.Cog, name="Logging"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
-	@commands.hybrid_group(name="log", fallback="log-specs_fallback", description="log-specs_description")
+	@commands.hybrid_group(
+		name="log", fallback="log_specs-fallback", description="log_specs-description", usage="log_specs-usage"
+	)
 	@commands.has_permissions(manage_guild=True)
-	@app_commands.checks.has_permissions(manage_guild=True)
+	@app_commands.rename(state="log_specs-args-state-name", channel="log_specs-args-channel-name")
+	@app_commands.describe(
+		state="log_specs-args-state-description",
+		channel="log_specs-args-channel-description",
+	)
 	async def log_toggle(
 		self,
 		ctx: Context,
@@ -56,7 +62,10 @@ class LogCommands(commands.Cog):
 		)
 		await ctx.send(content="log.toggle.on", channel=CustomTextChannel.from_channel(channel))
 
-	@log_toggle.command(name="add")
+	@log_toggle.command(name="add", description="logadd_specs-description", usage="logadd_specs-usage")
+	@app_commands.rename(module="logadd_specs-args-module-name")
+	@app_commands.describe(module="logadd_specs-args-module-description")
+	@commands.has_permissions(manage_guild=True)
 	async def log_module_add(self, ctx: Context, module: str):
 		if module == "all":
 			await self.client.db.execute("UPDATE log SET modules = DEFAULT WHERE guild_id = $1", ctx.guild.id)
@@ -69,7 +78,10 @@ class LogCommands(commands.Cog):
 
 		await ctx.send("log.module.add", module=module)
 
-	@log_toggle.command(name="remove")
+	@log_toggle.command(name="remove", description="logremove_specs-description", usage="logremove_specs-usage")
+	@app_commands.rename(module="logremove_specs-args-module-name")
+	@app_commands.describe(module="logremove_specs-args-module-description")
+	@commands.has_permissions(manage_guild=True)
 	async def log_module_remove(self, ctx: Context, module: str):
 		if module == "all":
 			await self.client.db.execute("UPDATE log SET modules = ARRAY[] WHERE guild_id = $1", ctx.guild.id)

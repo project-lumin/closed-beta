@@ -82,10 +82,10 @@ class Command:
 	description: str
 	usage: str
 	prefix: str
+	aliases: Optional[str]
 
 	@classmethod
 	def from_ctx(cls, ctx: commands.Context):
-		prefix = ctx.prefix.replace(ctx.me.mention, f"@{ctx.me.display_name}") if ctx.prefix else "?!"
 		if ctx.command and slash_command_localization:
 			usage = (
 				slash_command_localization(ctx.command.usage, ctx) if ctx.command.usage else ctx.command.qualified_name
@@ -94,9 +94,25 @@ class Command:
 			return cls(
 				name=ctx.command.qualified_name,
 				description=description if isinstance(description, str) and description else "-",
-				usage=f"{prefix}{usage}",
-				prefix=prefix,
+				usage=f"{ctx.clean_prefix}{usage}",
+				prefix=ctx.clean_prefix,
+				aliases=", ".join(ctx.command.aliases) if len(ctx.command.aliases) > 0 else None,
 			)
+		return None
+
+	@classmethod
+	def from_command(cls, command: commands.Command, ctx: commands.Context):
+		if slash_command_localization:
+			usage = slash_command_localization(command.usage, ctx) if command.usage else command.qualified_name
+			description = slash_command_localization(command.description, ctx)
+			return cls(
+				name=command.qualified_name,
+				description=description if isinstance(description, str) and description else "-",
+				usage=f"{ctx.clean_prefix}{usage}",
+				prefix=ctx.clean_prefix,
+				aliases=", ".join(command.aliases) if len(command.aliases) > 0 else None,
+			)
+		return None
 
 
 @dataclass
@@ -244,6 +260,7 @@ class MyClient(commands.AutoShardedBot):
 		self.loop: asyncio.AbstractEventLoop = asyncio.new_event_loop()
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None  # type: ignore
+		self.session: aiohttp.ClientSession = None  # type: ignore
 		self.ready_event = asyncio.Event()
 		self.owner_ids = {
 			648168353453572117,  # pearoo
@@ -380,6 +397,7 @@ class MyClient(commands.AutoShardedBot):
 			"basic",
 			"economy",
 			"giveaway",
+			"help",
 			"info",
 			"log",
 			"mod",
@@ -564,7 +582,7 @@ async def after_invoke(ctx: commands.Context):
 		pass
 
 
-@client.hybrid_command(name="reload", description="reload_specs-description", usage="reload_specs-usage")
+@client.hybrid_command(hidden=True, name="reload", description="reload_specs-description", usage="reload_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="reload_specs-args-cog-description")
 @app_commands.rename(cog="reload_specs-args-cog-name")
@@ -579,7 +597,7 @@ async def reload(ctx: commands.Context, cog: str):
 		await ctx.reply(content=f"Failed to reload extension `{cog}`: {e}")
 
 
-@client.hybrid_command(name="load", description="load_specs-description", usage="load_specs-usage")
+@client.hybrid_command(hidden=True, name="load", description="load_specs-description", usage="load_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="load_specs-args-cog-description")
 @app_commands.rename(cog="load_specs-args-cog-name")
@@ -594,7 +612,7 @@ async def load(ctx: commands.Context, cog: str):
 		await ctx.reply(content=f"Failed to load extension `{cog}`: {e}")
 
 
-@client.hybrid_command(name="unload", description="unload_specs-description", usage="unload_specs-usage")
+@client.hybrid_command(hidden=True, name="unload", description="unload_specs-description", usage="unload_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="unload_specs-args-cog-description")
 @app_commands.rename(cog="unload_specs-args-cog-name")
@@ -610,20 +628,18 @@ async def unload(ctx: commands.Context, cog: str):
 
 
 @client.hybrid_command(
-	name="l10n-reload",
-	description="l10n-reload_specs-description",
-	usage="l10n-reload_specs-usage",
+	hidden=True, name="l10nreload", description="l10nreload_specs-description", usage="l10nreload_specs-usage"
 )
 @commands.is_owner()
-@app_commands.describe(path="l10n-reload_specs-args-path-description")
-@app_commands.rename(path="l10n-reload_specs-args-path-name")
+@app_commands.describe(path="l10nreload_specs-args-path-description")
+@app_commands.rename(path="l10nreload_specs-args-path-name")
 async def l10nreload(ctx: commands.Context, path: str = "./localization"):
 	ctx.bot.custom_response.load_localizations(path)
 	await ctx.reply(content="Reloaded localization files.")
 	logger.info(f"{ctx.author.name} reloaded localization files.")
 
 
-@client.hybrid_command(name="sync", description="sync_specs-description", usage="sync_specs-usage")
+@client.hybrid_command(hidden=True, name="sync", description="sync_specs-description", usage="sync_specs-usage")
 @commands.is_owner()
 @app_commands.describe(
 	guilds="sync_specs-args-guilds-description",

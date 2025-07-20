@@ -2299,5 +2299,78 @@
 				]
 			}
 		}
+	},
+	"cogs": {
+		"afk": "AFK",
+		"basic": "Alap (basic)",
+		"economy": "Pénzrendszer (economy)",
+		"giveaway": "Nyereményjáték (giveaway)",
+		"help": "Segítség (help)",
+		"info": "Információ (information)",
+		"log": "Naplózás (logging)",
+		"moderation": "Moderáció (moderation)",
+		"say": "Üzenetek (says)",
+		"setup": "Konfiguráció (setup)",
+		"snapshot": "Snapshot-ok (snapshots)",
+		"status": "Státusz (status)"
+	},
+	"help": {
+		"bot": {
+			"embeds": [
+				{
+					"title": "Segítség",
+					"description": "Itt egy lista a botban található modulokról és csoportokról.\nHasználd a(z) `{prefix}help (csoport)` parancsot további információkért.",
+					"fields": [
+						{
+							"name": "{module}",
+							"value": "{commands} parancs",
+							"inline": true
+						}
+					]
+				}
+			]
+		},
+		"cog": {
+			"embeds": [
+				{
+					"title": "{cog} segítség",
+					"description": "Ez a modul {commands} parancsot tartalmaz.",
+					"fields": [
+						{
+							"name": "{command.usage}",
+							"value": "{command.description}"
+						}
+					]
+				}
+			]
+		},
+		"group": {
+			"embeds": [
+				{
+					"title": "{group.prefix}{group.name} segítség",
+					"description": "Ez a csoport {commands} parancsot tartalmaz.",
+					"fields": [
+						{
+							"name": "{command.usage}",
+							"value": "{command.description}"
+						}
+					]
+				}
+			]
+		},
+		"command": {
+			"embeds": [
+				{
+					"title": "{command.usage}",
+					"description": "{command.description}",
+					"fields": [
+						{
+							"name": "Aliasok",
+							"value": "{command.aliases}"
+						}
+					]
+				}
+			]
+		}
 	}
 }
