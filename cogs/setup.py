@@ -1,7 +1,8 @@
 from discord import app_commands
 
 import main
-from helpers import *
+from discord.ext import commands
+from typing import Optional
 
 
 class Setup(commands.Cog, name="Setup"):
