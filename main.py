@@ -86,7 +86,6 @@ class Command:
 
 	@classmethod
 	def from_ctx(cls, ctx: commands.Context):
-		prefix = ctx.prefix.replace(ctx.me.mention, f"@{ctx.me.display_name}") if ctx.prefix else "?!"
 		if ctx.command and slash_command_localization:
 			usage = (
 				slash_command_localization(ctx.command.usage, ctx) if ctx.command.usage else ctx.command.qualified_name
