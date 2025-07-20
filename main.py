@@ -260,6 +260,7 @@ class MyClient(commands.AutoShardedBot):
 		self.loop: asyncio.AbstractEventLoop = asyncio.new_event_loop()
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None  # type: ignore
+		self.session: aiohttp.ClientSession = None  # type: ignore
 		self.ready_event = asyncio.Event()
 		self.owner_ids = {
 			648168353453572117,  # pearoo
