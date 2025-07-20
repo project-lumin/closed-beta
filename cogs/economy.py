@@ -340,7 +340,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		await ctx.send(**message)
 
 	@commands.hybrid_command(name="work", description="work_specs-description")
-	@commands.cooldown(1, 3600, commands.BucketType.user)
+	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
 	async def work(self, ctx: Context):
 		amount: int = random.randint(300, 1500)
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
@@ -355,7 +355,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		await ctx.send("crime", amount=amount)
 
 	@commands.hybrid_command(name="daily", description="daily_specs-description")
-	@commands.cooldown(1, 86400, commands.BucketType.user)
+	@commands.cooldown(1, 86400, commands.BucketType.user)  # type: ignore
 	async def daily(self, ctx: Context):
 		amount = 5000
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
@@ -436,7 +436,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			await ctx.send("removemoney.errors.positive")
 
 	@commands.hybrid_command(name="luck", description="luck_specs-description")
-	@commands.cooldown(1, 3600, commands.BucketType.user)
+	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
 	async def luck(self, ctx: Context):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 		minimum_balance = 1000
@@ -506,7 +506,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@app_commands.rename(bet="slots_specs-args-bet-name")
 	@app_commands.describe(bet="slots_specs-args-bet-description")
 	@commands.hybrid_command(name="slots", description="slots_specs-description", usage="slots_specs-usage")
-	@commands.cooldown(1, 3600, commands.BucketType.user)
+	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
 	async def slots(self, ctx: Context, bet: int):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 
