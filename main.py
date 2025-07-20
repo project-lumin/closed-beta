@@ -113,6 +113,7 @@ class Command:
 				prefix=ctx.clean_prefix,
 				aliases=", ".join(command.aliases) if len(command.aliases) > 0 else None,
 			)
+		return None
 
 
 @dataclass
