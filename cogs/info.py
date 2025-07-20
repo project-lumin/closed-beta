@@ -72,6 +72,8 @@ class Info(commands.Cog, name="Information"):
 		await ctx.send("info.role", role=CustomRole.from_role(role))
 
 	@info.command(name="ip", description="ipinfo_specs-description")
+	@app_commands.rename(ip_addr="ipinfo_specs-args-ip-name")
+	@app_commands.describe(ip_addr="ipinfo_specs-args-ip-description")
 	async def ip(self, ctx: Context, ip_addr: str):
 		try:
 			ip_json = await self.client.request(f"https://ipinfo.io/{ip_addr}/json")
