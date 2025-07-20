@@ -150,8 +150,7 @@ class Info(commands.Cog, name="Information"):
 		if template_code:
 			try:
 				template_obj = await self.client.fetch_template(template_code)
-				await ctx.send("info.template", template=CustomTemplate.from_template(template_obj))
-				return
+				return await ctx.send("info.template", template=CustomTemplate.from_template(template_obj))
 			except discord.NotFound:
 				pass
 
