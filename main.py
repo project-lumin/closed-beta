@@ -397,6 +397,7 @@ class MyClient(commands.AutoShardedBot):
 			"basic",
 			"economy",
 			"giveaway",
+			"help",
 			"info",
 			"log",
 			"mod",
