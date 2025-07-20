@@ -1,7 +1,7 @@
 # Lumin
 
 [![Crowdin](https://badges.crowdin.net/project-lumin/localized.svg)](https://crowdin.com/project/project-lumin)
-![GitHub Release](https://img.shields.io/github/v/release/project-lumin/closed-beta)
+[![GitHub Release](https://img.shields.io/github/v/release/project-lumin/closed-beta)](https://github.com/project-lumin/closed-beta/releases/latest)
 ![GitHub Stars](https://img.shields.io/github/stars/project-lumin/closed-beta?style=flat)
 [![Discord](https://img.shields.io/discord/572077459189792769?label=discord
 )](https://discord.gg/s8zBYQk)
