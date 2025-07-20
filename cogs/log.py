@@ -405,10 +405,7 @@ class LogListeners(commands.Cog):
 			if hasattr(custom_before, attr) and hasattr(custom_after, attr):
 				if getattr(custom_before, attr) != getattr(custom_after, attr):
 					updated_by = await self._get_actor(
-						after.guild,
-						after.id,
-						discord.AuditLogAction.channel_update,
-						changed_attribute=attr
+						after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute=attr
 					)
 					await self.send_webhook(
 						before.guild.id, attr, before=custom_before, after=custom_after, updated_by=updated_by
