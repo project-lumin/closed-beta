@@ -628,10 +628,7 @@ async def unload(ctx: commands.Context, cog: str):
 
 
 @client.hybrid_command(
-	hidden=True,
-	name="l10nreload",
-	description="l10nreload_specs-description",
-	usage="l10nreload_specs-usage"
+	hidden=True, name="l10nreload", description="l10nreload_specs-description", usage="l10nreload_specs-usage"
 )
 @commands.is_owner()
 @app_commands.describe(path="l10nreload_specs-args-path-description")

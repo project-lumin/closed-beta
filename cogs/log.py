@@ -24,7 +24,9 @@ class LogCommands(commands.Cog, name="Logging"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
-	@commands.hybrid_group(name="log", fallback="log_specs-fallback", description="log_specs-description", usage="log_specs-usage")
+	@commands.hybrid_group(
+		name="log", fallback="log_specs-fallback", description="log_specs-description", usage="log_specs-usage"
+	)
 	@commands.has_permissions(manage_guild=True)
 	@app_commands.rename(state="log_specs-args-state-name", channel="log_specs-args-channel-name")
 	@app_commands.describe(
