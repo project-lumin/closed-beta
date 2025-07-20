@@ -25,7 +25,7 @@ class Setup(commands.Cog, name="Setup"):
 			mention,
 			ctx.guild.id,
 		)
-		await ctx.send("setup.prefix.set", prefix=prefix)
+		return await ctx.send("setup.prefix.set", prefix=prefix)
 
 
 async def setup(client):
