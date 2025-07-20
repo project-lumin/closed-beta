@@ -12,7 +12,7 @@ from main import Context, logger
 import helpers
 
 
-class Giveaway(commands.Cog):
+class Giveaway(commands.Cog, name="Giveaway"):
 	def __init__(self, client):
 		self.client = client
 		self.custom_response = CustomResponse(client)

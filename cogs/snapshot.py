@@ -15,7 +15,7 @@ from helpers import CustomResponse
 from main import MyClient
 
 
-class Snapshot(commands.Cog):
+class Snapshot(commands.Cog, name="Snapshots"):
 	def __init__(self, client):
 		self.client: MyClient = client
 		self.connection: asyncpg.Pool = client.db

@@ -4,7 +4,7 @@ import main
 from helpers import *
 
 
-class Setup(commands.Cog):
+class Setup(commands.Cog, name="Setup"):
 	def __init__(self, client):
 		self.client = client
 

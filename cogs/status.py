@@ -8,7 +8,7 @@ from discord.ext import commands, tasks
 from main import MyClient
 
 
-class Status(commands.Cog):
+class Status(commands.Cog, command_attrs=dict(hidden=True)):
 	def __init__(self, client):
 		self.client: MyClient = client
 

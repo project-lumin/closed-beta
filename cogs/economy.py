@@ -302,7 +302,7 @@ class EconomyHelper:
 
 @app_commands.guild_only()
 @commands.guild_only()
-class Economy(commands.GroupCog, group_name="economy"):
+class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	def __init__(self, client):
 		self.client: MyClient = client
 		self.helper = EconomyHelper(client)
@@ -600,8 +600,7 @@ class Economy(commands.GroupCog, group_name="economy"):
 		await ctx.send("withdraw.success", amount=amount)
 
 
-# noinspection PyTypeChecker
-class Shop(commands.Cog):
+class Shop(commands.Cog, name="Shop"):
 	def __init__(self, client):
 		self.client: MyClient = client
 		self.helper = EconomyHelper(client)

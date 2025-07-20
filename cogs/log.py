@@ -20,7 +20,7 @@ from helpers import (
 from main import MyClient, Context
 
 
-class LogCommands(commands.Cog):
+class LogCommands(commands.Cog, name="Logging"):
 	def __init__(self, client: MyClient) -> None:
 		self.client = client
 

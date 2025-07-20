@@ -14,7 +14,7 @@ from helpers.custom_args import *
 from main import MyClient, Context
 
 
-class Info(commands.Cog):
+class Info(commands.Cog, name="Information"):
 	def __init__(self, client: MyClient):
 		self.client = client
 

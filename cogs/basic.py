@@ -6,7 +6,7 @@ import main
 from main import MyClient
 
 
-class Basic(commands.Cog):
+class Basic(commands.Cog, name="Basic"):
 	def __init__(self, client: MyClient):
 		self.client: MyClient = client
 
