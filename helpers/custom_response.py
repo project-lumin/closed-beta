@@ -19,7 +19,7 @@ PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+}$")
 
 
 class CustomResponse:
-	"""A class to handle custom responses."""
+	"""A class to handle custom responses with localization."""
 
 	def __init__(self, client: discord.Client | Type[discord.Client], name: Optional[str] = None) -> None:
 		"""A custom message instance.
