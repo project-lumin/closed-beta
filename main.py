@@ -32,13 +32,8 @@ logger = logging.getLogger()
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-DEBUG = False
-"""Whether the bot is in debug mode or not. This controls which token and prefix to use and where to send error reports.
-If you're on Windows, this will be set to True automatically."""
-if platform.system() == "Windows":
-	DEBUG = True
 
-if DEBUG:
+if __debug__:
 	TOKEN = os.getenv("DEBUG_TOKEN")
 
 slash_command_localization: Optional[localization.Localization] = None
@@ -291,7 +286,7 @@ class MyClient(commands.AutoShardedBot):
 				return await response.json()
 
 	async def get_prefix(self, message: discord.Message) -> Union[str, list[str]]:
-		if DEBUG:
+		if __debug__:
 			return "?"
 		if not message.guild:
 			return "?!"
@@ -510,7 +505,7 @@ class MyClient(commands.AutoShardedBot):
 			case _:
 				# if the error is unknown, log it
 				channel: discord.TextChannel = (
-					ctx.channel if DEBUG and ctx and ctx.channel else await self.fetch_channel(1268260404677574697)
+					ctx.channel if __debug__ and ctx and ctx.channel else await self.fetch_channel(1268260404677574697)
 				)
 				stack = "".join(traceback.format_exception(type(error), error, error.__traceback__))
 				# if stack is more than 1700 characters, turn it into a .txt file and store it as an attachment
@@ -704,9 +699,10 @@ async def start():
 
 
 if __name__ == "__main__":
-	if DEBUG:
-		TOKEN = os.getenv("DEBUG_TOKEN")
+	if __debug__:
 		logger.info("Running in debug mode")
+	else:
+		logger.info("Running in production mode")
 	try:
 		loop = asyncio.new_event_loop()
 		loop.run_until_complete(start())

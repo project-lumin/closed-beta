@@ -180,8 +180,11 @@ class CustomResponse:
 			"now": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
 		}
 
-		if DEBUG:
-			self.load_localizations("../localization")
+		if __debug__:
+			now = time.time()
+			if now - self._last_debug_reload > 5:
+				self.load_localizations("../localization")
+				self._last_debug_reload = now
 
 		payload = localization.Localization(self.localizations, default_locale="en").localize(
 			name, locale, **kwargs, random=r"{random}", **context_formatting
