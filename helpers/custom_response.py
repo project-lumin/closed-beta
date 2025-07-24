@@ -15,7 +15,6 @@ from discord.ext import commands, localization
 from helpers import emojis
 
 logger = logging.getLogger(__name__)
-PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+}$")
 
 
 class CustomResponse:
