@@ -2301,6 +2301,37 @@
 					}
 				]
 			}
+		},
+		"on_message_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Üzenet Törölve",
+						"description": "{message.author} üzenete a(z) {message.channel.mention} csatornában törölve lett.",
+						"fields": [
+							{
+								"name": "Tartalom",
+								"value": "```{message.content}```",
+								"inline": false
+							},
+							{
+								"name": "Beágyazások száma",
+								"value": "{message.embeds}",
+								"inline": true
+							},
+							{
+								"name": "Csatolmányok száma",
+								"value": "{message.attachments}",
+								"inline": true
+							},
+							{
+								"name": "Törölte",
+								"value": "{deleted_by.mention} (`{deleted_by.id}`)"
+							}
+						]
+					}
+				]
+			}
 		}
 	},
 	"cogs": {

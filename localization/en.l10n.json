@@ -2310,6 +2310,37 @@
 					}
 				]
 			}
+		},
+		"on_message_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Message Deleted",
+						"description": "A message by {message.author} was deleted in {message.channel.mention}.",
+						"fields": [
+							{
+								"name": "Message content",
+								"value": "```{message.content}```",
+								"inline": false
+							},
+							{
+								"name": "Number of embeds",
+								"value": "{message.embeds}",
+								"inline": true
+							},
+							{
+								"name": "Number of attachments",
+								"value": "{message.attachments}",
+								"inline": true
+							},
+							{
+								"name": "Deleted by",
+								"value": "{deleted_by.mention} (`{deleted_by.id}`)"
+							}
+						]
+					}
+				]
+			}
 		}
 	},
 	"cogs": {
