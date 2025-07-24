@@ -46,13 +46,12 @@ def update_slash_localizations():
 	for file_path in pathlib.Path("./slash_localization").glob("*.l10n.json"):
 		lang = file_path.stem.removesuffix(".l10n")
 		try:
-			with open(file_path, encoding="utf-8") as f:
-				data = json.load(f)
-				if not isinstance(data, dict):
-					raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
-				if lang not in slash_localizations:
-					slash_localizations[lang] = {}
-				slash_localizations[lang].update(data)
+			data = json.loads(Path(file_path).read_text(encoding="utf-8"))
+			if not isinstance(data, dict):
+				raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
+			if lang not in slash_localizations:
+				slash_localizations[lang] = {}
+			slash_localizations[lang].update(data)
 		except Exception as e:
 			logger.warning(f"Failed to load {file_path}: {e}")
 	global slash_command_localization
@@ -252,7 +251,7 @@ class MyClient(commands.AutoShardedBot):
 	def __init__(self):
 		update_slash_localizations()
 		self.uptime: Optional[datetime.datetime] = None
-		self.loop: asyncio.AbstractEventLoop = asyncio.new_event_loop()
+		self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None  # type: ignore
 		self.session: aiohttp.ClientSession = None  # type: ignore
@@ -281,9 +280,8 @@ class MyClient(commands.AutoShardedBot):
 		self.custom_response = custom_response.CustomResponse(self)
 
 	async def request(self, url: str):
-		async with self.session as session:
-			async with session.get(url) as response:
-				return await response.json()
+		async with self.session.get(url) as response:
+			return await response.json()
 
 	async def get_prefix(self, message: discord.Message) -> Union[str, list[str]]:
 		if __debug__:
@@ -690,7 +688,7 @@ async def sync(
 		await ctx.reply(content=f"Synced the tree to **{guilds_synced}/{len(guilds)}** guilds, took **{end:.2f}s**")
 
 
-async def start():
+async def main():
 	try:
 		await client.start(TOKEN)
 	except KeyboardInterrupt:
@@ -704,7 +702,6 @@ if __name__ == "__main__":
 	else:
 		logger.info("Running in production mode")
 	try:
-		loop = asyncio.new_event_loop()
-		loop.run_until_complete(start())
+		asyncio.run(main())
 	except KeyboardInterrupt:
 		logger.error("KeyboardInterrupt: Bot shut down by console")
