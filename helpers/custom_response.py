@@ -5,8 +5,8 @@ import json
 import logging
 import pathlib
 import random
-import re
-from typing import Any, Optional, Type, Union, overload
+import time
+from typing import Any, Optional, Union, overload
 
 import discord
 from .custom_args import CustomGuild, CustomMember
