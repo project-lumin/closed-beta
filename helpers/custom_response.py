@@ -162,10 +162,10 @@ class CustomResponse:
 
 		context_formatting = {
 			"author": CustomMember.from_member(original.author)
-				if isinstance(original, commands.Context)
-				else CustomMember.from_member(original.user)
-				if isinstance(original, discord.Interaction)
-				else None,
+			if isinstance(original, commands.Context)
+			else CustomMember.from_member(original.user)
+			if isinstance(original, discord.Interaction)
+			else None,
 			"guild": (
 				CustomGuild.from_guild(original.guild)
 				if isinstance(original, (discord.Interaction, commands.Context)) and hasattr(original, "guild")
@@ -182,15 +182,11 @@ class CustomResponse:
 				self.load_localizations("../localization")
 				self._last_debug_reload = now
 
-		payload = self._localizer.localize(
-			name, locale, **kwargs, random=r"{random}", **context_formatting
-		)
+		payload = self._localizer.localize(name, locale, **kwargs, random=r"{random}", **context_formatting)
 
 		if isinstance(payload, dict):
 			if random_value := payload.get("random"):
-				payload = localization.Localization.format_strings(
-					payload, random=random.choice(random_value)
-				)
+				payload = localization.Localization.format_strings(payload, random=random.choice(random_value))
 			payload.pop("random", None)
 			payload = self.convert_embeds(payload) if convert_embeds else payload
 
