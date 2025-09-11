@@ -466,6 +466,19 @@
 				}
 			}
 		},
+		"slowmode": {
+			"reason": "{moderator.username} frissítette a lassítást",
+			"response": {
+				"embeds": [
+					{
+						"title": "Lassítás frissítve",
+						"description": "{channel.mention} csatorna lassítása frissítve lett `{time}` értékre.",
+						"color": 6656243,
+						"timestamp": "{now}"
+					}
+				]
+			}
+		},
 		"delete": {
 			"response": {
 				"embeds": [

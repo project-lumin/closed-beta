@@ -1,23 +1,26 @@
+import datetime
+from copy import deepcopy
 from enum import Enum
-from typing import Self, Any, Literal
+from typing import Any, Literal, Self
 
 import asyncpg
 import discord
 from discord import app_commands
 from discord.ext import commands
-import datetime
+
 import main
 from helpers import (
-	FormatDateTime,
-	CustomMember,
 	CustomGuild,
+	CustomMember,
+	CustomTextChannel,
 	CustomUser,
-	custom_response,
+	FormatDateTime,
 	convert_to_query,
+	custom_response,
+	seconds_to_text,
 	text_to_seconds,
 )
 from main import MyClient
-from copy import deepcopy
 
 
 class CaseType(Enum):
@@ -871,6 +874,24 @@ class Moderation(commands.GroupCog, name="mod"):
 				pass
 
 		await ctx.send("mod.unban.response", user=CustomUser.from_user(user))
+
+	@commands.bot_has_permissions(manage_channels=True)
+	@app_commands.checks.bot_has_permissions(manage_channels=True)
+	@commands.has_permissions(manage_channels=True)
+	@app_commands.checks.has_permissions(manage_channels=True)
+	@commands.hybrid_command(name="slowmode", description="sm_specs-description", usage="sm_specs-usage")
+	async def slowmode(self, ctx: main.Context, seconds: str, channel: discord.TextChannel = None):
+		channel = channel or ctx.channel
+		max_slowmode_delay = 60 * 60 * 6  # 6 hours
+		slowmode_before = channel.slowmode_delay
+		try:
+			seconds = text_to_seconds(seconds, channel.slowmode_delay)
+		except ValueError:
+			raise commands.BadArgument
+		seconds = max(0, min(seconds, max_slowmode_delay))
+		reason = await self.custom_response("mod.slowmode.reason", ctx, moderator=CustomMember.from_member(ctx.author))
+		await ctx.channel.edit(slowmode_delay=seconds, reason=reason)
+		await ctx.send("mod.slowmode.response", channel=CustomTextChannel.from_channel(channel), time_before=seconds_to_text(slowmode_before), time=seconds_to_text(seconds))
 
 
 @commands.guild_only()

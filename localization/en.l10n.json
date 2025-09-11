@@ -420,6 +420,19 @@
 				}
 			}
 		},
+		"slowmode": {
+			"reason": "Slowmode changed by {moderator.username}",
+			"response": {
+				"embeds": [
+					{
+						"title": "Slowmode changed",
+						"description": "Set slowmode in {channel.mention} to `{time}`.",
+						"color": 6656243,
+						"timestamp": "{now}"
+					}
+				]
+			}
+		},
 		"info": {
 			"response": {
 				"embeds": [

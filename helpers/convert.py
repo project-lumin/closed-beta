@@ -6,7 +6,7 @@ from typing import Optional
 import discord
 
 
-def text_to_seconds(time: str) -> int:
+def text_to_seconds(time: str, base: int = 0) -> int:
 	"""
 	Converts text into seconds. ex.: 5m = 300, 1d3min = 86400
 
@@ -34,6 +34,9 @@ def text_to_seconds(time: str) -> int:
 	        - minutes
 
 	        - seconds
+	base: `int`
+	    Base seconds to add the result to, or remove the result from, if ``time`` starts with a plus or minus sign
+	    respectively.
 
 	Returns
 	-------
@@ -89,10 +92,18 @@ def text_to_seconds(time: str) -> int:
 	matches = pattern.findall(time)
 
 	if not matches:
-		raise ValueError(f"String doesn't contain time units ('{time}')")
+		try:
+			return int(time) + base
+		except ValueError:
+			raise ValueError(f"String doesn't contain time units ('{time}')")
 
 	for value, unit in matches:
 		total_seconds += int(value) * time_units.get(unit)
+
+	if time.startswith("-"):
+		total_seconds = base - total_seconds
+	elif time.startswith("+"):
+		total_seconds = base + total_seconds
 
 	return total_seconds
 
@@ -111,6 +122,8 @@ def seconds_to_text(seconds: int) -> str:
 	`str`
 	        Human-readable time.
 	"""
+	if seconds == 0:
+		return "0s"
 	time_units = {
 		"y": 60 * 60 * 24 * 365,
 		"mo": 60 * 60 * 24 * 31,
