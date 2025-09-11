@@ -1,10 +1,11 @@
 from discord import app_commands
 
 import main
-from helpers import *
+from discord.ext import commands
+from typing import Optional
 
 
-class Setup(commands.Cog):
+class Setup(commands.Cog, name="Setup"):
 	def __init__(self, client):
 		self.client = client
 
@@ -24,7 +25,7 @@ class Setup(commands.Cog):
 			mention,
 			ctx.guild.id,
 		)
-		await ctx.send("setup.prefix.set", prefix=prefix)
+		return await ctx.send("setup.prefix.set", prefix=prefix)
 
 
 async def setup(client):

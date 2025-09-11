@@ -1,4 +1,16 @@
 {
+	"member": "member",
+	"amount": "amount",
+	"bet": "bet",
+	"on": "on",
+	"off": "off",
+	"mod": "mod",
+	"delete": "delete",
+	"economy": "economy",
+	"account": "account",
+	"cash": "cash",
+	"bank": "bank",
+	"…": "...",
 	"global": {
 		"member": "member",
 		"amount": "amount",
@@ -642,6 +654,55 @@
 			"message": {
 				"name": "message",
 				"description": "The👏message👏to👏clap"
+			}
+		}
+	},
+	"log": "log",
+	"log_specs": {
+		"description": "Set up logging in the server",
+		"usage": "log [on|off] (channel)",
+		"fallback": "set",
+		"args": {
+			"state": {
+				"name": "state",
+				"description": "Whether to turn logging on or off"
+			},
+			"channel": {
+				"name": "channel",
+				"description": "The channel to log in"
+			}
+		}
+	},
+	"add": "add",
+	"logadd_specs": {
+		"description": "Add a module to the logging system",
+		"usage": "log add [module]",
+		"args": {
+			"module": {
+				"name": "module",
+				"description": "The module you want to add to the logging system"
+			}
+		}
+	},
+	"remove": "remove",
+	"logremove_specs": {
+		"description": "Remove a module from the logging system",
+		"usage": "log remove [module]",
+		"args": {
+			"module": {
+				"name": "module",
+				"description": "The module you want to remove from the logging system"
+			}
+		}
+	},
+	"l10nreload": "l10nreload",
+	"l10nreload_specs": {
+		"description": "Reload localization files (dev-only)",
+		"usage": "l10nreload (path)",
+		"args": {
+			"path": {
+				"name": "path",
+				"description": "The path to the localization files (default: ./localization)"
 			}
 		}
 	}

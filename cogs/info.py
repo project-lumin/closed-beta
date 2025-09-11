@@ -1,5 +1,4 @@
 import asyncio
-import json
 import re
 
 import discord
@@ -8,13 +7,28 @@ import pypokedex
 import requests
 from discord.ext import commands
 from emoji import EMOJI_DATA
-
+from typing import Optional
 from helpers.regex import DISCORD_TEMPLATE
-from helpers.custom_args import *
+from helpers.custom_args import (
+	CustomUser,
+	CustomMember,
+	CustomGuild,
+	CustomRole,
+	IPAddress,
+	BotInfo,
+	CustomEmoji,
+	CustomPartialEmoji,
+	CustomTextChannel,
+	CustomVoiceChannel,
+	CustomCategoryChannel,
+	CustomForumChannel,
+	CustomTemplate,
+	CustomStageChannel,
+)
 from main import MyClient, Context
 
 
-class Info(commands.Cog):
+class Info(commands.Cog, name="Information"):
 	def __init__(self, client: MyClient):
 		self.client = client
 
@@ -73,6 +87,8 @@ class Info(commands.Cog):
 		await ctx.send("info.role", role=CustomRole.from_role(role))
 
 	@info.command(name="ip", description="ipinfo_specs-description")
+	@app_commands.rename(ip_addr="ipinfo_specs-args-ip-name")
+	@app_commands.describe(ip_addr="ipinfo_specs-args-ip-description")
 	async def ip(self, ctx: Context, ip_addr: str):
 		try:
 			ip_json = await self.client.request(f"https://ipinfo.io/{ip_addr}/json")
@@ -149,8 +165,7 @@ class Info(commands.Cog):
 		if template_code:
 			try:
 				template_obj = await self.client.fetch_template(template_code)
-				await ctx.send("info.template", template=CustomTemplate.from_template(template_obj))
-				return
+				return await ctx.send("info.template", template=CustomTemplate.from_template(template_obj))
 			except discord.NotFound:
 				pass
 

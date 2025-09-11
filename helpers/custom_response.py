@@ -5,8 +5,8 @@ import json
 import logging
 import pathlib
 import random
-import re
-from typing import Any, Optional, Type, Union, overload
+import time
+from typing import Any, Optional, Union, overload
 
 import discord
 from .custom_args import CustomGuild, CustomMember
@@ -15,25 +15,26 @@ from discord.ext import commands, localization
 from helpers import emojis
 
 logger = logging.getLogger(__name__)
-PLACEHOLDER_REGEX = re.compile(r"^\{[\w.]+}$")
 
 
 class CustomResponse:
-	"""A class to handle custom responses."""
+	"""A class to handle custom responses with localization."""
 
-	def __init__(self, client: discord.Client | Type[discord.Client], name: Optional[str] = None) -> None:
+	def __init__(self, client: discord.Client | type[discord.Client], name: Optional[str] = None) -> None:
 		"""A custom message instance.
 
 		Parameters
 		----------
 		client: `discord.Client`
-		        The client object with a `db` attribute.
+			The client object with a `db` attribute.
 		name: `str`
-		        The name of the cog that uses this class.
+			The name of the cog that uses this class.
 		"""
 		self.client = client
 		self.name = name
-		self.localizations = {}
+		self.localizations: dict[str, dict] = {}
+		self._localizer = None
+		self._last_debug_reload: float = 0
 
 		self.load_localizations()
 
@@ -62,9 +63,7 @@ class CustomResponse:
 			if len(data.get("embeds", [])) > 10:
 				raise ValueError(f"The maximum number of embeds is 10. You have {len(data['embeds'])} embeds.")
 			if data.get("embed") and not data.get("embeds"):
-				data["embeds"] = [data["embed"]]
-
-			data.pop("embed", None)
+				data["embeds"] = [data.pop("embed")]
 
 			cleaned_embeds = []
 			for embed_dict in data.get("embeds", []):
@@ -105,19 +104,16 @@ class CustomResponse:
 		localization_path = pathlib.Path(path)
 		for file_path in localization_path.glob("*.l10n.json"):
 			lang = file_path.stem.removesuffix(".l10n")
-			temp_dict = {}
 			try:
 				with open(file_path, encoding="utf-8") as f:
 					data = json.load(f)
 					if not isinstance(data, dict):
 						raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
-					if lang not in temp_dict:
-						temp_dict[lang] = {}
-					temp_dict[lang].update(data)
+					self.localizations.setdefault(lang, {}).update(data)
 			except Exception as e:
 				logger.warning(f"Failed to load {file_path}: {e}")
-			finally:
-				self.localizations.update(temp_dict)
+
+		self._localizer = localization.Localization(self.localizations, default_locale="en")
 
 	async def get_message(
 		self,
@@ -180,12 +176,13 @@ class CustomResponse:
 			"now": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
 		}
 
-		if DEBUG:
-			self.load_localizations("../localization")
+		if __debug__:
+			now = time.time()
+			if now - self._last_debug_reload > 5:
+				self.load_localizations("../localization")
+				self._last_debug_reload = now
 
-		payload = localization.Localization(self.localizations, default_locale="en").localize(
-			name, locale, **kwargs, random=r"{random}", **context_formatting
-		)
+		payload = self._localizer.localize(name, locale, **kwargs, random=r"{random}", **context_formatting)
 
 		if isinstance(payload, dict):
 			if random_value := payload.get("random"):

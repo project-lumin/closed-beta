@@ -11,7 +11,7 @@ import random
 from urllib.parse import quote_plus
 
 
-class Say(commands.Cog):
+class Say(commands.Cog, name="Says"):
 	def __init__(self, client: MyClient):
 		self.client: MyClient = client
 		self.custom_response: CustomResponse = CustomResponse(client)

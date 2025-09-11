@@ -8,7 +8,7 @@ from discord.ext import commands, tasks
 from main import MyClient
 
 
-class Status(commands.Cog):
+class Status(commands.Cog, command_attrs=dict(hidden=True)):
 	def __init__(self, client):
 		self.client: MyClient = client
 
@@ -24,7 +24,8 @@ class Status(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_connect(self):
-		logging.info("Status update started.")
+		self.update_status.restart()
+		logging.info("Status update restarted.")
 
 	@tasks.loop(seconds=30)
 	async def update_status(self):
@@ -35,7 +36,7 @@ class Status(commands.Cog):
 			activity=discord.CustomActivity(
 				name=f"{len(self.client.guilds)} servers | ?!{random.choice([command.qualified_name for command in self.client.commands])}"
 			),
-			status=discord.Status.online,
+			status=discord.Status.online,  # type: ignore
 		)
 
 	async def cog_unload(self) -> None:
@@ -44,7 +45,7 @@ class Status(commands.Cog):
 	async def cog_load(self) -> None:
 		if self.client.is_ready():
 			logging.info("The status string was probably updated. Restarting the status loop.")
-			self.update_status.restart()
+			await self.on_connect()
 
 
 async def setup(client: commands.AutoShardedBot):

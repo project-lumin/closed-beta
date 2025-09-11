@@ -32,13 +32,8 @@ logger = logging.getLogger()
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-DEBUG = False
-"""Whether the bot is in debug mode or not. This controls which token and prefix to use and where to send error reports.
-If you're on Windows, this will be set to True automatically."""
-if platform.system() == "Windows":
-	DEBUG = True
 
-if DEBUG:
+if __debug__:
 	TOKEN = os.getenv("DEBUG_TOKEN")
 
 slash_command_localization: Optional[localization.Localization] = None
@@ -51,13 +46,12 @@ def update_slash_localizations():
 	for file_path in pathlib.Path("./slash_localization").glob("*.l10n.json"):
 		lang = file_path.stem.removesuffix(".l10n")
 		try:
-			with open(file_path, encoding="utf-8") as f:
-				data = json.load(f)
-				if not isinstance(data, dict):
-					raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
-				if lang not in slash_localizations:
-					slash_localizations[lang] = {}
-				slash_localizations[lang].update(data)
+			data = json.loads(Path(file_path).read_text(encoding="utf-8"))
+			if not isinstance(data, dict):
+				raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
+			if lang not in slash_localizations:
+				slash_localizations[lang] = {}
+			slash_localizations[lang].update(data)
 		except Exception as e:
 			logger.warning(f"Failed to load {file_path}: {e}")
 	global slash_command_localization
@@ -82,10 +76,10 @@ class Command:
 	description: str
 	usage: str
 	prefix: str
+	aliases: Optional[str]
 
 	@classmethod
 	def from_ctx(cls, ctx: commands.Context):
-		prefix = ctx.prefix.replace(ctx.me.mention, f"@{ctx.me.display_name}") if ctx.prefix else "?!"
 		if ctx.command and slash_command_localization:
 			usage = (
 				slash_command_localization(ctx.command.usage, ctx) if ctx.command.usage else ctx.command.qualified_name
@@ -94,9 +88,25 @@ class Command:
 			return cls(
 				name=ctx.command.qualified_name,
 				description=description if isinstance(description, str) and description else "-",
-				usage=f"{prefix}{usage}",
-				prefix=prefix,
+				usage=f"{ctx.clean_prefix}{usage}",
+				prefix=ctx.clean_prefix,
+				aliases=", ".join(ctx.command.aliases) if len(ctx.command.aliases) > 0 else None,
 			)
+		return None
+
+	@classmethod
+	def from_command(cls, command: commands.Command, ctx: commands.Context):
+		if slash_command_localization:
+			usage = slash_command_localization(command.usage, ctx) if command.usage else command.qualified_name
+			description = slash_command_localization(command.description, ctx)
+			return cls(
+				name=command.qualified_name,
+				description=description if isinstance(description, str) and description else "-",
+				usage=f"{ctx.clean_prefix}{usage}",
+				prefix=ctx.clean_prefix,
+				aliases=", ".join(command.aliases) if len(command.aliases) > 0 else None,
+			)
+		return None
 
 
 @dataclass
@@ -241,16 +251,17 @@ class MyClient(commands.AutoShardedBot):
 	def __init__(self):
 		update_slash_localizations()
 		self.uptime: Optional[datetime.datetime] = None
-		self.loop: asyncio.AbstractEventLoop = asyncio.new_event_loop()
+		self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None  # type: ignore
+		self.session: aiohttp.ClientSession = None  # type: ignore
 		self.ready_event = asyncio.Event()
-		self.devs = [
+		self.owner_ids = {
 			648168353453572117,  # pearoo
 			657350415511322647,  # liba
 			452133888047972352,  # aki26
 			1051181672508444683,  # sarky
-		]
+		}
 		super().__init__(
 			command_prefix=self.get_prefix,  # type: ignore
 			heartbeat_timeout=150.0,
@@ -264,35 +275,32 @@ class MyClient(commands.AutoShardedBot):
 			max_messages=20000,
 			allowed_contexts=app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True),
 			allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
-			allowed_mentions=discord.AllowedMentions(everyone=False, roles=False)
+			allowed_mentions=discord.AllowedMentions(everyone=False, roles=False),
 		)
 		self.custom_response = custom_response.CustomResponse(self)
 
 	async def request(self, url: str):
-		async with self.session as session:
-			async with session.get(url) as response:
-				return await response.json()
+		async with self.session.get(url) as response:
+			return await response.json()
 
 	async def get_prefix(self, message: discord.Message) -> Union[str, list[str]]:
-		if DEBUG:
+		if __debug__:
 			return "?"
 		if not message.guild:
 			return "?!"
-		prefix = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", message.guild.id)
-		if not prefix:
-			return commands.when_mentioned_or("?!")(self, message)
+		row = await self.db.fetchrow("SELECT prefix, mention FROM guilds WHERE guild_id = $1", message.guild.id)
+		prefix, mention = row.get("prefix", "?!"), row.get("mention", True)
+		if mention:
+			return commands.when_mentioned_or(prefix)(self, message)
 		else:
-			if prefix["mention"]:
-				return commands.when_mentioned_or(prefix["prefix"])(self, message)
-			else:
-				return prefix["prefix"]
+			return prefix
 
 	async def on_guild_join(self, guild: discord.Guild):
 		row = await self.db.fetchrow("SELECT * FROM guilds WHERE guild_id = $1", guild.id)
 		if not row:
 			await self.db.execute("INSERT INTO guilds (guild_id) VALUES ($1)", guild.id)
 
-	async def get_context(  # type: ignore # pyright is crying because of mismatched arguments, we can disregard it
+	async def get_context(
 		self,
 		origin: Union[discord.Message, discord.Interaction],
 		/,
@@ -344,7 +352,7 @@ class MyClient(commands.AutoShardedBot):
 		benchmark = perf_counter()
 		database_exists = await self.db.fetchval(
 			"SELECT 1 FROM information_schema.schemata WHERE schema_name = 'public'"
-		)  # type: ignore
+		)
 		if not database_exists:
 			await self.db.execute("CREATE DATABASE lumin_beta OWNER lumin")
 			logger.info("Created database 'lumin'!")
@@ -378,15 +386,15 @@ class MyClient(commands.AutoShardedBot):
 			"basic",
 			"economy",
 			"giveaway",
+			"help",
 			"info",
+			"log",
 			"mod",
 			"say",
 			"setup",
 			"snapshot",
 			"status",
 		]
-		if DEBUG:
-			allowed.extend(("log",))
 
 		cogs = Path("./cogs").glob("*.py")
 		for cog in cogs:
@@ -495,7 +503,7 @@ class MyClient(commands.AutoShardedBot):
 			case _:
 				# if the error is unknown, log it
 				channel: discord.TextChannel = (
-					ctx.channel if DEBUG and ctx and ctx.channel else await self.fetch_channel(1268260404677574697)
+					ctx.channel if __debug__ and ctx and ctx.channel else await self.fetch_channel(1268260404677574697)
 				)
 				stack = "".join(traceback.format_exception(type(error), error, error.__traceback__))
 				# if stack is more than 1700 characters, turn it into a .txt file and store it as an attachment
@@ -563,7 +571,7 @@ async def after_invoke(ctx: commands.Context):
 		pass
 
 
-@client.hybrid_command(name="reload", description="reload_specs-description", usage="reload_specs-usage")
+@client.hybrid_command(hidden=True, name="reload", description="reload_specs-description", usage="reload_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="reload_specs-args-cog-description")
 @app_commands.rename(cog="reload_specs-args-cog-name")
@@ -578,7 +586,7 @@ async def reload(ctx: commands.Context, cog: str):
 		await ctx.reply(content=f"Failed to reload extension `{cog}`: {e}")
 
 
-@client.hybrid_command(name="load", description="load_specs-description", usage="load_specs-usage")
+@client.hybrid_command(hidden=True, name="load", description="load_specs-description", usage="load_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="load_specs-args-cog-description")
 @app_commands.rename(cog="load_specs-args-cog-name")
@@ -593,7 +601,7 @@ async def load(ctx: commands.Context, cog: str):
 		await ctx.reply(content=f"Failed to load extension `{cog}`: {e}")
 
 
-@client.hybrid_command(name="unload", description="unload_specs-description", usage="unload_specs-usage")
+@client.hybrid_command(hidden=True, name="unload", description="unload_specs-description", usage="unload_specs-usage")
 @commands.is_owner()
 @app_commands.describe(cog="unload_specs-args-cog-description")
 @app_commands.rename(cog="unload_specs-args-cog-name")
@@ -609,20 +617,18 @@ async def unload(ctx: commands.Context, cog: str):
 
 
 @client.hybrid_command(
-	name="l10n-reload",
-	description="l10n-reload_specs-description",
-	usage="l10n-reload_specs-usage",
+	hidden=True, name="l10nreload", description="l10nreload_specs-description", usage="l10nreload_specs-usage"
 )
 @commands.is_owner()
-@app_commands.describe(path="l10n-reload_specs-args-path-description")
-@app_commands.rename(path="l10n-reload_specs-args-path-name")
+@app_commands.describe(path="l10nreload_specs-args-path-description")
+@app_commands.rename(path="l10nreload_specs-args-path-name")
 async def l10nreload(ctx: commands.Context, path: str = "./localization"):
 	ctx.bot.custom_response.load_localizations(path)
 	await ctx.reply(content="Reloaded localization files.")
 	logger.info(f"{ctx.author.name} reloaded localization files.")
 
 
-@client.hybrid_command(name="sync", description="sync_specs-description", usage="sync_specs-usage")
+@client.hybrid_command(hidden=True, name="sync", description="sync_specs-description", usage="sync_specs-usage")
 @commands.is_owner()
 @app_commands.describe(
 	guilds="sync_specs-args-guilds-description",
@@ -682,7 +688,7 @@ async def sync(
 		await ctx.reply(content=f"Synced the tree to **{guilds_synced}/{len(guilds)}** guilds, took **{end:.2f}s**")
 
 
-async def start():
+async def main():
 	try:
 		await client.start(TOKEN)
 	except KeyboardInterrupt:
@@ -691,11 +697,11 @@ async def start():
 
 
 if __name__ == "__main__":
-	if DEBUG:
-		TOKEN = os.getenv("DEBUG_TOKEN")
+	if __debug__:
 		logger.info("Running in debug mode")
+	else:
+		logger.info("Running in production mode")
 	try:
-		loop = asyncio.new_event_loop()
-		loop.run_until_complete(start())
+		asyncio.run(main())
 	except KeyboardInterrupt:
 		logger.error("KeyboardInterrupt: Bot shut down by console")
