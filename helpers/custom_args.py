@@ -1116,9 +1116,9 @@ class CustomTextChannel:
 		return CustomGuild.from_guild(self._guild)
 
 	@property
-	def slowmode(self) -> int:
-		"""Returns the slowmode delay in seconds."""
-		return self._slowmode_delay
+	def slowmode(self) -> str:
+		"""Returns the slowmode delay."""
+		return seconds_to_text(self._slowmode_delay)
 
 	slowmode_delay = slowmode
 

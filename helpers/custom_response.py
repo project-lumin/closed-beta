@@ -139,7 +139,6 @@ class CustomResponse:
 		Union[dict, str, list, int, float, bool]
 		        The message payload.
 		"""
-		from main import DEBUG
 
 		original = locale
 

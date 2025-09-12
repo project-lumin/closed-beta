@@ -880,7 +880,10 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@commands.has_permissions(manage_channels=True)
 	@app_commands.checks.has_permissions(manage_channels=True)
 	@commands.hybrid_command(name="slowmode", description="sm_specs-description", usage="sm_specs-usage")
-	async def slowmode(self, ctx: main.Context, seconds: str, channel: discord.TextChannel = None):
+	async def slowmode(self, ctx: main.Context, seconds: str = None, channel: discord.TextChannel = None):
+		if not seconds:
+			await ctx.send("mod.slowmode.current_slowmode", channel=CustomTextChannel.from_channel(ctx.channel))
+			return
 		channel = channel or ctx.channel
 		max_slowmode_delay = 60 * 60 * 6  # 6 hours
 		slowmode_before = channel.slowmode_delay

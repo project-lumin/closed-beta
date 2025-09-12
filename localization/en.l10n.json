@@ -431,6 +431,9 @@
 						"timestamp": "{now}"
 					}
 				]
+			},
+			"current_slowmode": {
+				"content": "The current slowmode in {channel.mention} is `{channel.slowmode}`."
 			}
 		},
 		"info": {
