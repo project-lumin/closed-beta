@@ -706,5 +706,20 @@
 				"description": "A lokalizációs fájlok mappája (alap: ./localization)"
 			}
 		}
+	},
+	"slowmode": "slowmode",
+	"sm_specs": {
+		"description": "Lassítás beállítása egy csatornában",
+		"usage": "slowmode (hossz) (csatorna)",
+		"args": {
+			"duration": {
+				"name": "hossz",
+				"description": "A lassítás hossza (pl. 1s, 5m, 1h, 1d), \"off\" a kikapcsoláshoz"
+			},
+			"channel": {
+				"name": "csatorna",
+				"description": "A csatorna, ahol be szeretnéd állítani a lassítást (alap: aktuális)"
+			}
+		}
 	}
 }
