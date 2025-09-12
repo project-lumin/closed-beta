@@ -891,7 +891,12 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 		seconds = max(0, min(seconds, max_slowmode_delay))
 		reason = await self.custom_response("mod.slowmode.reason", ctx, moderator=CustomMember.from_member(ctx.author))
 		await ctx.channel.edit(slowmode_delay=seconds, reason=reason)
-		await ctx.send("mod.slowmode.response", channel=CustomTextChannel.from_channel(channel), time_before=seconds_to_text(slowmode_before), time=seconds_to_text(seconds))
+		await ctx.send(
+			"mod.slowmode.response",
+			channel=CustomTextChannel.from_channel(channel),
+			time_before=seconds_to_text(slowmode_before),
+			time=seconds_to_text(seconds),
+		)
 
 
 @commands.guild_only()
