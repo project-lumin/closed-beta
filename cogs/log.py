@@ -122,7 +122,7 @@ class LogListeners(commands.Cog):
 		target_id: int,
 		actions: discord.AuditLogAction | int | list[discord.AuditLogAction | int],
 		changed_attribute: Optional[str] = None,
-	) -> Optional[CustomUser]:
+	) -> Optional[discord.User]:
 		"""Retreives the actor from the audit logs for a specific action on a channel or role."""
 		try:
 			async for entry in guild.audit_logs(
@@ -143,17 +143,17 @@ class LogListeners(commands.Cog):
 
 				if changed_attribute:
 					if changed_attribute == "position":
-						return CustomUser.from_user(entry.user)
+						return entry.user
 
 					if hasattr(entry.changes.before, changed_attribute) or hasattr(
 						entry.changes.after, changed_attribute
 					):
-						return CustomUser.from_user(entry.user)
+						return entry.user
 					# If the attribute doesn't match, this isn't the right log entry.
 					continue
 
 				# If not looking for a specific attribute, the first match is good enough (for create/delete/permissions)
-				return CustomUser.from_user(entry.user)
+				return entry.user
 
 		except Exception as e:
 			print(f"Error getting actor from audit logs: {e}")
@@ -257,8 +257,6 @@ class LogListeners(commands.Cog):
 		custom_response = CustomResponse(self.client)
 		message: dict | str = await custom_response.get_message(key, self.client.get_guild(guild_id), **kwargs)
 		if isinstance(message, dict):
-			message.pop("delete_after", None)
-			message.pop("ephemeral", None)
 			await webhook.send(**message)
 		else:
 			await webhook.send(content=message)
@@ -376,7 +374,9 @@ class LogListeners(commands.Cog):
 		custom_channel = convert_to_custom_channel(channel)
 		if custom_channel:
 			created_by = await self._get_actor(channel.guild, channel.id, discord.AuditLogAction.channel_create)
-			await self.send_webhook(channel.guild.id, "create", channel=custom_channel, created_by=created_by)
+			await self.send_webhook(
+				channel.guild.id, "create", channel=custom_channel, created_by=CustomUser.from_user(created_by)
+			)
 
 	@commands.Cog.listener()
 	async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
@@ -420,7 +420,11 @@ class LogListeners(commands.Cog):
 						after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute=attr
 					)
 					await self.send_webhook(
-						before.guild.id, attr, before=custom_before, after=custom_after, updated_by=updated_by
+						before.guild.id,
+						attr,
+						before=custom_before,
+						after=custom_after,
+						updated_by=CustomUser.from_user(updated_by),
 					)
 
 		if custom_before.name != custom_after.name:
@@ -428,28 +432,44 @@ class LogListeners(commands.Cog):
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="name"
 			)
 			await self.send_webhook(
-				before.guild.id, "name", before=custom_before, after=custom_after, updated_by=updated_by
+				before.guild.id,
+				"name",
+				before=custom_before,
+				after=custom_after,
+				updated_by=CustomUser.from_user(updated_by),
 			)
 		if custom_before.topic != custom_after.topic:
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="topic"
 			)
 			await self.send_webhook(
-				before.guild.id, "topic", before=custom_before, after=custom_after, updated_by=updated_by
+				before.guild.id,
+				"topic",
+				before=custom_before,
+				after=custom_after,
+				updated_by=CustomUser.from_user(updated_by),
 			)
 		if custom_before.nsfw != custom_after.nsfw:
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="nsfw"
 			)
 			await self.send_webhook(
-				before.guild.id, "nsfw", before=custom_before, after=custom_after, updated_by=updated_by
+				before.guild.id,
+				"nsfw",
+				before=custom_before,
+				after=custom_after,
+				updated_by=CustomUser.from_user(updated_by),
 			)
 		if custom_before.slowmode_delay != custom_after.slowmode_delay:
 			updated_by = await self._get_actor(
 				after.guild, after.id, discord.AuditLogAction.channel_update, changed_attribute="slowmode_delay"
 			)
 			await self.send_webhook(
-				before.guild.id, "slowmode", before=custom_before, after=custom_after, updated_by=updated_by
+				before.guild.id,
+				"slowmode",
+				before=custom_before,
+				after=custom_after,
+				updated_by=CustomUser.from_user(updated_by),
 			)
 		if custom_before.position != custom_after.position:
 			await self.send_webhook(before.guild.id, "position", before=custom_before, after=custom_after)
@@ -464,8 +484,28 @@ class LogListeners(commands.Cog):
 			diff_string = self._get_permission_diff_string(before.overwrites, after.overwrites)
 			if diff_string:
 				await self.send_webhook(
-					before.guild.id, "permissions", diff=diff_string, updated_by=updated_by, channel=custom_after
+					before.guild.id,
+					"permissions",
+					diff=diff_string,
+					updated_by=CustomUser.from_user(updated_by),
+					channel=custom_after,
 				)
+
+	@commands.Cog.listener()
+	async def on_message_delete(self, message: discord.Message):
+		if not message.guild:
+			return
+
+		# if someone deletes their own message, it won't show up in audit logs, so we default to that
+		deleted_by = (
+			await self._get_actor(message.guild, message.id, discord.AuditLogAction.message_delete) or message.author
+		)
+		await self.send_webhook(
+			message.guild.id,
+			"delete",
+			message=CustomMessage.from_message(message),
+			deleted_by=CustomUser.from_user(deleted_by),
+		)
 
 
 async def setup(client: MyClient) -> None:

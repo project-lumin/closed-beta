@@ -466,6 +466,19 @@
 				}
 			}
 		},
+		"slowmode": {
+			"reason": "{moderator.username} frissítette a lassítást",
+			"response": {
+				"embeds": [
+					{
+						"title": "Lassítás frissítve",
+						"description": "{channel.mention} csatorna lassítása frissítve lett `{time}` értékre.",
+						"color": 6656243,
+						"timestamp": "{now}"
+					}
+				]
+			}
+		},
 		"delete": {
 			"response": {
 				"embeds": [
@@ -897,6 +910,9 @@
 					"author": {
 						"name": "{server.name}",
 						"icon_url": "{server.icon}"
+					},
+					"image": {
+						"url": "{server.banner}"
 					},
 					"timestamp": "{now}"
 				}
@@ -2295,6 +2311,37 @@
 							}
 						],
 						"color": 3447003
+					}
+				]
+			}
+		},
+		"on_message_delete": {
+			"delete": {
+				"embeds": [
+					{
+						"title": "Üzenet Törölve",
+						"description": "{message.author} üzenete a(z) {message.channel.mention} csatornában törölve lett.",
+						"fields": [
+							{
+								"name": "Tartalom",
+								"value": "```{message.content}```",
+								"inline": false
+							},
+							{
+								"name": "Beágyazások száma",
+								"value": "{message.embeds}",
+								"inline": true
+							},
+							{
+								"name": "Csatolmányok száma",
+								"value": "{message.attachments}",
+								"inline": true
+							},
+							{
+								"name": "Törölte",
+								"value": "{deleted_by.mention} (`{deleted_by.id}`)"
+							}
+						]
 					}
 				]
 			}

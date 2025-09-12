@@ -48,6 +48,7 @@
    ```bash
    python main.py
    ```
+   For debug mode, run with `-O` or `-OO`
 
 ## Contributor Notice
 
