@@ -9,7 +9,6 @@ from helpers import CustomMember, CustomUser, regex
 if TYPE_CHECKING:
 	from main import Context, MyClient
 
-
 @app_commands.guild_only()
 @commands.guild_only()
 class AFK(commands.Cog):

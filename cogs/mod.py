@@ -21,9 +21,10 @@ from helpers import (
 	seconds_to_text,
 	text_to_seconds,
 )
+from main import MyClient
 
 if TYPE_CHECKING:
-	from main import Context, MyClient
+	from main import Context
 
 
 class CaseType(Enum):
