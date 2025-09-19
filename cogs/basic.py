@@ -1,9 +1,10 @@
 from time import perf_counter
+from typing import TYPE_CHECKING
 
 from discord.ext import commands
 
-import main
-from main import MyClient
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class Basic(commands.Cog, name="Basic"):
@@ -11,7 +12,7 @@ class Basic(commands.Cog, name="Basic"):
 		self.client: MyClient = client
 
 	@commands.hybrid_command(name="ping", description="ping_specs-description")
-	async def ping(self, ctx: main.Context):
+	async def ping(self, ctx: Context):
 		# Database ping calculation
 		database_start = perf_counter()
 		await self.client.db.execute("SELECT 1")

@@ -1,31 +1,34 @@
 import asyncio
 import re
+from typing import TYPE_CHECKING, Optional
 
 import discord
-from discord import app_commands
 import pypokedex
 import requests
+from discord import app_commands
 from discord.ext import commands
 from emoji import EMOJI_DATA
-from typing import Optional
-from helpers.regex import DISCORD_TEMPLATE
+
 from helpers.custom_args import (
-	CustomUser,
-	CustomMember,
-	CustomGuild,
-	CustomRole,
-	IPAddress,
 	BotInfo,
-	CustomEmoji,
-	CustomPartialEmoji,
-	CustomTextChannel,
-	CustomVoiceChannel,
 	CustomCategoryChannel,
+	CustomEmoji,
 	CustomForumChannel,
-	CustomTemplate,
+	CustomGuild,
+	CustomMember,
+	CustomPartialEmoji,
+	CustomRole,
 	CustomStageChannel,
+	CustomTemplate,
+	CustomTextChannel,
+	CustomUser,
+	CustomVoiceChannel,
+	IPAddress,
 )
-from main import MyClient, Context
+from helpers.regex import DISCORD_TEMPLATE
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class Info(commands.Cog, name="Information"):

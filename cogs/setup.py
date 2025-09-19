@@ -1,12 +1,14 @@
-from discord import app_commands
+from typing import TYPE_CHECKING, Optional
 
-import main
+from discord import app_commands
 from discord.ext import commands
-from typing import Optional
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class Setup(commands.Cog, name="Setup"):
-	def __init__(self, client):
+	def __init__(self, client: MyClient):
 		self.client = client
 
 	@commands.hybrid_command(name="prefix", description="prefix_specs-description")
@@ -16,7 +18,7 @@ class Setup(commands.Cog, name="Setup"):
 		prefix="prefix_specs-args-prefix-description",
 		mention="prefix_specs-args-mention-description",
 	)
-	async def prefix(self, ctx: main.Context, prefix: str, mention: Optional[bool] = True):
+	async def prefix(self, ctx: Context, prefix: str, mention: Optional[bool] = True):
 		if len(prefix) > 10:
 			return await ctx.send("setup.prefix.errors.long", prefix=prefix, limit=10)
 		await self.client.db.execute(

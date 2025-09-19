@@ -1,23 +1,27 @@
+import datetime
+from copy import deepcopy
 from enum import Enum
-from typing import Self, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, Self
 
 import asyncpg
 import discord
 from discord import app_commands
 from discord.ext import commands
-import datetime
-import main
+
 from helpers import (
-	FormatDateTime,
-	CustomMember,
 	CustomGuild,
+	CustomMember,
+	CustomTextChannel,
 	CustomUser,
-	custom_response,
+	FormatDateTime,
 	convert_to_query,
+	custom_response,
+	seconds_to_text,
 	text_to_seconds,
 )
-from main import MyClient
-from copy import deepcopy
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class CaseType(Enum):
@@ -441,8 +445,8 @@ class Warn(Case):
 
 	async def after_creation(self) -> None:
 		"""Notifies the user about the warning."""
-		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message("mod.warn.notify", self._guild, warn=self)
+		_custom_response = custom_response.CustomResponse(MyClient, "mod")
+		message = await _custom_response.get_message("mod.warn.notify", self._guild, warn=self)
 
 		try:
 			if isinstance(message, dict):
@@ -452,8 +456,8 @@ class Warn(Case):
 
 	async def after_deletion(self) -> None:
 		"""Notifies the user about the removal of the warning."""
-		self._custom_response = custom_response.CustomResponse(MyClient, "mod")
-		message = await self._custom_response.get_message("mod.warn.unwarned", self._guild, warn=self)
+		_custom_response = custom_response.CustomResponse(MyClient, "mod")
+		message = await _custom_response.get_message("mod.warn.unwarned", self._guild, warn=self)
 
 		try:
 			if isinstance(message, dict):
@@ -669,7 +673,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@commands.has_permissions(moderate_members=True)
 	async def warn(
 		self,
-		ctx: main.Context,
+		ctx: Context,
 		user: discord.Member,
 		expires: str = None,
 		*,
@@ -693,10 +697,12 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 			expires = None
 
 		if user == ctx.me:
-			return await ctx.send("mod.warn.errors.bot")
+			await ctx.send("mod.warn.errors.bot")
+			return
 
 		if user.top_role >= ctx.author.top_role:
-			return await ctx.send("mod.warn.errors.hierarchy")
+			await ctx.send("mod.warn.errors.hierarchy")
+			return
 
 		warn = Warn(
 			Case.generate_id(ctx.message),
@@ -728,7 +734,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@commands.has_permissions(moderate_members=True)
 	async def mute(
 		self,
-		ctx: main.Context,
+		ctx: Context,
 		user: discord.Member,
 		expires: str,
 		*,
@@ -739,7 +745,8 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 		if user == ctx.me:
-			return await ctx.send("mod.mute.errors.bot")
+			await ctx.send("mod.mute.errors.bot")
+			return
 		mute = Mute(
 			Case.generate_id(ctx.message),
 			ctx.guild,
@@ -764,7 +771,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@app_commands.describe(user="unmute_specs-args-user-description")
 	@app_commands.checks.has_permissions(moderate_members=True)
 	@commands.has_permissions(moderate_members=True)
-	async def unmute(self, ctx: main.Context, user: discord.Member):
+	async def unmute(self, ctx: Context, user: discord.Member):
 		if user.timed_out_until:
 			cases = await Mute.from_db(
 				self.client.db,
@@ -780,7 +787,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 				await user.edit(timed_out_until=None)
 		await user.edit(timed_out_until=None)
 
-		await ctx.send("mod.unmute.response", user=CustomMember.from_member(user))
+		await ctx.send("mod.unmute.response", user=user)
 
 	@commands.bot_has_permissions(kick_members=True)
 	@app_commands.checks.bot_has_permissions(kick_members=True)
@@ -792,9 +799,10 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	)
 	@app_commands.checks.has_permissions(kick_members=True)
 	@commands.has_permissions(kick_members=True)
-	async def kick(self, ctx: main.Context, user: discord.Member, *, reason: str = None):
+	async def kick(self, ctx: Context, user: discord.Member, *, reason: str = None):
 		if user == ctx.me:
-			return await ctx.send("mod.kick.errors.bot")
+			await ctx.send("mod.kick.errors.bot")
+			return
 		kick = Kick(
 			Case.generate_id(ctx.message),
 			ctx.guild,
@@ -824,7 +832,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@commands.has_permissions(ban_members=True)
 	async def ban(
 		self,
-		ctx: main.Context,
+		ctx: Context,
 		user: discord.User,
 		expires: str = None,
 		*,
@@ -837,7 +845,8 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 		if user == ctx.me:
-			return await ctx.send("mod.ban.errors.bot")
+			await ctx.send("mod.ban.errors.bot")
+			return
 		ban = Ban(
 			Case.generate_id(ctx.message),
 			ctx.guild,
@@ -858,7 +867,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@app_commands.describe(user="unban_specs-args-user-description")
 	@app_commands.checks.has_permissions(ban_members=True)
 	@commands.has_permissions(ban_members=True)
-	async def unban(self, ctx: main.Context, user: discord.User):
+	async def unban(self, ctx: Context, user: discord.User):
 		cases = await Ban.from_db(self.client.db, self.client, ctx.guild, user=user)
 		if cases:
 			for case in cases:
@@ -870,7 +879,39 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 			except discord.NotFound:
 				pass
 
-		await ctx.send("mod.unban.response", user=CustomUser.from_user(user))
+		await ctx.send("mod.unban.response", user=user)
+
+	@commands.bot_has_permissions(manage_channels=True)
+	@app_commands.checks.bot_has_permissions(manage_channels=True)
+	@commands.has_permissions(manage_channels=True)
+	@app_commands.checks.has_permissions(manage_channels=True)
+	@commands.hybrid_command(name="slowmode", description="sm_specs-description", usage="sm_specs-usage")
+	@app_commands.describe(duration="sm_specs-args-duration-description", channel="sm_specs-args-channel-description")
+	@app_commands.rename(duration="sm_specs-args-duration-name", channel="sm_specs-args-channel-name")
+	async def slowmode(self, ctx: Context, duration: str = None, channel: discord.TextChannel = None):
+		if not duration:
+			await ctx.send("mod.slowmode.current_slowmode", channel=CustomTextChannel.from_channel(ctx.channel))
+			return
+		if duration.lower() == "off":
+			duration = "0s"
+		channel = channel or ctx.channel
+		max_slowmode_delay = 60 * 60 * 6  # 6 hours
+		slowmode_before = channel.slowmode_delay
+		try:
+			seconds = text_to_seconds(duration, channel.slowmode_delay)
+		except ValueError:
+			raise commands.BadArgument
+		seconds = max(
+			0, min(seconds, max_slowmode_delay)
+		)  # clamp between 0 and 6hrs (silently, but whatever, its easier for the user)
+		reason = await self.custom_response("mod.slowmode.reason", ctx, moderator=ctx.author)
+		await ctx.channel.edit(slowmode_delay=seconds, reason=reason)
+		await ctx.send(
+			"mod.slowmode.response",
+			channel=channel,
+			time_before=seconds_to_text(slowmode_before),
+			time=seconds_to_text(seconds),
+		)
 
 
 @commands.guild_only()
@@ -888,7 +929,7 @@ class Cases(commands.Cog, name="Cases"):
 	)
 	@app_commands.rename(case_id="caseinfo_specs-args-case_id-name")
 	@app_commands.describe(case_id="caseinfo_specs-args-case_id-description")
-	async def case(self, ctx: main.Context, case_id: str):
+	async def case(self, ctx: Context, case_id: str):
 		try:
 			case_id = int(case_id)
 		except ValueError:
@@ -896,7 +937,8 @@ class Cases(commands.Cog, name="Cases"):
 
 		case = await Case.from_id(self.client.db, self.client, ctx.guild, case_id, get_type=True)
 		if not case:
-			return await ctx.send("mod.info.errors.not_found", case_id=case_id)
+			await ctx.send("mod.info.errors.not_found", case_id=case_id)
+			return
 
 		# since we need the case's information but we don't want to duplicate db calls,
 		# we check inside the actual command
@@ -917,16 +959,19 @@ class Cases(commands.Cog, name="Cases"):
 	@app_commands.rename(case_id="casedel_specs-args-case_id-name")
 	@app_commands.checks.has_permissions(moderate_members=True)
 	@commands.has_permissions(moderate_members=True)
-	async def delete(self, ctx: main.Context, case_id: str):
+	async def delete(self, ctx: Context, case_id: str):
 		try:
+			# because discord's app commands only support int up to 2^54, but discord snowflakes are 2^64,
+			# we need to convert the case id to an int ourselves :(
 			case_id = int(case_id)
 		except ValueError:
-			raise commands.BadArgument
+			raise commands.BadArgument("case_id")
 		case = await Case.from_id(self.client.db, self.client, ctx.guild, case_id, get_type=True)
 		if not case:
-			return await ctx.send("mod.delete.errors.not_found", case_id=case_id)
+			await ctx.send("mod.delete.errors.not_found", case_id=case_id)
+			return
 
-		match case.type:  # type: ignore
+		match case.type:
 			case CaseType.WARN:
 				case = await Warn.from_id(self.client.db, self.client, ctx.guild, case_id)
 			case CaseType.MUTE:
@@ -936,7 +981,7 @@ class Cases(commands.Cog, name="Cases"):
 			case CaseType.BAN:
 				case = await Ban.from_id(self.client.db, self.client, ctx.guild, case_id)
 		case._custom_response = self.custom_response
-		await case.delete(self.client.db)  # type: ignore
+		await case.delete(self.client.db)
 
 		await ctx.send("mod.delete.response", case=case)
 
@@ -968,7 +1013,7 @@ class Cases(commands.Cog, name="Cases"):
 	@commands.has_permissions(moderate_members=True)
 	async def edit(
 		self,
-		ctx: main.Context,
+		ctx: Context,
 		case_id: str,
 		value: Literal["expires", "reason", "message"],
 		*,
@@ -977,16 +1022,18 @@ class Cases(commands.Cog, name="Cases"):
 		try:
 			case_id = int(case_id)
 		except ValueError:
-			raise commands.BadArgument
+			raise commands.BadArgument("case_id")
 		case: Case = await Case.from_id(self.client.db, self.client, ctx.guild, case_id, get_type=True)
 		if case is None:
-			return await ctx.send("mod.edit.errors.not_found", case_id=case_id)
+			await ctx.send("mod.edit.errors.not_found", case_id=case_id)
+			return
 
 		if value == "expires":
 			try:
 				new_value = datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(new_value))
 			except (ValueError, TypeError):
-				return await ctx.send("mod.edit.errors.invalid_time", case_id=case_id)
+				await ctx.send("mod.edit.errors.invalid_time", case_id=case_id)
+				return
 
 		new_case = case.copy()
 		setattr(new_case, value, new_value)
@@ -1001,7 +1048,7 @@ class Cases(commands.Cog, name="Cases"):
 	)
 	@app_commands.describe(user="caselist_specs-args-user-description")
 	@app_commands.rename(user="caselist_specs-args-user-name")
-	async def list(self, ctx: main.Context, user: discord.Member = None):
+	async def list(self, ctx: Context, user: discord.Member = None):
 		user = user or ctx.author
 
 		cases = await Case.from_user(self.client.db, user, self.client, ctx.guild, 10)
@@ -1015,18 +1062,21 @@ class Cases(commands.Cog, name="Cases"):
 			"mod.list.response", ctx, cases=cases
 		)
 		if not isinstance(message, dict):
-			return await ctx.send(content=message)
+			await ctx.send(content=message)
+			return
 
 		embeds: list[discord.Embed] = message.get("embeds")
 		if not cases:
 			if embeds:
 				embeds[0].remove_field(0)
-			return await ctx.send(**message)
+			await ctx.send(**message)
+			return
 
 		if embeds:
 			template = embeds[0].to_dict().get("fields", [None])[0]
 			if not template:
-				return await ctx.send(**message)
+				await ctx.send(**message)
+				return
 			embeds[0].clear_fields()
 			for case in cases:
 				formatted = discord.ext.localization.Localization.format_strings(template, case=case)

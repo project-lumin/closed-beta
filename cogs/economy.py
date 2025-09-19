@@ -1,13 +1,15 @@
 import random
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from helpers import custom_response, random_helper
-from helpers.custom_args import CustomRole, CustomUser, CustomMember
-from main import MyClient, Context
-from typing import Literal, Optional, Union
+from helpers.custom_args import CustomRole, CustomUser
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class ShopItem:
@@ -307,7 +309,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	def __init__(self, client):
 		self.client: MyClient = client
 		self.helper = EconomyHelper(client)
-		self.custom_response = custom_response.CustomResponse(client)
+		self.custom_response = client.custom_response
 
 	@commands.hybrid_command(name="leaderboard", description="leaderboard_specs-description")
 	async def leaderboard(self, ctx: commands.Context):
@@ -320,12 +322,14 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		if not rows:
 			if embeds:
 				embeds[0].remove_field(0)
-			return await ctx.send(**message)
+			await ctx.send(**message)
+			return
 
 		if embeds:
 			template = embeds[0].to_dict().get("fields", [None])[0]
 			if not template:
-				return await ctx.send(**message)
+				await ctx.send(**message)
+				return
 			embeds[0].clear_fields()
 			for i in rows:
 				user = CustomUser.from_user(self.client.get_user(i["user_id"]))
@@ -394,7 +398,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			await ctx.send(
 				"addmoney.success",
 				amount=amount,
-				member=CustomMember.from_member(member),
+				member=member,
 			)
 		else:
 			await ctx.send("addmoney.errors.positive")
@@ -468,18 +472,21 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		amount: discord.app_commands.Range[int, 1],
 	):
 		if amount < 1:
-			return await ctx.send("pay.errors.positive")
+			await ctx.send("pay.errors.positive")
+			return
 		if member == ctx.author:
-			return await ctx.send(content="??? xd")
+			await ctx.send(content="??? xd")
+			return
 
 		author_balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 		if author_balance < amount:
-			return await ctx.send("pay.errors.balance")
+			await ctx.send("pay.errors.balance")
+			return
 
 		await self.helper.add_money(member.id, ctx.guild.id, amount)
 		await self.helper.remove_money(ctx.author.id, ctx.guild.id, amount)
 
-		await ctx.send("pay.success", amount=amount, member=CustomMember.from_member(member))
+		await ctx.send("pay.success", amount=amount, member=member)
 
 	@app_commands.rename(member="global-member")
 	@app_commands.describe(member="balance_specs-args-member-description")
@@ -501,7 +508,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 					if len(embed.fields) > 2:
 						message["embeds"][index].remove_field(2)
 
-		await ctx.send(content="", **message)
+		await ctx.send(**message)
 
 	@app_commands.rename(bet="slots_specs-args-bet-name")
 	@app_commands.describe(bet="slots_specs-args-bet-description")
@@ -511,7 +518,8 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 
 		if bet > balance or balance < 0:
-			return await ctx.send("slots.errors.balance")
+			await ctx.send("slots.errors.balance")
+			return
 
 		bet = bet * 2
 
@@ -558,13 +566,16 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			if amount.lower() in await self.custom_response("deposit.all", ctx):
 				amount = cash
 			else:
-				return await ctx.send("deposit.errors.invalid_amount")
+				await ctx.send("deposit.errors.invalid_amount")
+				return
 
 		if amount < 1:
-			return await ctx.send("deposit.errors.invalid_amount")
+			await ctx.send("deposit.errors.invalid_amount")
+			return
 
 		if cash < amount:
-			return await ctx.send("deposit.errors.balance")
+			await ctx.send("deposit.errors.balance")
+			return
 
 		await self.helper.remove_money(ctx.author.id, ctx.guild.id, amount, "cash")
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount, "bank")
@@ -587,13 +598,16 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			if amount.lower() in await self.custom_response("withdraw.all", ctx):
 				amount = bank
 			else:
-				return await ctx.send("withdraw.errors.invalid_amount")
+				await ctx.send("withdraw.errors.invalid_amount")
+				return
 
 		if amount < 1:
-			return await ctx.send("withdraw.errors.invalid_amount")
+			await ctx.send("withdraw.errors.invalid_amount")
+			return
 
 		if bank < amount:
-			return await ctx.send("withdraw.errors.balance")
+			await ctx.send("withdraw.errors.balance")
+			return
 
 		await self.helper.remove_money(ctx.author.id, ctx.guild.id, amount, "bank")
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount, "cash")
@@ -645,7 +659,8 @@ class Shop(commands.Cog, name="Shop"):
 			item.lower(),
 		)
 		if not row:
-			return await ctx.send("shop.buy.errors.not_found")
+			await ctx.send("shop.buy.errors.not_found")
+			return
 
 		item = ShopItem(
 			row["item_name"],
@@ -654,11 +669,13 @@ class Shop(commands.Cog, name="Shop"):
 			ctx.guild.get_role(row["role"]),
 		)
 		if not item.role:
-			return await ctx.send("shop.buy.errors.role_not_found")
+			await ctx.send("shop.buy.errors.role_not_found")
+			return
 
 		user_balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 		if user_balance < item.price:
-			return await ctx.send("shop.buy.errors.balance")
+			await ctx.send("shop.buy.errors.balance")
+			return
 
 		await ctx.author.add_roles(item.role)
 		await self.helper.remove_money(ctx.author.id, ctx.guild.id, item.price)
@@ -691,14 +708,17 @@ class Shop(commands.Cog, name="Shop"):
 			item.lower(),
 		)
 		if row:
-			return await ctx.send("shop.set.errors.already_item")
+			await ctx.send("shop.set.errors.already_item")
+			return
 
 		items = await self.client.db.fetch("SELECT * FROM shop WHERE guild_id = $1", ctx.guild.id)
 		if len(items) + 1 >= 10:
-			return await ctx.send("shop.set.errors.limit")
+			await ctx.send("shop.set.errors.limit")
+			return
 
 		if ctx.author.top_role.position <= role.position:
-			return await ctx.send("shop.set.errors.role_higher")
+			await ctx.send("shop.set.errors.role_higher")
+			return
 
 		await self.client.db.execute(
 			"INSERT INTO shop(item_name, item_description, item_price, role, guild_id, creator_id) VALUES($1, $2, $3, $4, $5, $6)",
@@ -728,7 +748,8 @@ class Shop(commands.Cog, name="Shop"):
 			item.lower(),
 		)
 		if not row:
-			return await ctx.send("shop.remove.errors.not_found")
+			await ctx.send("shop.remove.errors.not_found")
+			return
 
 		item = ShopItem(
 			row["item_name"],
@@ -737,7 +758,8 @@ class Shop(commands.Cog, name="Shop"):
 			ctx.guild.get_role(row["role"]),
 		)
 		if ctx.author.top_role.position <= item.role.position:
-			return await ctx.send("shop.remove.errors.role_higher")
+			await ctx.send("shop.remove.errors.role_higher")
+			return
 
 		await self.client.db.execute(
 			"DELETE FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",

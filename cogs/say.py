@@ -1,14 +1,18 @@
+import random
+from typing import TYPE_CHECKING
+from urllib.parse import quote_plus
+
 import discord
-from discord.ext import commands
+from art import text2art
 from discord import app_commands
+from discord.ext import commands
 
 from helpers import CustomResponse
-from main import MyClient, Context
-from helpers.regex import DISCORD_MESSAGE_URL
 from helpers.convert import text_to_emoji
-from art import text2art
-import random
-from urllib.parse import quote_plus
+from helpers.regex import DISCORD_MESSAGE_URL
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class Say(commands.Cog, name="Says"):

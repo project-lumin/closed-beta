@@ -705,5 +705,20 @@
 				"description": "The path to the localization files (default: ./localization)"
 			}
 		}
+	},
+	"slowmode": "slowmode",
+	"sm_specs": {
+		"description": "Set slowmode in a channel or check the current channel's slowmode",
+		"usage": "slowmode (duration) (channel)",
+		"args": {
+			"duration": {
+				"name": "duration",
+				"description": "The duration of the slowmode (ex. 1s, 5m, 1h), \"off\" to disable slowmode"
+			},
+			"channel": {
+				"name": "channel",
+				"description": "The channel to set the slowmode in (default: current channel)"
+			}
+		}
 	}
 }

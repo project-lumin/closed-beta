@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import json
 import uuid
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 from uuid import UUID
 
 import asyncpg
@@ -10,25 +10,24 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-import main
-from helpers import CustomResponse
-from main import MyClient
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class Snapshot(commands.Cog, name="Snapshots"):
-	def __init__(self, client):
-		self.client: MyClient = client
+	def __init__(self, client: MyClient):
+		self.client = client
 		self.connection: asyncpg.Pool = client.db
-		self.custom_response: CustomResponse = CustomResponse(client, "snapshot")
+		self.custom_response = client.custom_response
 
 	@staticmethod
-	async def save(ctx: main.Context) -> dict:
+	async def save(ctx: Context) -> dict:
 		"""
 		Creates a snapshot of the server.
 
 		Parameters
 		----------
-		ctx: `main.Context`
+		ctx: `Context`
 		        The context to get the guild data from.
 
 		Returns
@@ -48,7 +47,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				"position": x.position,
 				"name": x.name,
 				"display_icon": (await x.display_icon.read()).decode("latin1")
-				if x.display_icon and type(x.display_icon) == discord.Asset
+				if x.display_icon and x.display_icon is discord.Asset
 				else x.display_icon
 				if x.display_icon
 				else None,
@@ -95,13 +94,13 @@ class Snapshot(commands.Cog, name="Snapshots"):
 
 		return payload
 
-	async def create_snapshot(self, ctx: main.Context) -> Optional[UUID]:
+	async def create_snapshot(self, ctx: Context) -> Optional[UUID]:
 		"""
 		Creates a snapshot and inserts it into the database.
 
 		Parameters
 		----------
-		ctx: `main.Context`
+		ctx: `Context`
 		        The context to get the guild data from.
 
 		Returns
@@ -149,13 +148,13 @@ class Snapshot(commands.Cog, name="Snapshots"):
 		else:
 			return None
 
-	async def delete_all_channels(self, ctx: main.Context):
+	async def delete_all_channels(self, ctx: Context):
 		"""
 		Deletes all channels in the server.
 
 		Parameters
 		----------
-		ctx: `main.Context`
+		ctx: `Context`
 		        The context to get the guild data from.
 		"""
 		for x in ctx.guild.channels:
@@ -165,13 +164,13 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				continue
 			await asyncio.sleep(0.5)
 
-	async def delete_all_roles(self, ctx: main.Context):
+	async def delete_all_roles(self, ctx: Context):
 		"""
 		Deletes all roles in the server.
 
 		Parameters
 		----------
-		ctx: `main.Context`
+		ctx: `Context`
 		        The context to get the guild data from.
 		"""
 		for x in ctx.guild.roles:
@@ -181,10 +180,10 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				continue
 			await asyncio.sleep(0.5)
 
-	async def load_snapshot(self, ctx: main.Context, payload: dict):
+	async def load_snapshot(self, ctx: Context, payload: dict):
 		for x in sorted(
 			payload["roles"],
-			key=lambda x: payload["roles"][x]["position"],
+			key=lambda r: payload["roles"][r]["position"],
 			reverse=True,
 		):
 			perms = discord.Permissions(permissions=int(payload["roles"][x]["perms"]))
@@ -199,7 +198,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						if payload["roles"][x]["display_icon"]
 						else None
 					)
-				except:
+				except (AttributeError, TypeError):
 					dicon = payload["roles"][x]["display_icon"] if payload["roles"][x]["display_icon"] else None
 				role = await ctx.guild.create_role(
 					name=payload["roles"][x]["name"],
@@ -236,7 +235,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						default_auto_archive_duration=x["default_auto_archive_duration"],
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "voice":
 				try:
@@ -260,7 +259,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						rtc_region=x["rtc_region"],
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "stage_voice":
 				try:
@@ -281,7 +280,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						overwrites=overwrites,
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "category":
 				try:
@@ -300,7 +299,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						overwrites=overwrites,
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "forum":
 				try:
@@ -325,7 +324,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						default_auto_archive_duration=x["default_auto_archive_duration"],
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 
 	@commands.hybrid_group(
@@ -335,7 +334,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 	)
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)
-	async def snapshot(self, ctx: main.Context):
+	async def snapshot(self, ctx: Context):
 		code = await self.create_snapshot(ctx)
 
 		await ctx.send("snapshot.create", code=code)
@@ -345,7 +344,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 	@app_commands.rename(code="ss_load_specs-args-code-name")
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)
-	async def load(self, ctx: main.Context, code: str):
+	async def load(self, ctx: Context, code: str):
 		payload = await self.get_snapshot(code)
 		if not payload:
 			return await ctx.send("snapshot.not_found")
