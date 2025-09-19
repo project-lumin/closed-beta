@@ -289,7 +289,7 @@ class LogListeners(commands.Cog):
 			guild_id = guild.id
 
 		# retrieve calling function name
-		func_name = sys._getframe(1).f_code.co_name  # type: ignore
+		# func_name = sys._getframe(1).f_code.co_name  # type: ignore
 
 		result = await self.client.db.fetchval("SELECT is_on FROM log WHERE guild_id = $1", guild_id)
 		return result

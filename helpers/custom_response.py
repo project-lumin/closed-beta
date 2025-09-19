@@ -162,11 +162,11 @@ class CustomResponse:
 
 		match original:
 			case discord.Guild():
-				guild_id = original.id
+				guild_id = original.id  # noqa: F841
 			case discord.Interaction() | commands.Context():
-				guild_id = original.guild.id
+				guild_id = original.guild.id  # noqa: F841
 			case _:
-				guild_id = None
+				guild_id = None  # noqa: F841
 
 		# these are variables that are always inserted into commands IF there is a context
 		context_formatting = {

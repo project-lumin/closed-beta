@@ -47,7 +47,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				"position": x.position,
 				"name": x.name,
 				"display_icon": (await x.display_icon.read()).decode("latin1")
-				if x.display_icon and type(x.display_icon) == discord.Asset
+				if x.display_icon and x.display_icon is discord.Asset
 				else x.display_icon
 				if x.display_icon
 				else None,
@@ -183,7 +183,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 	async def load_snapshot(self, ctx: Context, payload: dict):
 		for x in sorted(
 			payload["roles"],
-			key=lambda x: payload["roles"][x]["position"],
+			key=lambda r: payload["roles"][r]["position"],
 			reverse=True,
 		):
 			perms = discord.Permissions(permissions=int(payload["roles"][x]["perms"]))
@@ -198,7 +198,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						if payload["roles"][x]["display_icon"]
 						else None
 					)
-				except:
+				except (AttributeError, TypeError):
 					dicon = payload["roles"][x]["display_icon"] if payload["roles"][x]["display_icon"] else None
 				role = await ctx.guild.create_role(
 					name=payload["roles"][x]["name"],
@@ -235,7 +235,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						default_auto_archive_duration=x["default_auto_archive_duration"],
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "voice":
 				try:
@@ -259,7 +259,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						rtc_region=x["rtc_region"],
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "stage_voice":
 				try:
@@ -280,7 +280,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						overwrites=overwrites,
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "category":
 				try:
@@ -299,7 +299,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						overwrites=overwrites,
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 			elif x["type"] == "forum":
 				try:
@@ -324,7 +324,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 						default_auto_archive_duration=x["default_auto_archive_duration"],
 					)
 					await asyncio.sleep(0.5)
-				except:
+				except (discord.Forbidden, discord.HTTPException):
 					continue
 
 	@commands.hybrid_group(

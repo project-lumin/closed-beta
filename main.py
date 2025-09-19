@@ -223,7 +223,9 @@ class SlashCommandLocalizer(app_commands.Translator):
 		context: app_commands.TranslationContext,
 	) -> str | None:
 		if slash_command_localization:
-			localized = slash_command_localization.translate(string.message, str(locale))
+			localized = slash_command_localization.translate(
+				string.message, str(locale)
+			)
 			if not isinstance(localized, str):
 				return None
 			return localized
@@ -256,9 +258,9 @@ class MyClient(commands.AutoShardedBot):
 		self.session: aiohttp.ClientSession | None = None
 		self.ready_event = asyncio.Event()
 		self.owner_ids = {
-			648168353453572117,  # pearoo
-			657350415511322647,  # liba
-			452133888047972352,  # aki26
+			648168353453572117,   # pearoo
+			657350415511322647,   # liba
+			452133888047972352,   # aki26
 			1051181672508444683,  # sarky
 		}
 		super().__init__(
