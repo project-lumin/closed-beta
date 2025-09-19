@@ -11,7 +11,7 @@ import traceback
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter
-from typing import Optional, Literal, Union, Any, Sequence
+from typing import Any, Literal, Optional, Sequence, Union
 
 import aiohttp
 import asyncpg
@@ -223,12 +223,11 @@ class SlashCommandLocalizer(app_commands.Translator):
 		context: app_commands.TranslationContext,
 	) -> str | None:
 		if slash_command_localization:
-			localized: Union[str, list[str], dict[str, Any]] = slash_command_localization.translate(
-				string.message, str(locale)
-			)
-			if isinstance(localized, (list, dict)):
+			localized = slash_command_localization.translate(string.message, str(locale))
+			if not isinstance(localized, str):
 				return None
 			return localized
+		return None
 
 	async def unload(self) -> None:
 		benchmark = perf_counter()
@@ -253,8 +252,8 @@ class MyClient(commands.AutoShardedBot):
 		self.uptime: Optional[datetime.datetime] = None
 		self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
 		intents: discord.Intents = discord.Intents.all()
-		self.db: asyncpg.Pool = None  # type: ignore
-		self.session: aiohttp.ClientSession = None  # type: ignore
+		self.db: asyncpg.Pool | None = None
+		self.session: aiohttp.ClientSession | None = None
 		self.ready_event = asyncio.Event()
 		self.owner_ids = {
 			648168353453572117,  # pearoo
@@ -263,7 +262,7 @@ class MyClient(commands.AutoShardedBot):
 			1051181672508444683,  # sarky
 		}
 		super().__init__(
-			command_prefix=self.get_prefix,  # type: ignore
+			command_prefix=self.get_prefix,
 			heartbeat_timeout=150.0,
 			intents=intents,
 			case_insensitive=False,
@@ -356,8 +355,6 @@ class MyClient(commands.AutoShardedBot):
 		if not database_exists:
 			await self.db.execute("CREATE DATABASE lumin_beta OWNER lumin")
 			logger.info("Created database 'lumin'!")
-
-		# integer\s+default\s+nextval\('(\w+)_\w+_seq'::regclass\)\s+not\s+null\s+constraint\s+\1_\w+_pkey\s+primary\s+key,
 
 		with open("first_time.sql", encoding="utf-8") as f:
 			# "ok ok but pearoo how do i update this if i

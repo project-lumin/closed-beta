@@ -11,9 +11,17 @@ from typing import Any, Optional, Union, overload
 import discord
 from discord.ext import commands, localization
 
-from helpers import emojis, CustomEmoji, CustomPartialEmoji
+from helpers import emojis
 
-from .custom_args import CustomGuild, CustomMember, CustomRole, CustomUser
+from .custom_args import (
+	CustomEmoji,
+	CustomGuild,
+	CustomMember,
+	CustomPartialEmoji,
+	CustomRole,
+	CustomUser,
+	FormatDateTime,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -192,6 +200,8 @@ class CustomResponse:
 					kwargs[key] = CustomEmoji.from_emoji(value)
 				case discord.PartialEmoji():
 					kwargs[key] = CustomPartialEmoji.from_emoji(value)
+				case datetime.datetime():
+					kwargs[key] = FormatDateTime(value, "F")
 				case _:
 					continue
 

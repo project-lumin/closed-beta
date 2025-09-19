@@ -1,11 +1,13 @@
 import asyncio
 import logging
 import random
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands, tasks
 
-from main import MyClient
+if TYPE_CHECKING:
+	from main import MyClient
 
 
 class Status(commands.Cog, command_attrs=dict(hidden=True)):

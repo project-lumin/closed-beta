@@ -1,21 +1,24 @@
 import asyncio
-from typing import Optional
+import random
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING, Optional
 
 import discord
-from discord.ext import commands
-from datetime import datetime, timedelta
-import random
 from discord import app_commands
+from discord.ext import commands
 
-from helpers import CustomResponse, FormatDateTime
-from main import Context, logger
 import helpers
+from helpers import FormatDateTime
+from main import logger
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class Giveaway(commands.Cog, name="Giveaway"):
-	def __init__(self, client):
+	def __init__(self, client: MyClient):
 		self.client = client
-		self.custom_response = CustomResponse(client)
+		self.custom_response = client.custom_response
 		self.active_giveaways = {}
 		self.GIVEAWAY_EMOJI = "🎉"
 

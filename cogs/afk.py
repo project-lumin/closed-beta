@@ -1,12 +1,14 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 import main
-from helpers import custom_response, CustomUser, regex, CustomMember
-from main import MyClient
+from helpers import CustomMember, CustomUser, regex
+
+if TYPE_CHECKING:
+	from main import MyClient
 
 
 @app_commands.guild_only()
@@ -14,7 +16,7 @@ from main import MyClient
 class AFK(commands.Cog):
 	def __init__(self, client: MyClient):
 		self.client: MyClient = client
-		self.custom_response: custom_response.CustomResponse = custom_response.CustomResponse(client)
+		self.custom_response = client.custom_response
 
 	@commands.Cog.listener("on_message")
 	async def check_afk(self, message: discord.Message) -> None:

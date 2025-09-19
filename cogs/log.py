@@ -1,23 +1,25 @@
 import datetime
 import sys
-from typing import Literal, Optional, Union, overload
-import discord
+from typing import TYPE_CHECKING, Literal, Optional, Union, overload
 
+import discord
 from discord import app_commands
 from discord.ext import commands
 
 from helpers import (
-	CustomResponse,
-	CustomMessage,
-	CustomAutoModRule,
 	CustomAutoModAction,
+	CustomAutoModRule,
 	CustomInvite,
+	CustomMessage,
+	CustomResponse,
+	CustomTextChannel,
+	CustomUser,
 	FormatDateTime,
 	convert_to_custom_channel,
-	CustomUser,
-	CustomTextChannel,
 )
-from main import MyClient, Context
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class LogCommands(commands.Cog, name="Logging"):

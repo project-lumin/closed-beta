@@ -1,11 +1,14 @@
-from typing import Any, get_args, get_origin, Literal, Optional
+from typing import TYPE_CHECKING, Any, Literal, Optional, get_args, get_origin
 
 import discord
 from discord.ext import commands
 from discord.ext.commands._types import BotT
 
 from helpers import custom_response
-from main import Command, Context, MyClient
+from main import Command
+
+if TYPE_CHECKING:
+	from main import Context, MyClient
 
 
 class HelpCommand(commands.HelpCommand):
