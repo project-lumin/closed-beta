@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from typing import TYPE_CHECKING
 from urllib.parse import quote_plus
@@ -16,8 +18,8 @@ if TYPE_CHECKING:
 
 
 class Say(commands.Cog, name="Says"):
-	def __init__(self, client: MyClient):
-		self.client: MyClient = client
+	def __init__(self, client: "MyClient"):
+		self.client = client
 		self.custom_response: CustomResponse = CustomResponse(client)
 
 	@commands.hybrid_group(
@@ -26,7 +28,7 @@ class Say(commands.Cog, name="Says"):
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="say_specs-args-message-name")
 	@app_commands.describe(message="say_specs-args-message-description")
-	async def say(self, ctx: Context, *, message: commands.Range[str, 1, 2000]):
+	async def say(self, ctx: "Context", *, message: commands.Range[str, 1, 2000]):
 		await ctx.send("say.message", message=message)
 
 	@say.command(name="channel", description="chsay_specs-description", usage="chsay_specs-usage")
@@ -35,7 +37,7 @@ class Say(commands.Cog, name="Says"):
 	@app_commands.describe(
 		channel="chsay_specs-args-channel-description", message="chsay_specs-args-message-description"
 	)
-	async def channel_say(self, ctx: Context, channel: discord.TextChannel, *, message: commands.Range[str, 1, 2000]):
+	async def channel_say(self, ctx: "Context", channel: discord.TextChannel, *, message: commands.Range[str, 1, 2000]):
 		await channel.send(message, allowed_mentions=discord.AllowedMentions.none())
 
 	@say.command(name="edit", description="editmsg_specs-description", usage="editmsg_specs-usage")
@@ -44,7 +46,7 @@ class Say(commands.Cog, name="Says"):
 	@app_commands.describe(
 		message_link="editmsg_specs-args-link-description", content="editmsg_specs-args-content-description"
 	)
-	async def edit_message(self, ctx: Context, message_link: str, *, content: commands.Range[str, 1, 2000]):
+	async def edit_message(self, ctx: "Context", message_link: str, *, content: commands.Range[str, 1, 2000]):
 		match = DISCORD_MESSAGE_URL.search(message_link)
 		try:
 			if match:
@@ -66,21 +68,21 @@ class Say(commands.Cog, name="Says"):
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="asciisay_specs-args-message-name")
 	@app_commands.describe(message="asciisay_specs-args-message-description")
-	async def ascii_say(self, ctx: Context, *, message: commands.Range[str, 1, 20]):
+	async def ascii_say(self, ctx: "Context", *, message: commands.Range[str, 1, 20]):
 		await ctx.send("say.ascii", ascii=text2art(message))
 
 	@say.command(name="emoji", description="emojisay_specs-description", usage="emojisay_specs-usage")
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="emojisay_specs-args-message-name")
 	@app_commands.describe(message="emojisay_specs-args-message-description")
-	async def emoji_say(self, ctx: Context, *, message: commands.Range[str, 1, 20]):
+	async def emoji_say(self, ctx: "Context", *, message: commands.Range[str, 1, 20]):
 		await ctx.send("say.emoji", emoji=" ".join(text_to_emoji(message)))
 
 	@say.command(name="achievement", description="mcsay_specs-description", usage="mcsay_specs-usage")
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="mcsay_specs-args-message-name")
 	@app_commands.describe(message="mcsay_specs-args-message-description")
-	async def achievement_say(self, ctx: Context, *, message: commands.Range[str, 1, 50]):
+	async def achievement_say(self, ctx: "Context", *, message: commands.Range[str, 1, 50]):
 		icon = random.randint(1, 29)
 		localized_title = await self.custom_response("say.achievement.title", ctx)
 		achievement_title = quote_plus(localized_title)
@@ -92,7 +94,7 @@ class Say(commands.Cog, name="Says"):
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(data="qr_specs-args-data-name")
 	@app_commands.describe(data="qr_specs-args-data-description")
-	async def qr_code(self, ctx: Context, *, data: commands.Range[str, 1, 500]):
+	async def qr_code(self, ctx: "Context", *, data: commands.Range[str, 1, 500]):
 		data = quote_plus(data)
 		qr = f"https://api.qrserver.com/v1/create-qr-code/?data={data}&size=1000x1000&qzone=2"
 		await ctx.send("say.qr", qr=qr)
@@ -101,16 +103,16 @@ class Say(commands.Cog, name="Says"):
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="reversesay_specs-args-msg-name")
 	@app_commands.describe(message="reversesay_specs-args-msg-description")
-	async def reverse_say(self, ctx: Context, *, message: commands.Range[str, 1, 2000]):
+	async def reverse_say(self, ctx: "Context", *, message: commands.Range[str, 1, 2000]):
 		await ctx.send("say.reverse", message=message[::-1])
 
 	@say.command(name="clap", description="clapsay_specs-description", usage="clapsay_specs-usage")
 	@commands.has_permissions(manage_messages=True)
 	@app_commands.rename(message="clapsay_specs-args-message-name")
 	@app_commands.describe(message="clapsay_specs-args-message-description")
-	async def clap_say(self, ctx: Context, *, message: commands.Range[str, 1, 500]):
+	async def clap_say(self, ctx: "Context", *, message: commands.Range[str, 1, 500]):
 		await ctx.send("say.clap", message=message.replace(" ", "👏"))
 
 
-async def setup(client: MyClient):
+async def setup(client: "MyClient"):
 	await client.add_cog(Say(client))

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Literal, Optional, get_args, get_origin
 
 import discord
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class HelpCommand(commands.HelpCommand):
-	context: Context
+	context: "Context"
 
 	def __init__(self):
 		super().__init__()
@@ -140,7 +142,7 @@ class HelpCommand(commands.HelpCommand):
 
 
 class Help(commands.Cog, command_attrs=dict(hidden=True)):
-	def __init__(self, client: MyClient):
+	def __init__(self, client: "MyClient"):
 		self.client = client
 		help_command = HelpCommand()
 		help_command.custom_response = client.custom_response
@@ -148,5 +150,5 @@ class Help(commands.Cog, command_attrs=dict(hidden=True)):
 		self.client.help_command = help_command
 
 
-async def setup(client: MyClient):
+async def setup(client: "MyClient"):
 	await client.add_cog(Help(client))

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import sys
 from typing import TYPE_CHECKING, Literal, Optional, Union, overload
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 
 class LogCommands(commands.Cog, name="Logging"):
-	def __init__(self, client: MyClient) -> None:
+	def __init__(self, client: "MyClient") -> None:
 		self.client = client
 
 	@commands.hybrid_group(
@@ -37,7 +39,7 @@ class LogCommands(commands.Cog, name="Logging"):
 	)
 	async def log_toggle(
 		self,
-		ctx: Context,
+		ctx: "Context",
 		state: Literal["on", "off"] = "on",
 		channel: discord.TextChannel = None,
 	):
@@ -68,7 +70,7 @@ class LogCommands(commands.Cog, name="Logging"):
 	@app_commands.rename(module="logadd_specs-args-module-name")
 	@app_commands.describe(module="logadd_specs-args-module-description")
 	@commands.has_permissions(manage_guild=True)
-	async def log_module_add(self, ctx: Context, module: str):
+	async def log_module_add(self, ctx: "Context", module: str):
 		if module == "all":
 			await self.client.db.execute("UPDATE log SET modules = DEFAULT WHERE guild_id = $1", ctx.guild.id)
 		else:
@@ -84,7 +86,7 @@ class LogCommands(commands.Cog, name="Logging"):
 	@app_commands.rename(module="logremove_specs-args-module-name")
 	@app_commands.describe(module="logremove_specs-args-module-description")
 	@commands.has_permissions(manage_guild=True)
-	async def log_module_remove(self, ctx: Context, module: str):
+	async def log_module_remove(self, ctx: "Context", module: str):
 		if module == "all":
 			await self.client.db.execute("UPDATE log SET modules = ARRAY[] WHERE guild_id = $1", ctx.guild.id)
 		else:
@@ -98,7 +100,7 @@ class LogCommands(commands.Cog, name="Logging"):
 
 
 class LogListeners(commands.Cog):
-	def __init__(self, client: MyClient) -> None:
+	def __init__(self, client: "MyClient") -> None:
 		self.client = client
 
 	# TODO:
@@ -510,6 +512,6 @@ class LogListeners(commands.Cog):
 		)
 
 
-async def setup(client: MyClient) -> None:
+async def setup(client: "MyClient") -> None:
 	await client.add_cog(LogCommands(client))
 	await client.add_cog(LogListeners(client))

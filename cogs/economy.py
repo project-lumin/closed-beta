@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from typing import TYPE_CHECKING, Literal, Optional, Union
 
@@ -306,8 +308,8 @@ class EconomyHelper:
 @app_commands.guild_only()
 @commands.guild_only()
 class Economy(commands.GroupCog, name="Economy", group_name="economy"):
-	def __init__(self, client):
-		self.client: MyClient = client
+	def __init__(self, client: "MyClient"):
+		self.client = client
 		self.helper = EconomyHelper(client)
 		self.custom_response = client.custom_response
 
@@ -345,14 +347,14 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 
 	@commands.hybrid_command(name="work", description="work_specs-description")
 	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
-	async def work(self, ctx: Context):
+	async def work(self, ctx: "Context"):
 		amount: int = random.randint(300, 1500)
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
 
 		await ctx.send("work", amount=amount)
 
 	@commands.hybrid_command(name="crime", description="crime_specs-description")
-	async def crime(self, ctx: Context):
+	async def crime(self, ctx: "Context"):
 		amount = random.randint(500, 2000)
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
 
@@ -360,7 +362,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 
 	@commands.hybrid_command(name="daily", description="daily_specs-description")
 	@commands.cooldown(1, 86400, commands.BucketType.user)  # type: ignore
-	async def daily(self, ctx: Context):
+	async def daily(self, ctx: "Context"):
 		amount = 5000
 		await self.helper.add_money(ctx.author.id, ctx.guild.id, amount)
 
@@ -387,7 +389,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@commands.has_permissions(administrator=True)
 	async def addmoney(
 		self,
-		ctx: Context,
+		ctx: "Context",
 		member: discord.Member,
 		amount: commands.Range[int, 1],
 		account: Literal["cash", "bank"] = "cash",
@@ -424,7 +426,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@commands.has_permissions(administrator=True)
 	async def removemoney(
 		self,
-		ctx: Context,
+		ctx: "Context",
 		member: discord.Member,
 		amount: discord.app_commands.Range[int, 1],
 		account: Literal["cash", "bank"] = "cash",
@@ -441,7 +443,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 
 	@commands.hybrid_command(name="luck", description="luck_specs-description")
 	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
-	async def luck(self, ctx: Context):
+	async def luck(self, ctx: "Context"):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 		minimum_balance = 1000
 		if balance < minimum_balance:
@@ -467,7 +469,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@commands.hybrid_command(name="pay", description="pay_specs-description", usage="pay_specs-usage")
 	async def pay(
 		self,
-		ctx: Context,
+		ctx: "Context",
 		member: discord.Member,
 		amount: discord.app_commands.Range[int, 1],
 	):
@@ -496,7 +498,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		usage="balance_specs-usage",
 		aliases=["bal"],
 	)
-	async def balance(self, ctx: Context, member: Optional[discord.Member]):
+	async def balance(self, ctx: "Context", member: Optional[discord.Member]):
 		member = member or ctx.author
 		cash, bank = await self.helper.get_balance(member.id, ctx.guild.id, wallet=None)
 
@@ -514,7 +516,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@app_commands.describe(bet="slots_specs-args-bet-description")
 	@commands.hybrid_command(name="slots", description="slots_specs-description", usage="slots_specs-usage")
 	@commands.cooldown(1, 3600, commands.BucketType.user)  # type: ignore
-	async def slots(self, ctx: Context, bet: int):
+	async def slots(self, ctx: "Context", bet: int):
 		balance = await self.helper.get_balance(ctx.author.id, ctx.guild.id)
 
 		if bet > balance or balance < 0:
@@ -557,7 +559,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		description="deposit_specs-description",
 		usage="deposit_specs-usage",
 	)
-	async def deposit(self, ctx: Context, amount: discord.app_commands.Range[int, 1] = None):
+	async def deposit(self, ctx: "Context", amount: discord.app_commands.Range[int, 1] = None):
 		cash, bank = await self.helper.get_balance(ctx.author.id, ctx.guild.id, wallet=None)
 		amount = amount or cash
 		try:
@@ -589,7 +591,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		description="withdraw_specs-description",
 		usage="withdraw_specs-usage",
 	)
-	async def withdraw(self, ctx: Context, amount: discord.app_commands.Range[int, 1] = None):
+	async def withdraw(self, ctx: "Context", amount: discord.app_commands.Range[int, 1] = None):
 		cash, bank = await self.helper.get_balance(ctx.author.id, ctx.guild.id, wallet=None)
 		amount = amount or bank
 		try:
@@ -626,7 +628,7 @@ class Shop(commands.Cog, name="Shop"):
 		description="shop_specs-description",
 		fallback="shop_specs-fallback",
 	)
-	async def shop(self, ctx: Context):
+	async def shop(self, ctx: "Context"):
 		row = await self.client.db.fetch("SELECT * FROM shop WHERE guild_id = $1", str(ctx.guild.id))
 		if not row:
 			return await ctx.send("shop.list.empty")
@@ -652,7 +654,7 @@ class Shop(commands.Cog, name="Shop"):
 	@shop.command(name="buy", description="buy_specs-description", usage="buy_specs-usage")
 	@app_commands.rename(item="buy_specs-args-item-name")
 	@app_commands.describe(item="buy_specs-args-item-description")
-	async def buy(self, ctx: Context, item: str):
+	async def buy(self, ctx: "Context", item: str):
 		row = await self.client.db.fetchrow(
 			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
 			ctx.guild.id,
@@ -701,7 +703,7 @@ class Shop(commands.Cog, name="Shop"):
 	)
 	@app_commands.checks.has_permissions(manage_guild=True, manage_roles=True)
 	@commands.has_permissions(manage_guild=True, manage_roles=True)
-	async def set_item(self, ctx: Context, item: str, price: int, description: str, role: discord.Role):
+	async def set_item(self, ctx: "Context", item: str, price: int, description: str, role: discord.Role):
 		row = await self.client.db.fetchrow(
 			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
 			str(ctx.guild.id),
@@ -741,7 +743,7 @@ class Shop(commands.Cog, name="Shop"):
 	@app_commands.rename(item="global-item")
 	@app_commands.describe(item="remove_item_specs-args-item-description")
 	@app_commands.checks.has_permissions(manage_guild=True)
-	async def remove_item(self, ctx: Context, item: str):
+	async def remove_item(self, ctx: "Context", item: str):
 		row = await self.client.db.fetchrow(
 			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
 			ctx.guild.id,
@@ -769,6 +771,6 @@ class Shop(commands.Cog, name="Shop"):
 		await ctx.send("shop.remove.success", item=item)
 
 
-async def setup(client: MyClient):
+async def setup(client: "MyClient"):
 	await client.add_cog(Economy(client))
 	await client.add_cog(Shop(client))

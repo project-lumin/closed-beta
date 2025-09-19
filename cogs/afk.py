@@ -4,18 +4,17 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-import main
 from helpers import CustomMember, CustomUser, regex
 
 if TYPE_CHECKING:
-	from main import MyClient
+	from main import Context, MyClient
 
 
 @app_commands.guild_only()
 @commands.guild_only()
 class AFK(commands.Cog):
-	def __init__(self, client: MyClient):
-		self.client: MyClient = client
+	def __init__(self, client: "MyClient"):
+		self.client = client
 		self.custom_response = client.custom_response
 
 	@commands.Cog.listener("on_message")
@@ -87,7 +86,7 @@ class AFK(commands.Cog):
 	@commands.hybrid_command(name="afk", description="afk_specs-description", usage="afk_specs-usage")
 	@app_commands.rename(reason="afk_specs-args-reason-name")
 	@app_commands.describe(reason="afk_specs-args-reason-description")
-	async def afk(self, ctx: main.Context, reason: Optional[str] = None):
+	async def afk(self, ctx: "Context", reason: Optional[str] = None):
 		if not reason:
 			reason = await self.custom_response("afk.dnd", ctx)
 
@@ -148,5 +147,5 @@ class AFK(commands.Cog):
 			return await ctx.send("afk.on")
 
 
-async def setup(client: MyClient):
+async def setup(client: "MyClient"):
 	await client.add_cog(AFK(client))

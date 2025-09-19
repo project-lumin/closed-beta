@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
 import json
@@ -15,13 +17,13 @@ if TYPE_CHECKING:
 
 
 class Snapshot(commands.Cog, name="Snapshots"):
-	def __init__(self, client: MyClient):
+	def __init__(self, client: "MyClient"):
 		self.client = client
 		self.connection: asyncpg.Pool = client.db
 		self.custom_response = client.custom_response
 
 	@staticmethod
-	async def save(ctx: Context) -> dict:
+	async def save(ctx: "Context") -> dict:
 		"""
 		Creates a snapshot of the server.
 
@@ -94,7 +96,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 
 		return payload
 
-	async def create_snapshot(self, ctx: Context) -> Optional[UUID]:
+	async def create_snapshot(self, ctx: "Context") -> Optional[UUID]:
 		"""
 		Creates a snapshot and inserts it into the database.
 
@@ -148,7 +150,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 		else:
 			return None
 
-	async def delete_all_channels(self, ctx: Context):
+	async def delete_all_channels(self, ctx: "Context"):
 		"""
 		Deletes all channels in the server.
 
@@ -164,7 +166,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				continue
 			await asyncio.sleep(0.5)
 
-	async def delete_all_roles(self, ctx: Context):
+	async def delete_all_roles(self, ctx: "Context"):
 		"""
 		Deletes all roles in the server.
 
@@ -180,7 +182,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				continue
 			await asyncio.sleep(0.5)
 
-	async def load_snapshot(self, ctx: Context, payload: dict):
+	async def load_snapshot(self, ctx: "Context", payload: dict):
 		for x in sorted(
 			payload["roles"],
 			key=lambda r: payload["roles"][r]["position"],
@@ -334,7 +336,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 	)
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)
-	async def snapshot(self, ctx: Context):
+	async def snapshot(self, ctx: "Context"):
 		code = await self.create_snapshot(ctx)
 
 		await ctx.send("snapshot.create", code=code)
@@ -344,7 +346,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 	@app_commands.rename(code="ss_load_specs-args-code-name")
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)
-	async def load(self, ctx: Context, code: str):
+	async def load(self, ctx: "Context", code: str):
 		payload = await self.get_snapshot(code)
 		if not payload:
 			return await ctx.send("snapshot.not_found")
@@ -365,5 +367,5 @@ class Snapshot(commands.Cog, name="Snapshots"):
 		await ctx.send("snapshot.load")
 
 
-async def setup(client):
+async def setup(client: "MyClient"):
 	await client.add_cog(Snapshot(client))

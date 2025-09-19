@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 
 class Status(commands.Cog, command_attrs=dict(hidden=True)):
-	def __init__(self, client):
-		self.client: MyClient = client
+	def __init__(self, client: "MyClient"):
+		self.client = client
 
 	@commands.Cog.listener()
 	async def on_ready(self):
@@ -50,5 +50,5 @@ class Status(commands.Cog, command_attrs=dict(hidden=True)):
 			await self.on_connect()
 
 
-async def setup(client: commands.AutoShardedBot):
+async def setup(client: "MyClient"):
 	await client.add_cog(Status(client))
