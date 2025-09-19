@@ -714,7 +714,7 @@
 		"args": {
 			"duration": {
 				"name": "hossz",
-				"description": "A lassítás hossza (pl. 1s, 5m, 1h, 1d), \"off\" a kikapcsoláshoz"
+				"description": "A lassítás hossza (pl. 1s, 5m, 1h), \"off\" a kikapcsoláshoz"
 			},
 			"channel": {
 				"name": "csatorna",

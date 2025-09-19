@@ -713,7 +713,7 @@
 		"args": {
 			"duration": {
 				"name": "duration",
-				"description": "The duration of the slowmode (ex. 1s, 5m, 1h, 1d). \"off\" to disable slowmode"
+				"description": "The duration of the slowmode (ex. 1s, 5m, 1h), \"off\" to disable slowmode"
 			},
 			"channel": {
 				"name": "channel",

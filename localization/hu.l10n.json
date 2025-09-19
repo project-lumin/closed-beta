@@ -477,6 +477,9 @@
 						"timestamp": "{now}"
 					}
 				]
+			},
+			"current_slowmode": {
+				"content": "A lassítás {channel.mention} csatornában jelenleg `{channel.slowmode}`."
 			}
 		},
 		"delete": {
