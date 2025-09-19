@@ -9,10 +9,11 @@ import time
 from typing import Any, Optional, Union, overload
 
 import discord
-from .custom_args import CustomGuild, CustomMember
 from discord.ext import commands, localization
 
-from helpers import emojis
+from helpers import emojis, CustomEmoji, CustomPartialEmoji
+
+from .custom_args import CustomGuild, CustomMember, CustomRole, CustomUser
 
 logger = logging.getLogger(__name__)
 
@@ -159,6 +160,7 @@ class CustomResponse:
 			case _:
 				guild_id = None
 
+		# these are variables that are always inserted into commands IF there is a context
 		context_formatting = {
 			"author": CustomMember.from_member(original.author)
 			if isinstance(original, commands.Context)
@@ -174,6 +176,24 @@ class CustomResponse:
 			),
 			"now": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
 		}
+
+		# these are kwargs that are passed in but they're converted into custom args
+		for key, value in kwargs.items():
+			match value:
+				case discord.Guild():
+					kwargs[key] = CustomGuild.from_guild(value)
+				case discord.Member():
+					kwargs[key] = CustomMember.from_member(value)
+				case discord.User():
+					kwargs[key] = CustomUser.from_user(value)
+				case discord.Role():
+					kwargs[key] = CustomRole.from_role(value)
+				case discord.Emoji():
+					kwargs[key] = CustomEmoji.from_emoji(value)
+				case discord.PartialEmoji():
+					kwargs[key] = CustomPartialEmoji.from_emoji(value)
+				case _:
+					continue
 
 		if __debug__:
 			now = time.time()
