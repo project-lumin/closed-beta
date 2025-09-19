@@ -908,7 +908,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 			0, min(seconds, max_slowmode_delay)
 		)  # clamp between 0 and 6hrs (silently, but whatever, its easier for the user)
 		reason = await self.custom_response("mod.slowmode.reason", ctx, moderator=ctx.author)
-		await ctx.channel.edit(slowmode_delay=seconds, reason=reason)
+		await channel.edit(slowmode_delay=seconds, reason=reason)
 		await ctx.send(
 			"mod.slowmode.response",
 			channel=channel,
