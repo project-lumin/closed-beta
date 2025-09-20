@@ -1,0 +1,68 @@
+name: release_on_push.yml
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from pyproject.toml
+        id: pyproject
+        run: |
+          VERSION=$(grep -Po '(?<=^version = ")[^"]*' pyproject.toml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get latest release
+        id: latest
+        run: |
+          set -e
+          LATEST=$(gh release view --json tagName -q .tagName || echo "v0.0.0")
+            echo "latest=${LATEST#v}" >> $GITHUB_OUTPUT
+        env:
+            GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Compare versions
+        id: compare
+        run: |
+          PY=${{ steps.pyproject.outputs.version }}
+          REL=${{ steps.latest.outputs.latest }}
+          
+          echo "pyproject.toml: $PY"
+          echo "latest release: $REL"
+          
+          if [ "$PY" = "$REL" ]; then
+            echo "action=none" >> $GITHUB_OUTPUT
+          elif dpkg --compare-versions "$PY" gt "$REL"; then
+            echo "action=new_release" >> $GITHUB_OUTPUT
+          else
+            echo "action=update_toml" >> $GITHUB_OUTPUT
+
+      - name: Update pyproject.toml version
+        if: steps.compare.outputs.action == 'update_toml'
+        run: |
+          REL=${{ steps.latest.outputs.latest }}
+          sed -i "s/^version = \".*\"/version = \"$REL\"/" pyproject.toml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml
+          git commit -m "🤖 chore: bump version to latest release"
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:dev --force
+
+      - name: Create new release
+        if: steps.compare.outputs.action == 'new_release'
+        run: |
+          PY=${{ steps.pyproject.outputs.version }}
+          gh release create "v$PY" --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

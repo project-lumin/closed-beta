@@ -17,8 +17,7 @@
 - Python **3.12+**
 - **PostgreSQL**
 - Recommended OS: **Linux** or **macOS** (for optimal compatibility with `uvloop`)
-
-> `uvloop` is installed automatically on Linux/macOS via `pyproject.toml` dependency markers.
+- The `uv` package manager
 
 ### Setup Steps
 
@@ -28,27 +27,49 @@
    cd lumin
    ```
 
-2. **Set up the virtual environment and install dependencies**
-   ```bash
-   uv venv
-   uv pip install -e .
-   ```
+2. **Create a `.env` file** in the project root (follow the `.env.example` template)
 
-    - This installs all dependencies from `pyproject.toml`
-    - `uvloop` will be included automatically on supported platforms
-
-3. **Create a `.env` file** in the project root (follow the `.env.example` template)
-
-4. **Install PostgreSQL**, then:
+3. **Install PostgreSQL**, then:
     - Create a user named `lumin` with the password you defined above
     - Create a database named `lumin`, preferably owned by the `lumin` user
     - Optionally initialize tables by running the contents of `first_time.sql`
 
-5. **Run the bot**
+4. **Run the bot**
    ```bash
-   python main.py
+   uv run python -OO main.py
    ```
-   For debug mode, run with `-O` or `-OO`
+   `uv run` will automatically set up the virtual environment for you and download required dependencies from pyproject.toml.
+   
+   Python's `-OO` flag will set the `__debug__` variable to `False`, which will make the bot run in **production mode!**
+
+   If you want to run the bot in **debug mode**, run:
+
+   ```bash
+   uv run main.py
+   ```
+
+## The difference between "production mode" and "debug mode"
+When you run the bot using the regular `python main.py` command, you'll notice that the logs will say that
+the bot is running in what we call "debug mode". This is because Python's built-in `__debug__` variable is
+`True` by default.
+
+Debug mode will use the `DEBUG_TOKEN` from the `.env` file and it will send automatic error reports
+directly in the channel that the command was executed in.
+# This is very unsafe!
+Error messages might contain information that could compromise the bot.
+
+Entering production mode will tell Python to make the `__debug__` variable `False`. It's as simple as
+passing the `-O` or `-OO` flag to the Python command, like this:
+
+```bash
+python -OO main.py
+```
+
+## Using Docker
+
+We've provided a Dockerfile and a compose file in the Github repo. You can simply run `docker compuse up --build`
+to start the bot in a Docker container. Make sure to follow until step 2, because the bot still needs
+the `.env` file to function properly.
 
 ## Contributor Notice
 
