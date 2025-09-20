@@ -1,0 +1,8 @@
+.env.example
+.gitignore
+CODE_OF_CONDUCT.md
+compose.yml
+crowdin.yml
+Dockerfile
+README.md
+SECURITY.md
