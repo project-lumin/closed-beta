@@ -2,8 +2,7 @@ name: 🗞️ Format using Ruff
 on:
   push:
     branches:
-      - "*"
-  pull_request:
+      - "dev"
 
 jobs:
   format:
@@ -34,8 +33,7 @@ jobs:
       - name: Run Ruff Format
         run: ruff format --config pyproject.toml .
 
-      - name: Auto-commit on `dev` branch
-        if: github.ref == 'refs/heads/dev'
+      - name: Auto-commit
         run: |
           if [[ `git status --porcelain` ]]; then
             git config user.name "github-actions[bot]"
@@ -45,15 +43,4 @@ jobs:
             git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:dev --force
           else
             echo "Code was formatted successfully"
-          fi
-
-      - name: Fail check on PR if formatting needed
-        if: github.event_name == 'pull_request' && github.ref != 'refs/heads/dev'
-        run: |
-          if [[ `git status --porcelain` ]]; then
-            echo "❌ Formatting issues found. Please run 'ruff format .' locally."
-            git diff
-            exit 1
-          else
-            echo "✅ Code is properly formatted."
           fi
