@@ -38,8 +38,9 @@
    ```bash
    uv run python -OO main.py
    ```
-   `uv run` will automatically set up the virtual environment for you and download required dependencies from pyproject.toml.
-   
+   `uv run` will automatically set up the virtual environment for you and download required dependencies from
+   pyproject.toml.
+
    Python's `-OO` flag will set the `__debug__` variable to `False`, which will make the bot run in **production mode!**
 
    If you want to run the bot in **debug mode**, run:
@@ -49,13 +50,16 @@
    ```
 
 ## The difference between "production mode" and "debug mode"
+
 When you run the bot using the regular `python main.py` command, you'll notice that the logs will say that
 the bot is running in what we call "debug mode". This is because Python's built-in `__debug__` variable is
 `True` by default.
 
 Debug mode will use the `DEBUG_TOKEN` from the `.env` file and it will send automatic error reports
 directly in the channel that the command was executed in.
+
 # This is very unsafe!
+
 Error messages might contain information that could compromise the bot.
 
 Entering production mode will tell Python to make the `__debug__` variable `False`. It's as simple as

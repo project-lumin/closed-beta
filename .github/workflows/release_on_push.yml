@@ -30,7 +30,7 @@ jobs:
           LATEST=$(gh release view --json tagName -q .tagName || echo "v0.0.0")
             echo "latest=${LATEST#v}" >> $GITHUB_OUTPUT
         env:
-            GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Compare versions
         id: compare
