@@ -11,8 +11,9 @@ services:
       - "${DB_PORT:-5432}:5432"
     volumes:
       - ./first_time.sql:/docker-entrypoint-initdb.d/first_time.sql:ro
+      - postgres_data:/var/lib/postgresql/data
 
-  app:
+  bot:
     build: .
     depends_on:
       - db
@@ -21,5 +22,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT:-5432}
     volumes:
-      - .:/app
-    command: uv run python -OO main.py
+      - .:/bot
+
+volumes:
+  postgres_data:
