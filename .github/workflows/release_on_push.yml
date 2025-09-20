@@ -47,6 +47,7 @@ jobs:
             echo "action=new_release" >> $GITHUB_OUTPUT
           else
             echo "action=update_toml" >> $GITHUB_OUTPUT
+          fi
 
       - name: Update pyproject.toml version
         if: steps.compare.outputs.action == 'update_toml'
