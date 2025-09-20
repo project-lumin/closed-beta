@@ -1,6 +1,6 @@
 [project]
 name = "lumin"
-version = "0.1.0"
+version = "0.6.1"
 description = "fm01 v2.0 - closed beta"
 authors = [
     { name = "Pearoo", email = "contact@pearoo.dev" }
