@@ -1,20 +1,16 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Literal, Optional, get_args, get_origin
+from typing import Any, Literal, Optional, get_args, get_origin
 
 import discord
 from discord.ext import commands
 from discord.ext.commands._types import BotT
+from discord.ext.localization import Localization
 
-from helpers import custom_response
-from main import Command
-
-if TYPE_CHECKING:
-	from main import Context, MyClient
+from core import Command, Context, MyClient
+from helpers import CustomResponse
 
 
 class HelpCommand(commands.HelpCommand):
-	context: "Context"
+	context: Context
 
 	def __init__(self):
 		super().__init__()
@@ -76,11 +72,11 @@ class HelpCommand(commands.HelpCommand):
 				if not command_signatures:
 					continue
 
-				formatted = discord.ext.localization.Localization.format_strings(
+				formatted = Localization.format_strings(
 					template, module=cog.qualified_name or "-", commands=len(filtered)
 				)
 				embeds[0].add_field(**formatted)
-			message["embeds"] = custom_response.CustomResponse.convert_embeds(embeds)
+			message["embeds"] = CustomResponse.convert_embeds(embeds)
 
 		await self.get_destination().send(**message)
 
@@ -123,11 +119,9 @@ class HelpCommand(commands.HelpCommand):
 			for command in commands_list:
 				if len(embeds[0].fields) >= 25:
 					break
-				formatted = discord.ext.localization.Localization.format_strings(
-					template, command=Command.from_command(command, self.context)
-				)
+				formatted = Localization.format_strings(template, command=Command.from_command(command, self.context))
 				embeds[0].add_field(**formatted)
-			message["embeds"] = custom_response.CustomResponse.convert_embeds(embeds)
+			message["embeds"] = CustomResponse.convert_embeds(embeds)
 
 		await self.get_destination().send(**message)
 
@@ -142,7 +136,7 @@ class HelpCommand(commands.HelpCommand):
 
 
 class Help(commands.Cog, command_attrs=dict(hidden=True)):
-	def __init__(self, client: "MyClient"):
+	def __init__(self, client: MyClient):
 		self.client = client
 		help_command = HelpCommand()
 		help_command.custom_response = client.custom_response
@@ -150,5 +144,5 @@ class Help(commands.Cog, command_attrs=dict(hidden=True)):
 		self.client.help_command = help_command
 
 
-async def setup(client: "MyClient"):
+async def setup(client: MyClient):
 	await client.add_cog(Help(client))
