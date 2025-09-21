@@ -1,7 +1,6 @@
 from typing import Optional
 
 import discord
-import discord.errors
 from discord import app_commands
 from discord.ext import commands
 
