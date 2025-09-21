@@ -64,7 +64,6 @@ class MyClient(commands.AutoShardedBot):
 			return "?"
 		if not message.guild:
 			return "?!"
-		self.logger.info(f"{__debug__ = }")
 		row = await self.db.fetchrow("SELECT prefix, mention FROM guilds WHERE guild_id = $1", message.guild.id)
 		prefix, mention = row.get("prefix", "?!"), row.get("mention", True)
 		if mention:
