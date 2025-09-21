@@ -284,7 +284,7 @@ class MyClient(commands.AutoShardedBot):
 				too_long = len(stack) > 1700
 				file: discord.File | None = None
 				if too_long:
-					with open("../auto-report_stack-trace.txt", "w") as f:
+					with open("auto-report_stack-trace.txt", "w") as f:
 						f.write(stack)
 					file = discord.File(fp="auto-report_stack-trace.txt", filename="error.txt")
 					stack = "The stack trace was too long to send in a message, so it was saved as a file."
