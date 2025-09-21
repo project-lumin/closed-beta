@@ -1,17 +1,15 @@
 import asyncio
 import logging
 import random
-from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands, tasks
 
-if TYPE_CHECKING:
-	from main import MyClient
+from core import MyClient
 
 
 class Status(commands.Cog, command_attrs=dict(hidden=True)):
-	def __init__(self, client: "MyClient"):
+	def __init__(self, client: MyClient):
 		self.client = client
 
 	@commands.Cog.listener()
@@ -50,5 +48,5 @@ class Status(commands.Cog, command_attrs=dict(hidden=True)):
 			await self.on_connect()
 
 
-async def setup(client: "MyClient"):
+async def setup(client: MyClient):
 	await client.add_cog(Status(client))

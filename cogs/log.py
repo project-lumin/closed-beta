@@ -1,13 +1,12 @@
-from __future__ import annotations
-
 import datetime
 import sys
-from typing import TYPE_CHECKING, Literal, Optional, Union, overload
+from typing import Literal, Optional, Union, overload
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
+from core import Context, MyClient
 from helpers import (
 	CustomAutoModAction,
 	CustomAutoModRule,
@@ -20,12 +19,9 @@ from helpers import (
 	convert_to_custom_channel,
 )
 
-if TYPE_CHECKING:
-	from main import Context, MyClient
-
 
 class LogCommands(commands.Cog, name="Logging"):
-	def __init__(self, client: "MyClient") -> None:
+	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
 	@commands.hybrid_group(
@@ -39,9 +35,9 @@ class LogCommands(commands.Cog, name="Logging"):
 	)
 	async def log_toggle(
 		self,
-		ctx: "Context",
+		ctx: Context,
 		state: Literal["on", "off"] = "on",
-		channel: discord.TextChannel = None,
+		channel: discord.TextChannel | None = None,
 	):
 		is_on = state == "on"
 		if is_on:
@@ -70,7 +66,7 @@ class LogCommands(commands.Cog, name="Logging"):
 	@app_commands.rename(module="logadd_specs-args-module-name")
 	@app_commands.describe(module="logadd_specs-args-module-description")
 	@commands.has_permissions(manage_guild=True)
-	async def log_module_add(self, ctx: "Context", module: str):
+	async def log_module_add(self, ctx: Context, module: str):
 		if module == "all":
 			await self.client.db.execute("UPDATE log SET modules = DEFAULT WHERE guild_id = $1", ctx.guild.id)
 		else:
@@ -86,7 +82,7 @@ class LogCommands(commands.Cog, name="Logging"):
 	@app_commands.rename(module="logremove_specs-args-module-name")
 	@app_commands.describe(module="logremove_specs-args-module-description")
 	@commands.has_permissions(manage_guild=True)
-	async def log_module_remove(self, ctx: "Context", module: str):
+	async def log_module_remove(self, ctx: Context, module: str):
 		if module == "all":
 			await self.client.db.execute("UPDATE log SET modules = ARRAY[] WHERE guild_id = $1", ctx.guild.id)
 		else:
@@ -100,7 +96,7 @@ class LogCommands(commands.Cog, name="Logging"):
 
 
 class LogListeners(commands.Cog):
-	def __init__(self, client: "MyClient") -> None:
+	def __init__(self, client: MyClient) -> None:
 		self.client = client
 
 	# TODO:
@@ -126,11 +122,11 @@ class LogListeners(commands.Cog):
 		target_id: int,
 		actions: discord.AuditLogAction | int | list[discord.AuditLogAction | int],
 		changed_attribute: Optional[str] = None,
-	) -> Optional[discord.User]:
+	) -> Optional[Union[discord.User, discord.Member]]:
 		"""Retreives the actor from the audit logs for a specific action on a channel or role."""
 		try:
 			async for entry in guild.audit_logs(
-				limit=15, action=actions if isinstance(actions, (discord.AuditLogAction, int)) else discord.abc.MISSING
+				limit=15, action=actions if isinstance(actions, discord.AuditLogAction) else discord.abc.MISSING
 			):
 				target_channel_matches = False
 				if (
@@ -139,7 +135,7 @@ class LogListeners(commands.Cog):
 					and entry.target.id == target_id
 				):
 					target_channel_matches = True
-				if hasattr(entry.extra, "channel") and entry.extra.channel and entry.extra.channel.id == target_id:
+				if entry.extra.channel and entry.extra.channel.id == target_id:
 					target_channel_matches = True
 
 				if not target_channel_matches:
@@ -259,7 +255,7 @@ class LogListeners(commands.Cog):
 			return
 
 		custom_response = CustomResponse(self.client)
-		message: dict | str = await custom_response.get_message(key, self.client.get_guild(guild_id), **kwargs)
+		message = await custom_response.get_message(key, self.client.get_guild(guild_id), **kwargs)
 		if isinstance(message, dict):
 			await webhook.send(**message)
 		else:
@@ -298,6 +294,9 @@ class LogListeners(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before: discord.Message, after: discord.Message):
+		if not before.guild or not after.guild:
+			return
+
 		if before.content != after.content:
 			before = CustomMessage.from_message(before)
 			before.content = before.content or " "
@@ -344,7 +343,7 @@ class LogListeners(commands.Cog):
 	@commands.Cog.listener()
 	async def on_automod_action(self, execution: discord.AutoModAction):
 		await self.send_webhook(
-			execution.guild.id,
+			execution.guild_id,
 			"action",
 			execution=CustomAutoModAction.from_action(execution),
 		)
@@ -508,10 +507,10 @@ class LogListeners(commands.Cog):
 			message.guild.id,
 			"delete",
 			message=CustomMessage.from_message(message),
-			deleted_by=CustomUser.from_user(deleted_by),
+			deleted_by=CustomUser.from_user(deleted_by) if deleted_by else None,
 		)
 
 
-async def setup(client: "MyClient") -> None:
+async def setup(client: MyClient) -> None:
 	await client.add_cog(LogCommands(client))
 	await client.add_cog(LogListeners(client))

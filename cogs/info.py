@@ -1,16 +1,15 @@
-from __future__ import annotations
-
 import asyncio
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import discord
 import pypokedex
 import requests
 from discord import app_commands
 from discord.ext import commands
-from emoji import EMOJI_DATA
+from emoji.unicode_codes import EMOJI_DATA
 
+from core import Context, MyClient
 from helpers.custom_args import (
 	BotInfo,
 	CustomCategoryChannel,
@@ -29,12 +28,9 @@ from helpers.custom_args import (
 )
 from helpers.regex import DISCORD_TEMPLATE
 
-if TYPE_CHECKING:
-	from main import Context, MyClient
-
 
 class Info(commands.Cog, name="Information"):
-	def __init__(self, client: "MyClient"):
+	def __init__(self, client: MyClient):
 		self.client = client
 
 	@commands.hybrid_group(name="info", description="info_specs-description")
@@ -42,7 +38,7 @@ class Info(commands.Cog, name="Information"):
 	@app_commands.describe(argument="info_specs-args-argument-description")
 	async def info(
 		self,
-		ctx: "Context",
+		ctx: Context,
 		argument: discord.User | discord.abc.GuildChannel | discord.Role | discord.Emoji | discord.PartialEmoji,
 	):
 		if isinstance(argument, discord.User):
@@ -59,10 +55,10 @@ class Info(commands.Cog, name="Information"):
 	@info.command(name="user", description="userinfo_specs-description")
 	@app_commands.rename(user="userinfo_specs-args-user-name")
 	@app_commands.describe(user="userinfo_specs-args-user-description")
-	async def user(self, ctx: "Context", user: discord.Member | discord.User | None = None):
+	async def user(self, ctx: Context, user: discord.Member | discord.User | None = None):
 		user = user or ctx.author
 
-		if not ctx.guild:
+		if not ctx.guild and type(user) is discord.User:
 			await ctx.send("info.user.not_member", member=CustomUser.from_user(user))
 			return
 
@@ -78,14 +74,14 @@ class Info(commands.Cog, name="Information"):
 
 	@info.command(name="server", description="serverinfo_specs-description")
 	@commands.guild_only()
-	async def server(self, ctx: "Context"):
+	async def server(self, ctx: Context):
 		await ctx.send("info.server", server=CustomGuild.from_guild(ctx.guild))
 
 	@info.command(name="role", description="roleinfo_specs-description")
 	@commands.guild_only()
 	@app_commands.rename(role="roleinfo_specs-args-role-name")
 	@app_commands.describe(role="roleinfo_specs-args-role-description")
-	async def role(self, ctx: "Context", role: Optional[discord.Role] = None):
+	async def role(self, ctx: Context, role: Optional[discord.Role] = None):
 		role = role or ctx.author.top_role
 		if not role:
 			raise commands.BadArgument("role")
@@ -94,7 +90,7 @@ class Info(commands.Cog, name="Information"):
 	@info.command(name="ip", description="ipinfo_specs-description")
 	@app_commands.rename(ip_addr="ipinfo_specs-args-ip-name")
 	@app_commands.describe(ip_addr="ipinfo_specs-args-ip-description")
-	async def ip(self, ctx: "Context", ip_addr: str):
+	async def ip(self, ctx: Context, ip_addr: str):
 		try:
 			ip_json = await self.client.request(f"https://ipinfo.io/{ip_addr}/json")
 		except RuntimeError:
@@ -103,17 +99,17 @@ class Info(commands.Cog, name="Information"):
 		await ctx.send("info.ip", ip=ip)
 
 	@info.command(name="bot", description="botinfo_specs-description")
-	async def bot(self, ctx: "Context"):
+	async def bot(self, ctx: Context):
 		await ctx.send("info.bot", bot=BotInfo(self.client))
 
 	@info.command(name="emoji", description="emojiinfo_specs-description")
-	@app_commands.rename(emoji="emojiinfo_specs-args-emoji-name")
-	@app_commands.describe(emoji="emojiinfo_specs-args-emoji-description")
-	async def emoji(self, ctx: "Context", emoji: str):
+	@app_commands.rename(emoji_name="emojiinfo_specs-args-emoji-name")
+	@app_commands.describe(emoji_name="emojiinfo_specs-args-emoji-description")
+	async def emoji(self, ctx: Context, emoji_name: str):
 		try:
-			emoji = await commands.EmojiConverter().convert(ctx, emoji)
+			emoji = await commands.EmojiConverter().convert(ctx, emoji_name)
 		except commands.BadArgument:
-			emoji = discord.PartialEmoji.from_str(emoji)
+			emoji = discord.PartialEmoji.from_str(emoji_name)
 		if isinstance(emoji, discord.Emoji):
 			await ctx.send("info.emoji.custom_emoji", emoji=CustomEmoji.from_emoji(emoji))
 		elif isinstance(emoji, discord.PartialEmoji) and emoji.name in EMOJI_DATA:
@@ -125,7 +121,7 @@ class Info(commands.Cog, name="Information"):
 	@commands.guild_only()
 	@app_commands.rename(channel="chinfo_specs-args-channel-name")
 	@app_commands.describe(channel="chinfo_specs-args-channel-description")
-	async def channel(self, ctx: "Context", channel: discord.abc.GuildChannel):
+	async def channel(self, ctx: Context, channel: discord.abc.GuildChannel):
 		if isinstance(channel, discord.TextChannel):
 			await ctx.send("info.channel.text", channel=CustomTextChannel.from_channel(channel))
 		elif isinstance(channel, discord.VoiceChannel):
@@ -145,7 +141,7 @@ class Info(commands.Cog, name="Information"):
 	@info.command(name="pokemon", description="pokeinfo_specs-description")
 	@app_commands.rename(pokemon_name="pokeinfo_specs-args-pokemon-name")
 	@app_commands.describe(pokemon_name="pokeinfo_specs-args-pokemon-description")
-	async def pokemon(self, ctx: "Context", pokemon_name: str):
+	async def pokemon(self, ctx: Context, pokemon_name: str):
 		try:
 			pokemon = await asyncio.get_event_loop().run_in_executor(None, lambda: pypokedex.get(name=pokemon_name))  # type: ignore
 		except requests.HTTPError:
@@ -158,7 +154,7 @@ class Info(commands.Cog, name="Information"):
 	@info.command(name="template", description="tmplteinfo_specs-description")
 	@app_commands.rename(template="tmplteinfo_specs-args-tmpl-name")
 	@app_commands.describe(template="tmplteinfo_specs-args-tmpl-description")
-	async def template(self, ctx: "Context", template: str):
+	async def template(self, ctx: Context, template: str):
 		regex = DISCORD_TEMPLATE.search(template)
 		if regex:
 			template_code = regex.group(1)
@@ -183,5 +179,5 @@ class Info(commands.Cog, name="Information"):
 		raise commands.BadArgument("template")
 
 
-async def setup(client: "MyClient"):
+async def setup(client: MyClient):
 	await client.add_cog(Info(client))

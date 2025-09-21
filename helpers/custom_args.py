@@ -2,11 +2,13 @@
 
 import datetime
 from dataclasses import dataclass, field
-from typing import Union, Optional, Literal, Sequence
-from cpuinfo import get_cpu_info
-from emoji import demojize
+from typing import Literal, Optional, Sequence, Union
+
 import discord
 import psutil
+from cpuinfo import get_cpu_info
+from emoji import demojize
+
 from .convert import seconds_to_text
 
 
@@ -206,8 +208,8 @@ class CustomUser:
 	"""Returns a string that mentions the user."""
 
 	@classmethod
-	def from_user(cls, user: discord.User):
-		"""Creates a ``CustomUser`` from a ``discord.User`` object."""
+	def from_user(cls, user: Union[discord.User, discord.Member]):
+		"""Creates a ``CustomUser`` from a ``discord.User`` or a ``discord.Member`` object."""
 		return cls(
 			_name=f"{user.name}#{user.discriminator}" if user.discriminator != "0" else user.name,
 			id=user.id,

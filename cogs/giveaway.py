@@ -1,24 +1,20 @@
-from __future__ import annotations
-
 import asyncio
 import random
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 import helpers
+from core import Context, MyClient
 from helpers import FormatDateTime
 from main import logger
 
-if TYPE_CHECKING:
-	from main import Context, MyClient
-
 
 class Giveaway(commands.Cog, name="Giveaway"):
-	def __init__(self, client: "MyClient"):
+	def __init__(self, client: MyClient):
 		self.client = client
 		self.custom_response = client.custom_response
 		self.active_giveaways = {}
@@ -48,7 +44,7 @@ class Giveaway(commands.Cog, name="Giveaway"):
 	async def cog_load(self):
 		await self.load_active_giveaways()
 
-	async def end_giveaway(self, ctx: "Context" | None, message_id: int, channel_id: int, right_now: bool = False):
+	async def end_giveaway(self, ctx: Context | None, message_id: int, channel_id: int, right_now: bool = False):
 		if message_id not in self.active_giveaways:
 			return
 
@@ -121,7 +117,7 @@ class Giveaway(commands.Cog, name="Giveaway"):
 		duration="gw_specs-args-duration-description",
 		prize="gw_specs-args-prize-description",
 	)
-	async def giveaway(self, ctx: "Context", duration: str, winners: str = None, *, prize: str = None):
+	async def giveaway(self, ctx: Context, duration: str, winners: str | None = None, *, prize: str | None = None):
 		try:
 			end_time = datetime.now() + timedelta(seconds=helpers.text_to_seconds(duration))
 		except (ValueError, TypeError):
@@ -170,12 +166,12 @@ class Giveaway(commands.Cog, name="Giveaway"):
 		self.client.loop.create_task(self.end_giveaway(ctx, message.id, ctx.channel.id))
 
 	@giveaway.command(name="end", description="gw_end-description", usage="gw_end-usage", aliases=["reroll"])
-	@app_commands.rename(message_id="gw_end-args-message_id-name")
-	@app_commands.describe(message_id="gw_end-args-message_id-description")
+	@app_commands.rename(message="gw_end-args-message_id-name")
+	@app_commands.describe(message="gw_end-args-message_id-description")
 	@commands.has_permissions(manage_guild=True)
-	async def endgiveaway(self, ctx, message_id: str):
+	async def endgiveaway(self, ctx, message: str):
 		try:
-			message_id = int(message_id)
+			message_id = int(message)
 		except ValueError:
 			raise commands.BadArgument("message_id")
 
@@ -185,5 +181,5 @@ class Giveaway(commands.Cog, name="Giveaway"):
 		await self.end_giveaway(ctx, message_id, ctx.channel.id, True)
 
 
-async def setup(client: "MyClient"):
+async def setup(client: MyClient):
 	await client.add_cog(Giveaway(client))
