@@ -119,9 +119,7 @@ class HelpCommand(commands.HelpCommand):
 			for command in commands_list:
 				if len(embeds[0].fields) >= 25:
 					break
-				formatted = Localization.format_strings(
-					template, command=Command.from_command(command, self.context)
-				)
+				formatted = Localization.format_strings(template, command=Command.from_command(command, self.context))
 				embeds[0].add_field(**formatted)
 			message["embeds"] = CustomResponse.convert_embeds(embeds)
 

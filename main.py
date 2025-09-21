@@ -35,12 +35,14 @@ if __name__ == "__main__":
 logger.info("Starting the bot...")
 client = MyClient()
 
+
 async def main():
 	try:
 		await client.start(TOKEN)
 	except KeyboardInterrupt:
 		logger.error("KeyboardInterrupt: Bot shut down by console")
 		await client.close()
+
 
 if __name__ == "__main__":
 	if __debug__:
