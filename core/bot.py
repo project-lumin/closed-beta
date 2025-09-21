@@ -14,7 +14,7 @@ import asyncpg
 import discord
 from discord import app_commands
 from discord.ext import commands, localization
-from emojis import LOADING
+from helpers.emojis import LOADING
 
 from core import Command, Context, SlashCommandLocalizer, slash_command_localization, update_slash_localizations
 from helpers import custom_response, seconds_to_text
