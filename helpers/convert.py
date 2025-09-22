@@ -8,7 +8,12 @@ import discord
 
 def text_to_seconds(time: str, base: int = 0) -> int:
 	"""
-	Converts text into seconds. ex.: 5m = 300, 1d3min = 86400
+	Converts text into seconds.
+
+	Examples
+	--------
+	>>> text_to_seconds("5m")  # 300
+	>>> text_to_seconds("1d3min")  # 86400
 
 	Arguments
 	---------
@@ -44,7 +49,7 @@ def text_to_seconds(time: str, base: int = 0) -> int:
 	        Seconds.
 
 	Raises
-	----------
+	------
 	ValueError
 	        If the string doesn't contain time units.
 	"""
@@ -110,7 +115,12 @@ def text_to_seconds(time: str, base: int = 0) -> int:
 
 def seconds_to_text(seconds: int) -> str:
 	"""
-	Converts seconds into a human-readable format. ex.: 300 = 5m, 86400 = 1d
+	Converts seconds into a human-readable format.
+
+	Examples
+	--------
+	>>> seconds_to_text(300)  # 5m
+	>>> seconds_to_text(86400)  # 1d
 
 	Arguments
 	---------
