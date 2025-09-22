@@ -35,10 +35,7 @@ class AFK(commands.Cog):
 			return
 
 		await self.client.db.execute(
-			"UPDATE afk SET state = $1 WHERE user_id = $2 AND guild_id = $3",
-			False,
-			ctx.author.id,
-			ctx.guild.id,
+			"UPDATE afk SET state = $1 WHERE user_id = $2 AND guild_id = $3", False, ctx.author.id, ctx.guild.id
 		)
 		try:
 			await ctx.author.edit(nick=row["previous_nick"])
@@ -58,9 +55,7 @@ class AFK(commands.Cog):
 
 		for user in message.mentions:
 			row = await self.client.db.fetchrow(
-				"SELECT * FROM afk WHERE guild_id = $1 AND user_id = $2 AND state = TRUE",
-				message.guild.id,
-				user.id,
+				"SELECT * FROM afk WHERE guild_id = $1 AND user_id = $2 AND state = TRUE", message.guild.id, user.id
 			)
 
 			if row and row["user_id"] != message.author.id:
@@ -92,9 +87,7 @@ class AFK(commands.Cog):
 			return await ctx.send("afk.link")
 
 		row = await self.client.db.fetchrow(
-			"SELECT * FROM afk WHERE user_id = $1 AND guild_id = $2",
-			ctx.author.id,
-			ctx.guild.id,
+			"SELECT * FROM afk WHERE user_id = $1 AND guild_id = $2", ctx.author.id, ctx.guild.id
 		)
 		if not row:
 			await self.client.db.execute(
@@ -116,10 +109,7 @@ class AFK(commands.Cog):
 		if row["state"]:
 			# Turn off AFK
 			await self.client.db.execute(
-				"UPDATE afk SET state = $1 WHERE user_id = $2 AND guild_id = $3",
-				False,
-				ctx.author.id,
-				ctx.guild.id,
+				"UPDATE afk SET state = $1 WHERE user_id = $2 AND guild_id = $3", False, ctx.author.id, ctx.guild.id
 			)
 			try:
 				await ctx.author.edit(nick=row["previous_nick"])
