@@ -153,12 +153,7 @@ def seconds_to_text(seconds: int) -> str:
 	return time.strip()
 
 
-def convert_to_query(
-	table: str,
-	guild: Optional[discord.Guild] = None,
-	limit: Optional[int] = None,
-	**filters,
-):
+def convert_to_query(table: str, guild: Optional[discord.Guild] = None, limit: Optional[int] = None, **filters):
 	"""Converts a set of filters to an SQL query.
 
 	Parameters
