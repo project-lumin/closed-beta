@@ -39,10 +39,7 @@ class SlashCommandLocalizer(app_commands.Translator):
 	"""
 
 	async def translate(
-		self,
-		string: app_commands.locale_str,
-		locale: discord.Locale,
-		context: app_commands.TranslationContext,
+		self, string: app_commands.locale_str, locale: discord.Locale, context: app_commands.TranslationContext
 	) -> str | None:
 		if slash_command_localization:
 			localized = slash_command_localization.translate(string.message, str(locale))
