@@ -28,6 +28,11 @@ dependencies = [
     "pytemperature>=1.1",
 ]
 
+[dependency-groups]
+dev = [
+    "ruff>=0.13.1",
+]
+
 [tool.setuptools]
 packages = ["helpers"]
 
