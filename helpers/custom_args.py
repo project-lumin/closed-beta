@@ -57,16 +57,7 @@ class CustomColor:
 	__repr__ = __str__
 
 
-DatetimeFormat = Literal[
-	"time",
-	"seconds",
-	"date",
-	"month",
-	"short",
-	"long",
-	"relative",
-	discord.utils.TimestampStyle,
-]
+DatetimeFormat = Literal["time", "seconds", "date", "month", "short", "long", "relative", discord.utils.TimestampStyle]
 """The format to use for Discord timestamps."""
 
 
@@ -628,10 +619,7 @@ class CustomGuild:
 	@property
 	def mfa_level(self) -> str:
 		"""Returns the guild's MFA level."""
-		mapping = {
-			discord.MFALevel.disabled: r"{mfa.disabled}",
-			discord.MFALevel.require_2fa: r"{mfa.require_2fa}",
-		}
+		mapping = {discord.MFALevel.disabled: r"{mfa.disabled}", discord.MFALevel.require_2fa: r"{mfa.require_2fa}"}
 		return mapping.get(mapping)  # type: ignore
 
 	@property
