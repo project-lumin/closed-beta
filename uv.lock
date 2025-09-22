@@ -457,6 +457,11 @@ dependencies = [
     { name = "uvloop", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "aiodns", specifier = ">=3.5.0" },
@@ -477,6 +482,9 @@ requires-dist = [
     { name = "ruff", specifier = ">=0.13.1" },
     { name = "uvloop", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.13.1" }]
 
 [[package]]
 name = "multidict"
