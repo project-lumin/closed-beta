@@ -34,7 +34,9 @@ def update_slash_localizations():
 
 class SlashCommandLocalizer(app_commands.Translator):
 	"""Localizes slash commands and their arguments using discord-localization.
-	This uses the localization set by the user, not the guild's locale."""
+
+	This uses the localization set by the user, not the guild's locale.
+	"""
 
 	async def translate(
 		self,
