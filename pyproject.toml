@@ -36,6 +36,20 @@ packages = ["helpers"]
 [tool.ruff]
 target-version = "py312"
 line-length = 120
+src = ["core", "helpers", "cogs"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F403"]
 
 [tool.ruff.format]
+docstring-code-format = true
 indent-style = "tab"
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+logger-objects = ["core.logging"]
+select = ["D"]
+ignore = ["D100", "D101", "D102", "D103", "D105", "D206", "D401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
