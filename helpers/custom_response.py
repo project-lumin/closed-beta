@@ -63,7 +63,7 @@ class CustomResponse:
 		        If there are more than 10 embeds.
 
 		Returns
-		--------
+		-------
 		Any
 		        The original data, but with usable `discord.Embed`s.
 		"""
@@ -131,23 +131,22 @@ class CustomResponse:
 		convert_embeds: bool = True,
 		**kwargs: Any,
 	) -> Union[dict, str, list, int, float, bool]:
-		"""Gets a custom message from the database, or if not found, gets the default message.
+		"""Returns a custom message from the database, or if not found, returns the default message.
 
 		Parameters
 		----------
 		name: str
-		        The name of the message.
+			The name of the message.
 		locale: Union[str, discord.Locale, discord.Guild, discord.Interaction, commands.Context]
-		        The locale to use or the context to derive it.
+			The locale to use or the context to derive it.
 		convert_embeds: bool
-		        Whether to convert the embeds in the message to discord.Embeds.
+		    Whether to convert the embeds in the message to discord.Embeds.
 
 		Returns
 		-------
 		Union[dict, str, list, int, float, bool]
-		        The message payload.
+		    The message payload.
 		"""
-
 		original = locale
 
 		if isinstance(locale, (discord.Interaction, commands.Context)):
