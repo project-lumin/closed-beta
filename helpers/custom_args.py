@@ -1,4 +1,4 @@
-"""Custom arguments to make user-specified responses easier to configure"""
+"""Custom arguments to make user-specified responses easier to configure."""
 
 import datetime
 from dataclasses import dataclass, field
@@ -255,8 +255,7 @@ class CustomUser:
 
 	@property
 	def created_at(self):
-		"""Returns the date the user was created as a Discord timestamp. You can call this with or without brackets.
-		If you call it with braces you can pass a ``DatetimeFormat`` to format the timestamp."""
+		"""Returns the date the user was created as a Discord timestamp."""
 		return FormatDateTime(self._created_at, "F")
 
 	created = created_at
@@ -311,15 +310,14 @@ class CustomMember(CustomUser):
 
 	@property
 	def joined_at(self):
-		"""Returns the date the member joined the server as a Discord timestamp. You can call this with or without
-		brackets. If you call it with braces you can pass a ``DatetimeFormat`` to format the timestamp."""
+		"""Returns the date the member joined the server as a Discord timestamp."""
 		return FormatDateTime(self._joined_at, "F")
 
 	joined = joined_at
 
 	@property
 	def roles(self) -> Optional[str]:
-		"""Returns the roles the user has (excluding @everyone)"""
+		"""Returns the roles the user has (excluding @everyone)."""
 		self._roles.pop(0)
 		roles_string = ", ".join([role.mention for role in self._roles])
 		if len(roles_string) > 512:
@@ -446,8 +444,7 @@ class CustomRole:
 
 	@property
 	def created_at(self):
-		"""Returns the date the role was created as a Discord timestamp. You can call this with or without brackets.
-		If you call it with braces you can pass a ``DatetimeFormat`` to format the timestamp."""
+		"""Returns the date the role was created as a Discord timestamp."""
 		return FormatDateTime(self._created_at, "F")
 
 	created = created_at
@@ -592,8 +589,7 @@ class CustomGuild:
 
 	@property
 	def created_at(self):
-		"""Returns the date the guild was created as a Discord timestamp. You can call this with or without brackets.
-		If you call it with braces you can pass a ``DatetimeFormat`` to format the timestamp."""
+		"""Returns the date the guild was created as a Discord timestamp."""
 		return FormatDateTime(self._created_at, "F")
 
 	created = created_at
@@ -1379,19 +1375,19 @@ class CustomStageChannel:
 
 	@property
 	def category(self) -> Optional[CustomCategoryChannel]:
-		"""Returns the channel's category.'"""
+		"""Returns the channel's category."""
 		return CustomCategoryChannel.from_category(self._category) if self._category else None
 
 	@property
 	def created_at(self) -> FormatDateTime:
-		"""Returns the channel's creation date.'"""
+		"""Returns the channel's creation date."""
 		return FormatDateTime(self._created_at, "f")
 
 	created = created_at
 
 	@property
 	def jump_url(self) -> str:
-		"""Returns the channel's jump URL.'"""
+		"""Returns the channel's jump URL."""
 		return self._jump_url
 
 	url = jump_url
