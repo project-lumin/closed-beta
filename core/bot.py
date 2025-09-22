@@ -76,13 +76,7 @@ class MyClient(commands.AutoShardedBot):
 		if not row:
 			await self.db.execute("INSERT INTO guilds (guild_id) VALUES ($1)", guild.id)
 
-	async def get_context(
-		self,
-		origin: Union[discord.Message, discord.Interaction],
-		/,
-		*,
-		cls=Context,
-	) -> Any:
+	async def get_context(self, origin: Union[discord.Message, discord.Interaction], /, *, cls=Context) -> Any:
 		return await super().get_context(origin, cls=cls)
 
 	async def setup_hook(self):
@@ -187,9 +181,7 @@ class MyClient(commands.AutoShardedBot):
 		self.logger.info(f"discord-localization v{localization.__version__}")
 
 	async def handle_error(
-		self,
-		ctx: Context,
-		error: Union[discord.errors.DiscordException, app_commands.AppCommandError],
+		self, ctx: Context, error: Union[discord.errors.DiscordException, app_commands.AppCommandError]
 	):
 		command = None
 		if isinstance(ctx, (Context, commands.Context)):
@@ -206,11 +198,7 @@ class MyClient(commands.AutoShardedBot):
 				name = slash_command_localization(error.param.name, ctx)
 				parameter = f"[{name if error.param.required else f'({name})'}]"
 
-				await ctx.send(
-					"errors.missing_required_argument",
-					command=command,
-					parameter=parameter,
-				)
+				await ctx.send("errors.missing_required_argument", command=command, parameter=parameter)
 			case commands.BotMissingPermissions() | app_commands.BotMissingPermissions():
 				error: commands.BotMissingPermissions
 				permissions = [
@@ -218,11 +206,7 @@ class MyClient(commands.AutoShardedBot):
 					for permission in error.missing_permissions
 				]
 
-				await ctx.send(
-					"errors.bot_missing_permissions",
-					command=command,
-					permissions=", ".join(permissions),
-				)
+				await ctx.send("errors.bot_missing_permissions", command=command, permissions=", ".join(permissions))
 			case commands.BadArgument():
 				await ctx.send("errors.bad_argument", command=command)
 				raise error
@@ -233,19 +217,11 @@ class MyClient(commands.AutoShardedBot):
 					for permission in error.missing_permissions
 				]
 
-				await ctx.send(
-					"errors.missing_permissions",
-					command=command,
-					permissions=", ".join(permissions),
-				)
+				await ctx.send("errors.missing_permissions", command=command, permissions=", ".join(permissions))
 			case commands.CommandOnCooldown():
 				error: commands.CommandOnCooldown
 				retry_after = seconds_to_text(int(error.retry_after))
-				await ctx.send(
-					"errors.command_on_cooldown",
-					command=command,
-					retry_after=retry_after,
-				)
+				await ctx.send("errors.command_on_cooldown", command=command, retry_after=retry_after)
 			case commands.ChannelNotFound():
 				await ctx.send("errors.channel_not_found", command=command)
 			case commands.EmojiNotFound():
@@ -265,8 +241,7 @@ class MyClient(commands.AutoShardedBot):
 			case discord.RateLimited():
 				channel: discord.TextChannel = await self.fetch_channel(1268260404677574697)
 				webhook: discord.Webhook | None = discord.utils.get(
-					await channel.webhooks(),
-					name=f"{self.user.display_name} Rate Limit",
+					await channel.webhooks(), name=f"{self.user.display_name} Rate Limit"
 				)
 				if not webhook:
 					webhook = await channel.create_webhook(name=f"{self.user.display_name} Rate Limit")
@@ -293,8 +268,7 @@ class MyClient(commands.AutoShardedBot):
 				)
 				if not webhook:
 					webhook = await channel.create_webhook(
-						name=f"{self.user.display_name} Errors",
-						avatar=await ctx.me.avatar.read(),
+						name=f"{self.user.display_name} Errors", avatar=await ctx.me.avatar.read()
 					)
 				await webhook.send(
 					content=f"**ID:** {ctx.message.id}\n"
