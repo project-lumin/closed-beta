@@ -3,10 +3,9 @@ from time import perf_counter
 from typing import Literal, Optional
 
 import discord
+from core import Context, MyClient, update_slash_localizations
 from discord import app_commands
 from discord.ext import commands
-
-from core import Context, MyClient, update_slash_localizations
 
 logger = getLogger(__name__)
 
@@ -74,10 +73,7 @@ class Admin(commands.Cog):
 
 	@commands.hybrid_command(hidden=True, name="sync", description="sync_specs-description", usage="sync_specs-usage")
 	@commands.is_owner()
-	@app_commands.describe(
-		guilds="sync_specs-args-guilds-description",
-		scope="sync_specs-args-scope-description",
-	)
+	@app_commands.describe(guilds="sync_specs-args-guilds-description", scope="sync_specs-args-scope-description")
 	@app_commands.rename(guilds="sync_specs-args-guilds-name", scope="sync_specs-args-scope-name")
 	@app_commands.choices(
 		scope=[
