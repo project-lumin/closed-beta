@@ -1,22 +1,9 @@
 import asyncio
-import logging
 import os
-import platform
-
-import discord
-from dotenv import load_dotenv
 
 from core.bot import MyClient
-
-for handler in logging.root.handlers[:]:
-	# prevent double logging
-	logging.root.removeHandler(handler)
-
-discord.utils.setup_logging(level=logging.INFO, root=True)
-logger = logging.getLogger()
-
-load_dotenv()
-TOKEN = os.getenv("TOKEN")
+from core.logging import logger
+from dotenv import load_dotenv
 
 if __debug__:
 	TOKEN = os.getenv("DEBUG_TOKEN")
