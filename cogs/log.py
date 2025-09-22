@@ -3,10 +3,9 @@ import sys
 from typing import Literal, Optional, Union, overload
 
 import discord
+from core import Context, MyClient
 from discord import app_commands
 from discord.ext import commands
-
-from core import Context, MyClient
 from helpers import (
 	CustomAutoModAction,
 	CustomAutoModRule,
@@ -29,15 +28,9 @@ class LogCommands(commands.Cog, name="Logging"):
 	)
 	@commands.has_permissions(manage_guild=True)
 	@app_commands.rename(state="log_specs-args-state-name", channel="log_specs-args-channel-name")
-	@app_commands.describe(
-		state="log_specs-args-state-description",
-		channel="log_specs-args-channel-description",
-	)
+	@app_commands.describe(state="log_specs-args-state-description", channel="log_specs-args-channel-description")
 	async def log_toggle(
-		self,
-		ctx: Context,
-		state: Literal["on", "off"] = "on",
-		channel: discord.TextChannel | None = None,
+		self, ctx: Context, state: Literal["on", "off"] = "on", channel: discord.TextChannel | None = None
 	):
 		is_on = state == "on"
 		if is_on:
@@ -71,9 +64,7 @@ class LogCommands(commands.Cog, name="Logging"):
 			await self.client.db.execute("UPDATE log SET modules = DEFAULT WHERE guild_id = $1", ctx.guild.id)
 		else:
 			await self.client.db.execute(
-				"UPDATE log SET modules = array_append(modules, $1) WHERE guild_id = $2",
-				module,
-				ctx.guild.id,
+				"UPDATE log SET modules = array_append(modules, $1) WHERE guild_id = $2", module, ctx.guild.id
 			)
 
 		await ctx.send("log.module.add", module=module)
@@ -87,9 +78,7 @@ class LogCommands(commands.Cog, name="Logging"):
 			await self.client.db.execute("UPDATE log SET modules = ARRAY[] WHERE guild_id = $1", ctx.guild.id)
 		else:
 			await self.client.db.execute(
-				"UPDATE log SET modules = array_remove(modules, $1) WHERE guild_id = $2",
-				module,
-				ctx.guild.id,
+				"UPDATE log SET modules = array_remove(modules, $1) WHERE guild_id = $2", module, ctx.guild.id
 			)
 
 		await ctx.send("log.module.remove", module=module)
@@ -218,7 +207,7 @@ class LogListeners(commands.Cog):
 
 	async def _get_webhook(self, guild_id: int) -> Optional[discord.Webhook]:
 		"""
-		Retreives the webhook associated with the given ``guild_id``
+		Retreives the webhook associated with the given ``guild_id``.
 
 		Parameters
 		----------
@@ -269,7 +258,7 @@ class LogListeners(commands.Cog):
 
 	async def _log_check(self, guild: Union[int, discord.Guild]) -> bool:
 		"""
-		Returns whether the guild should receive log messages
+		Returns whether the guild should receive log messages.
 
 		Parameters
 		----------
@@ -300,12 +289,7 @@ class LogListeners(commands.Cog):
 		if before.content != after.content:
 			before = CustomMessage.from_message(before)
 			before.content = before.content or " "
-			await self.send_webhook(
-				before.guild.id,
-				"content",
-				before=before,
-				after=CustomMessage.from_message(after),
-			)
+			await self.send_webhook(before.guild.id, "content", before=before, after=CustomMessage.from_message(after))
 		if before.embeds != after.embeds and len(before.embeds) != 0:
 			await self.send_webhook(
 				before.guild.id,
@@ -342,11 +326,7 @@ class LogListeners(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_automod_action(self, execution: discord.AutoModAction):
-		await self.send_webhook(
-			execution.guild_id,
-			"action",
-			execution=CustomAutoModAction.from_action(execution),
-		)
+		await self.send_webhook(execution.guild_id, "action", execution=CustomAutoModAction.from_action(execution))
 
 	@commands.Cog.listener()
 	async def on_invite_create(self, invite: discord.Invite):

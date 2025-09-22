@@ -5,10 +5,9 @@ from typing import Any, Literal, Self
 
 import asyncpg
 import discord
+from core import Context, MyClient
 from discord import app_commands
 from discord.ext import commands
-
-from core import Context, MyClient
 from helpers import (
 	CustomGuild,
 	CustomMember,
@@ -180,12 +179,7 @@ class Case:
 
 	@classmethod
 	async def from_id(
-		cls,
-		db: asyncpg.Pool,
-		client: discord.Client,
-		guild: discord.Guild,
-		case_id: int,
-		get_type: bool = False,
+		cls, db: asyncpg.Pool, client: discord.Client, guild: discord.Guild, case_id: int, get_type: bool = False
 	) -> Self | None:
 		"""Get a `Case` from an ID.
 
@@ -207,11 +201,7 @@ class Case:
 		Optional[`Case`]
 		        The case.
 		"""
-		result = await db.fetch(
-			"SELECT * FROM cases WHERE case_id = $1 AND guild_id = $2",
-			case_id,
-			guild.id,
-		)
+		result = await db.fetch("SELECT * FROM cases WHERE case_id = $1 AND guild_id = $2", case_id, guild.id)
 		if not result:
 			return None
 		return cls.from_dict(result[0], client, get_type)
@@ -254,12 +244,7 @@ class Case:
 
 		result = await db.fetch(query, *query_parameters)
 
-		case_mapping = {
-			CaseType.WARN: Warn,
-			CaseType.MUTE: Mute,
-			CaseType.KICK: Kick,
-			CaseType.BAN: Ban,
-		}
+		case_mapping = {CaseType.WARN: Warn, CaseType.MUTE: Mute, CaseType.KICK: Kick, CaseType.BAN: Ban}
 
 		cases = []
 		for case_data in result:
@@ -275,10 +260,7 @@ class Case:
 
 	def to_dict(
 		self,
-	) -> dict[
-		str,
-		CaseType | int | discord.Guild | discord.Member | discord.User | str | datetime.datetime | None,
-	]:
+	) -> dict[str, CaseType | int | discord.Guild | discord.Member | discord.User | str | datetime.datetime | None]:
 		"""Convert the `Case` to a dictionary."""
 		return {
 			"_type": self.type,
@@ -294,13 +276,15 @@ class Case:
 	async def before_deletion(self):
 		"""An overrideable method that is called before a case is deleted. The default implementation does nothing.
 
-		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user."""
+		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user.
+		"""
 		pass
 
 	async def after_deletion(self):
 		"""An overrideable method that is called after a case is deleted. The default implementation does nothing.
 
-		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user."""
+		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user.
+		"""
 		pass
 
 	async def delete(self, db: asyncpg.Pool) -> None:
@@ -429,17 +413,7 @@ class Warn(Case):
 	):
 		self._user = user
 		self._guild = guild
-		super().__init__(
-			CaseType.WARN,
-			_id,
-			guild,
-			user,
-			moderator,
-			created,
-			reason,
-			expires,
-			message,
-		)
+		super().__init__(CaseType.WARN, _id, guild, user, moderator, created, reason, expires, message)
 
 	async def after_creation(self) -> None:
 		"""Notifies the user about the warning."""
@@ -476,17 +450,7 @@ class Kick(Case):
 		created: datetime.datetime = datetime.datetime.now(),
 		expires=None,
 	):
-		super().__init__(
-			CaseType.KICK,
-			_id,
-			guild,
-			user,
-			moderator,
-			created,
-			reason,
-			expires,
-			message,
-		)
+		super().__init__(CaseType.KICK, _id, guild, user, moderator, created, reason, expires, message)
 
 	async def before_creation(self) -> None:
 		"""Notifies the user about the kick."""
@@ -517,17 +481,7 @@ class Mute(Case):
 		message: str | None = None,
 		created: datetime.datetime = datetime.datetime.now(),
 	):
-		super().__init__(
-			CaseType.MUTE,
-			_id,
-			guild,
-			user,
-			moderator,
-			created,
-			reason,
-			expires,
-			message,
-		)
+		super().__init__(CaseType.MUTE, _id, guild, user, moderator, created, reason, expires, message)
 
 	async def before_creation(self) -> None:
 		"""Mutes the user."""
@@ -535,8 +489,7 @@ class Mute(Case):
 		reason = await self._custom_response("mod.mute.reason", self._guild, mute=self)
 		if isinstance(self._user, discord.Member) and self.expires is not None:
 			await self._user.timeout(
-				self.expires.astimezone(datetime.timezone.utc),
-				reason=reason if isinstance(reason, str) else None,
+				self.expires.astimezone(datetime.timezone.utc), reason=reason if isinstance(reason, str) else None
 			)
 
 	async def after_creation(self) -> None:
@@ -630,8 +583,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 		await self.client.wait_until_ready()
 
 		case_rows = await self.client.db.fetch(
-			"SELECT * FROM cases WHERE expires IS NOT NULL AND expires <= $1",
-			datetime.datetime.now(),
+			"SELECT * FROM cases WHERE expires IS NOT NULL AND expires <= $1", datetime.datetime.now()
 		)
 		for row in case_rows:
 			case = Case.from_dict(row, self.client, get_type=True)
@@ -669,14 +621,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	)
 	@app_commands.checks.has_permissions(moderate_members=True)
 	@commands.has_permissions(moderate_members=True)
-	async def warn(
-		self,
-		ctx: Context,
-		user: discord.Member,
-		expires: str = None,
-		*,
-		reason: str = None,
-	):
+	async def warn(self, ctx: Context, user: discord.Member, expires: str = None, *, reason: str = None):
 		try:
 			user = await commands.MemberConverter().convert(
 				ctx, str(user.name) if isinstance(user, discord.Member) else user
@@ -719,9 +664,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@app_commands.checks.bot_has_permissions(moderate_members=True)
 	@commands.hybrid_command(name="mute", description="mute_specs-description", usage="mute_specs-usage")
 	@app_commands.rename(
-		user="mute_specs-args-user-name",
-		expires="mute_specs-args-expires-name",
-		reason="mute_specs-args-reason-name",
+		user="mute_specs-args-user-name", expires="mute_specs-args-expires-name", reason="mute_specs-args-reason-name"
 	)
 	@app_commands.describe(
 		user="mute_specs-args-user-description",
@@ -730,14 +673,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	)
 	@app_commands.checks.has_permissions(moderate_members=True)
 	@commands.has_permissions(moderate_members=True)
-	async def mute(
-		self,
-		ctx: Context,
-		user: discord.Member,
-		expires: str,
-		*,
-		reason: str = None,
-	):
+	async def mute(self, ctx: Context, user: discord.Member, expires: str, *, reason: str = None):
 		try:
 			expires = datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires))
 		except (ValueError, TypeError):
@@ -760,11 +696,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 
 	@commands.bot_has_permissions(moderate_members=True)
 	@app_commands.checks.bot_has_permissions(moderate_members=True)
-	@commands.hybrid_command(
-		name="unmute",
-		description="unmute_specs-description",
-		usage="unmute_specs-usage",
-	)
+	@commands.hybrid_command(name="unmute", description="unmute_specs-description", usage="unmute_specs-usage")
 	@app_commands.rename(user="unmute_specs-args-user-name")
 	@app_commands.describe(user="unmute_specs-args-user-description")
 	@app_commands.checks.has_permissions(moderate_members=True)
@@ -791,10 +723,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@app_commands.checks.bot_has_permissions(kick_members=True)
 	@commands.hybrid_command(name="kick", description="kick_specs-description", usage="kick_specs-usage")
 	@app_commands.rename(user="kick_specs-args-user-name", reason="kick_specs-args-reason-name")
-	@app_commands.describe(
-		user="kick_specs-args-user-description",
-		reason="kick_specs-args-reason-description",
-	)
+	@app_commands.describe(user="kick_specs-args-user-description", reason="kick_specs-args-reason-description")
 	@app_commands.checks.has_permissions(kick_members=True)
 	@commands.has_permissions(kick_members=True)
 	async def kick(self, ctx: Context, user: discord.Member, *, reason: str = None):
@@ -817,9 +746,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@app_commands.checks.bot_has_permissions(ban_members=True)
 	@commands.hybrid_command(name="ban", description="ban_specs-description", usage="ban_specs-usage")
 	@app_commands.rename(
-		user="ban_specs-args-user-name",
-		reason="ban_specs-args-reason-name",
-		expires="ban_specs-args-expires-name",
+		user="ban_specs-args-user-name", reason="ban_specs-args-reason-name", expires="ban_specs-args-expires-name"
 	)
 	@app_commands.describe(
 		user="ban_specs-args-user-description",
@@ -828,14 +755,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	)
 	@app_commands.checks.has_permissions(ban_members=True)
 	@commands.has_permissions(ban_members=True)
-	async def ban(
-		self,
-		ctx: Context,
-		user: discord.User,
-		expires: str = None,
-		*,
-		reason: str = None,
-	):
+	async def ban(self, ctx: Context, user: discord.User, expires: str = None, *, reason: str = None):
 		try:
 			expires = (
 				datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
@@ -948,10 +868,7 @@ class Cases(commands.Cog, name="Cases"):
 	@commands.bot_has_permissions(moderate_members=True, ban_members=True)
 	@app_commands.checks.bot_has_permissions(moderate_members=True, ban_members=True)
 	@case.command(
-		name="delete",
-		description="casedel_specs-description",
-		usage="casedel_specs-usage",
-		aliases=["del", "remove"],
+		name="delete", description="casedel_specs-description", usage="casedel_specs-usage", aliases=["del", "remove"]
 	)
 	@app_commands.describe(case_id="casedel_specs-args-case_id-description")
 	@app_commands.rename(case_id="casedel_specs-args-case_id-name")
@@ -985,11 +902,7 @@ class Cases(commands.Cog, name="Cases"):
 
 	@commands.bot_has_permissions(moderate_members=True, ban_members=True)
 	@app_commands.checks.bot_has_permissions(moderate_members=True, ban_members=True)
-	@case.command(
-		name="edit",
-		description="caseedit_specs-description",
-		usage="caseedit_specs-usage",
-	)
+	@case.command(name="edit", description="caseedit_specs-description", usage="caseedit_specs-usage")
 	@app_commands.rename(
 		case_id="caseedit_specs-args-case_id-name",
 		value="caseedit_specs-args-value-name",
@@ -1009,14 +922,7 @@ class Cases(commands.Cog, name="Cases"):
 	)
 	@app_commands.checks.has_permissions(moderate_members=True)
 	@commands.has_permissions(moderate_members=True)
-	async def edit(
-		self,
-		ctx: Context,
-		case_id: str,
-		value: Literal["expires", "reason", "message"],
-		*,
-		new_value: str,
-	):
+	async def edit(self, ctx: Context, case_id: str, value: Literal["expires", "reason", "message"], *, new_value: str):
 		try:
 			case_id = int(case_id)
 		except ValueError:
@@ -1039,11 +945,7 @@ class Cases(commands.Cog, name="Cases"):
 
 		await ctx.send("mod.edit.response", case=case)
 
-	@case.command(
-		name="list",
-		description="caselist_specs-description",
-		usage="caselist_specs-usage",
-	)
+	@case.command(name="list", description="caselist_specs-description", usage="caselist_specs-usage")
 	@app_commands.describe(user="caselist_specs-args-user-description")
 	@app_commands.rename(user="caselist_specs-args-user-name")
 	async def list(self, ctx: Context, user: discord.Member = None):

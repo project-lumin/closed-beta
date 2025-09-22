@@ -7,10 +7,9 @@ from uuid import UUID
 
 import asyncpg
 import discord
+from core import Context, MyClient
 from discord import app_commands
 from discord.ext import commands
-
-from core import Context, MyClient
 
 
 class Snapshot(commands.Cog, name="Snapshots"):
@@ -34,7 +33,6 @@ class Snapshot(commands.Cog, name="Snapshots"):
 		`dict`
 		        The payload of the snapshot.
 		"""
-
 		payload = {"roles": {}, "channels": {}}
 
 		for x in ctx.guild.roles:
@@ -61,19 +59,11 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				"bitrate": x.bitrate if x.type == [discord.ChannelType.voice] else None,
 				"slowmode": x.slowmode_delay
 				if x.type
-				not in [
-					discord.ChannelType.voice,
-					discord.ChannelType.category,
-					discord.ChannelType.stage_voice,
-				]
+				not in [discord.ChannelType.voice, discord.ChannelType.category, discord.ChannelType.stage_voice]
 				else None,
 				"nsfw": x.is_nsfw()
 				if x.type
-				not in [
-					discord.ChannelType.voice,
-					discord.ChannelType.category,
-					discord.ChannelType.stage_voice,
-				]
+				not in [discord.ChannelType.voice, discord.ChannelType.category, discord.ChannelType.stage_voice]
 				else None,
 				"user_limit": x.user_limit if x.type in [discord.ChannelType.voice] else None,
 				"topic": x.topic if x.type not in [discord.ChannelType.voice, discord.ChannelType.category] else None,
@@ -180,11 +170,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 			await asyncio.sleep(0.5)
 
 	async def load_snapshot(self, ctx: Context, payload: dict):
-		for x in sorted(
-			payload["roles"],
-			key=lambda r: payload["roles"][r]["position"],
-			reverse=True,
-		):
+		for x in sorted(payload["roles"], key=lambda r: payload["roles"][r]["position"], reverse=True):
 			perms = discord.Permissions(permissions=int(payload["roles"][x]["perms"]))
 			if payload["roles"][x]["color"]:
 				color = discord.Colour(int(payload["roles"][x]["color"]))
@@ -327,9 +313,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 					continue
 
 	@commands.hybrid_group(
-		name="snapshot",
-		description="snapshot_specs-description",
-		fallback="snapshot_specs-fallback",
+		name="snapshot", description="snapshot_specs-description", fallback="snapshot_specs-fallback"
 	)
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)

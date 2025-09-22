@@ -5,11 +5,10 @@ from typing import Optional
 import discord
 import pypokedex
 import requests
+from core import Context, MyClient
 from discord import app_commands
 from discord.ext import commands
 from emoji.unicode_codes import EMOJI_DATA
-
-from core import Context, MyClient
 from helpers.custom_args import (
 	BotInfo,
 	CustomCategoryChannel,
@@ -127,10 +126,7 @@ class Info(commands.Cog, name="Information"):
 		elif isinstance(channel, discord.VoiceChannel):
 			await ctx.send("info.channel.voice", channel=CustomVoiceChannel.from_channel(channel))
 		elif isinstance(channel, discord.CategoryChannel):
-			await ctx.send(
-				"info.channel.category",
-				category=CustomCategoryChannel.from_category(channel),
-			)
+			await ctx.send("info.channel.category", category=CustomCategoryChannel.from_category(channel))
 		elif isinstance(channel, discord.ForumChannel):
 			await ctx.send("info.channel.forum", channel=CustomForumChannel.from_channel(channel))
 		elif isinstance(channel, discord.StageChannel):
@@ -172,10 +168,7 @@ class Info(commands.Cog, name="Information"):
 
 		template_code = await self.client.db.fetchrow("SELECT * FROM snapshots WHERE code = $1", template.lower())
 		if template_code:
-			return await ctx.send(
-				"info.template",
-				template=await CustomTemplate.from_dict(self.client, template_code),
-			)
+			return await ctx.send("info.template", template=await CustomTemplate.from_dict(self.client, template_code))
 		raise commands.BadArgument("template")
 
 

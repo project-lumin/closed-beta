@@ -2,11 +2,10 @@ import random
 from typing import Literal, Optional, Union
 
 import discord
+from core import Context, MyClient
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.localization import Localization
-
-from core import Context, MyClient
 from helpers import custom_response, random_helper
 from helpers.custom_args import CustomRole, CustomUser
 
@@ -63,11 +62,7 @@ class EconomyHelper:
 		self.client: MyClient = client
 
 	async def add_money(
-		self,
-		user_id: int,
-		guild_id: int,
-		amount: int,
-		wallet: Literal["cash", "bank"] = "cash",
+		self, user_id: int, guild_id: int, amount: int, wallet: Literal["cash", "bank"] = "cash"
 	) -> int:
 		"""
 		Add money to a user's balance.
@@ -97,27 +92,17 @@ class EconomyHelper:
 
 		if wallet == "cash":
 			await self.client.db.execute(
-				"UPDATE economy SET cash = $1 WHERE user_id = $2 AND guild_id = $3",
-				cash + amount,
-				user_id,
-				guild_id,
+				"UPDATE economy SET cash = $1 WHERE user_id = $2 AND guild_id = $3", cash + amount, user_id, guild_id
 			)
 			return cash + amount
 		else:
 			await self.client.db.execute(
-				"UPDATE economy SET bank = $1 WHERE user_id = $2 AND guild_id = $3",
-				bank + amount,
-				user_id,
-				guild_id,
+				"UPDATE economy SET bank = $1 WHERE user_id = $2 AND guild_id = $3", bank + amount, user_id, guild_id
 			)
 			return bank + amount
 
 	async def remove_money(
-		self,
-		user_id: int,
-		guild_id: int,
-		amount: int,
-		wallet: Literal["cash", "bank"] = "cash",
+		self, user_id: int, guild_id: int, amount: int, wallet: Literal["cash", "bank"] = "cash"
 	) -> int:
 		"""
 		Remove money from a user's balance.
@@ -149,26 +134,17 @@ class EconomyHelper:
 			if cash - amount < 0:
 				raise ValueError("Not enough money")
 			await self.client.db.execute(
-				"UPDATE economy SET cash = $1 WHERE user_id = $2 AND guild_id = $3",
-				cash - amount,
-				user_id,
-				guild_id,
+				"UPDATE economy SET cash = $1 WHERE user_id = $2 AND guild_id = $3", cash - amount, user_id, guild_id
 			)
 			return int(cash - amount)
 		else:
 			await self.client.db.execute(
-				"UPDATE economy SET bank = $1 WHERE user_id = $2 AND guild_id = $3",
-				bank - amount,
-				user_id,
-				guild_id,
+				"UPDATE economy SET bank = $1 WHERE user_id = $2 AND guild_id = $3", bank - amount, user_id, guild_id
 			)
 			return int(bank - amount)
 
 	async def get_balance(
-		self,
-		user_id: int,
-		guild_id: int,
-		wallet: Optional[Literal["cash", "bank"]] = "cash",
+		self, user_id: int, guild_id: int, wallet: Optional[Literal["cash", "bank"]] = "cash"
 	) -> Union[int, tuple[int, int]]:
 		"""
 		Get a user's balance.
@@ -196,21 +172,15 @@ class EconomyHelper:
 		match wallet:
 			case "cash":
 				balance = await self.client.db.fetchval(
-					"SELECT cash FROM economy WHERE user_id = $1 AND guild_id = $2",
-					user_id,
-					guild_id,
+					"SELECT cash FROM economy WHERE user_id = $1 AND guild_id = $2", user_id, guild_id
 				)
 			case "bank":
 				balance = await self.client.db.fetchval(
-					"SELECT bank FROM economy WHERE user_id = $1 AND guild_id = $2",
-					user_id,
-					guild_id,
+					"SELECT bank FROM economy WHERE user_id = $1 AND guild_id = $2", user_id, guild_id
 				)
 			case _:
 				row = await self.client.db.fetchrow(
-					"SELECT * FROM economy WHERE user_id = $1 AND guild_id = $2",
-					user_id,
-					guild_id,
+					"SELECT * FROM economy WHERE user_id = $1 AND guild_id = $2", user_id, guild_id
 				)
 				return int(row["cash"]), int(row["bank"])
 		return int(balance)
@@ -232,25 +202,15 @@ class EconomyHelper:
 		        If the user is already in the database.
 		"""
 		row = await self.client.db.fetchrow(
-			"SELECT * FROM economy WHERE user_id = $1 AND guild_id = $2",
-			user_id,
-			guild_id,
+			"SELECT * FROM economy WHERE user_id = $1 AND guild_id = $2", user_id, guild_id
 		)
 		if not row:
-			await self.client.db.execute(
-				"INSERT INTO economy(user_id, guild_id) VALUES($1, $2)",
-				user_id,
-				guild_id,
-			)
+			await self.client.db.execute("INSERT INTO economy(user_id, guild_id) VALUES($1, $2)", user_id, guild_id)
 		else:
 			raise ValueError("User already registered ({} @ {})".format(user_id, guild_id))
 
 	async def set_balance(
-		self,
-		user_id: int,
-		guild_id: int,
-		amount: int,
-		wallet: Literal["cash", "bank"] = "cash",
+		self, user_id: int, guild_id: int, amount: int, wallet: Literal["cash", "bank"] = "cash"
 	) -> None:
 		"""
 		Sets the balance of a user.
@@ -267,38 +227,24 @@ class EconomyHelper:
 		        The wallet to set the balance of. Defaults to cash.
 		"""
 		row = await self.client.db.fetchrow(
-			"SELECT * FROM economy WHERE user_id = $1 AND guild_id = $2",
-			user_id,
-			guild_id,
+			"SELECT * FROM economy WHERE user_id = $1 AND guild_id = $2", user_id, guild_id
 		)
 		if not row:
 			if wallet == "cash":
 				await self.client.db.execute(
-					"INSERT INTO economy(user_id, guild_id, cash) VALUES($1, $2, $3)",
-					user_id,
-					guild_id,
-					amount,
+					"INSERT INTO economy(user_id, guild_id, cash) VALUES($1, $2, $3)", user_id, guild_id, amount
 				)
 			else:
 				await self.client.db.execute(
-					"INSERT INTO economy(user_id, guild_id, bank) VALUES($1, $2, $3)",
-					user_id,
-					guild_id,
-					amount,
+					"INSERT INTO economy(user_id, guild_id, bank) VALUES($1, $2, $3)", user_id, guild_id, amount
 				)
 		if wallet == "cash":
 			await self.client.db.execute(
-				"UPDATE economy SET cash = $1 WHERE user_id = $2 AND guild_id = $3",
-				amount,
-				user_id,
-				guild_id,
+				"UPDATE economy SET cash = $1 WHERE user_id = $2 AND guild_id = $3", amount, user_id, guild_id
 			)
 		else:
 			await self.client.db.execute(
-				"UPDATE economy SET bank = $1 WHERE user_id = $2 AND guild_id = $3",
-				amount,
-				user_id,
-				guild_id,
+				"UPDATE economy SET bank = $1 WHERE user_id = $2 AND guild_id = $3", amount, user_id, guild_id
 			)
 
 
@@ -313,8 +259,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@commands.hybrid_command(name="leaderboard", description="leaderboard_specs-description")
 	async def leaderboard(self, ctx: commands.Context):
 		rows = await self.client.db.fetch(
-			"SELECT * FROM economy WHERE guild_id = $1 ORDER BY cash+bank DESC LIMIT 10",
-			ctx.guild.id,
+			"SELECT * FROM economy WHERE guild_id = $1 ORDER BY cash+bank DESC LIMIT 10", ctx.guild.id
 		)
 		message: dict = await self.custom_response("leaderboard", ctx)
 		embeds: list[discord.Embed] = message.get("embeds")
@@ -375,11 +320,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			app_commands.Choice(name="global-bank", value="bank"),
 		]
 	)
-	@commands.hybrid_command(
-		name="addmoney",
-		description="addmoney_specs-description",
-		usage="addmoney_specs-usage",
-	)
+	@commands.hybrid_command(name="addmoney", description="addmoney_specs-description", usage="addmoney_specs-usage")
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)
 	async def addmoney(
@@ -392,11 +333,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		if amount > 0:
 			await self.helper.add_money(member.id, ctx.guild.id, amount, account)
 
-			await ctx.send(
-				"addmoney.success",
-				amount=amount,
-				member=member,
-			)
+			await ctx.send("addmoney.success", amount=amount, member=member)
 		else:
 			await ctx.send("addmoney.errors.positive")
 
@@ -413,9 +350,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		]
 	)
 	@commands.hybrid_command(
-		name="removemoney",
-		description="removemoney_specs-description",
-		usage="removemoney_specs-usage",
+		name="removemoney", description="removemoney_specs-description", usage="removemoney_specs-usage"
 	)
 	@app_commands.checks.has_permissions(administrator=True)
 	@commands.has_permissions(administrator=True)
@@ -457,17 +392,9 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			await ctx.send("luck.lose", amount=amount)
 
 	@app_commands.rename(member="global-member", amount="global-amount")
-	@app_commands.describe(
-		member="pay_specs-args-member-description",
-		amount="pay_specs-args-amount-description",
-	)
+	@app_commands.describe(member="pay_specs-args-member-description", amount="pay_specs-args-amount-description")
 	@commands.hybrid_command(name="pay", description="pay_specs-description", usage="pay_specs-usage")
-	async def pay(
-		self,
-		ctx: Context,
-		member: discord.Member,
-		amount: discord.app_commands.Range[int, 1],
-	):
+	async def pay(self, ctx: Context, member: discord.Member, amount: discord.app_commands.Range[int, 1]):
 		if amount < 1:
 			await ctx.send("pay.errors.positive")
 			return
@@ -488,10 +415,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 	@app_commands.rename(member="global-member")
 	@app_commands.describe(member="balance_specs-args-member-description")
 	@commands.hybrid_command(
-		name="balance",
-		description="balance_specs-description",
-		usage="balance_specs-usage",
-		aliases=["bal"],
+		name="balance", description="balance_specs-description", usage="balance_specs-usage", aliases=["bal"]
 	)
 	async def balance(self, ctx: Context, member: Optional[discord.Member]):
 		member = member or ctx.author
@@ -533,11 +457,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 				new_balance = await self.helper.set_balance(ctx.author.id, ctx.guild.id, balance - bet, "bank")
 
 			message: dict = await self.custom_response(
-				"slots.lose",
-				ctx,
-				convert_embeds=False,
-				results=" ".join(results),
-				amount=bet,
+				"slots.lose", ctx, convert_embeds=False, results=" ".join(results), amount=bet
 			)
 			if new_balance >= 0:  # remove the debt alert embed field
 				if message.get("embeds"):
@@ -549,11 +469,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 
 	@app_commands.rename(amount="global-amount")
 	@app_commands.describe(amount="deposit_specs-args-amount-description")
-	@commands.hybrid_command(
-		name="deposit",
-		description="deposit_specs-description",
-		usage="deposit_specs-usage",
-	)
+	@commands.hybrid_command(name="deposit", description="deposit_specs-description", usage="deposit_specs-usage")
 	async def deposit(self, ctx: Context, amount: discord.app_commands.Range[int, 1] | None = None):
 		cash, bank = await self.helper.get_balance(ctx.author.id, ctx.guild.id, wallet=None)
 		amount = amount or cash
@@ -581,11 +497,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 
 	@app_commands.rename(amount="global-amount")
 	@app_commands.describe(amount="withdraw_specs-args-amount-description")
-	@commands.hybrid_command(
-		name="withdraw",
-		description="withdraw_specs-description",
-		usage="withdraw_specs-usage",
-	)
+	@commands.hybrid_command(name="withdraw", description="withdraw_specs-description", usage="withdraw_specs-usage")
 	async def withdraw(self, ctx: Context, amount: discord.app_commands.Range[int, 1] | None = None):
 		cash, bank = await self.helper.get_balance(ctx.author.id, ctx.guild.id, wallet=None)
 		amount = amount or bank
@@ -618,11 +530,7 @@ class Shop(commands.Cog, name="Shop"):
 		self.helper = EconomyHelper(client)
 		self.custom_response = custom_response.CustomResponse(client, name="shop")
 
-	@commands.hybrid_group(
-		name="shop",
-		description="shop_specs-description",
-		fallback="shop_specs-fallback",
-	)
+	@commands.hybrid_group(name="shop", description="shop_specs-description", fallback="shop_specs-fallback")
 	async def shop(self, ctx: Context):
 		row = await self.client.db.fetch("SELECT * FROM shop WHERE guild_id = $1", str(ctx.guild.id))
 		if not row:
@@ -651,20 +559,13 @@ class Shop(commands.Cog, name="Shop"):
 	@app_commands.describe(item_name="buy_specs-args-item-description")
 	async def buy(self, ctx: Context, item_name: str):
 		row = await self.client.db.fetchrow(
-			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
-			ctx.guild.id,
-			item_name.lower(),
+			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2", ctx.guild.id, item_name.lower()
 		)
 		if not row:
 			await ctx.send("shop.buy.errors.not_found")
 			return
 
-		item = ShopItem(
-			row["item_name"],
-			row["item_price"],
-			row["item_description"],
-			ctx.guild.get_role(row["role"]),
-		)
+		item = ShopItem(row["item_name"], row["item_price"], row["item_description"], ctx.guild.get_role(row["role"]))
 		if not item.role:
 			await ctx.send("shop.buy.errors.role_not_found")
 			return
@@ -679,16 +580,9 @@ class Shop(commands.Cog, name="Shop"):
 
 		await ctx.send("shop.buy.success", item=item)
 
-	@shop.command(
-		name="set_item",
-		description="set_item_specs-description",
-		usage="set_item_specs-usage",
-	)
+	@shop.command(name="set_item", description="set_item_specs-description", usage="set_item_specs-usage")
 	@app_commands.rename(
-		item_name="global-item",
-		price="global-price",
-		role="global-role",
-		description="global-description",
+		item_name="global-item", price="global-price", role="global-role", description="global-description"
 	)
 	@app_commands.describe(
 		item_name="set_item_specs-args-item-description",
@@ -700,9 +594,7 @@ class Shop(commands.Cog, name="Shop"):
 	@commands.has_permissions(manage_guild=True, manage_roles=True)
 	async def set_item(self, ctx: Context, item_name: str, price: int, description: str, role: discord.Role):
 		row = await self.client.db.fetchrow(
-			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
-			str(ctx.guild.id),
-			item_name.lower(),
+			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2", str(ctx.guild.id), item_name.lower()
 		)
 		if row:
 			await ctx.send("shop.set.errors.already_item")
@@ -730,38 +622,25 @@ class Shop(commands.Cog, name="Shop"):
 		item = ShopItem(item_name, price, description, role)
 		await ctx.send("shop.set.success", item=item)
 
-	@shop.command(
-		name="remove_item",
-		description="remove_item_specs-description",
-		usage="remove_item_specs-usage",
-	)
+	@shop.command(name="remove_item", description="remove_item_specs-description", usage="remove_item_specs-usage")
 	@app_commands.rename(item_name="global-item")
 	@app_commands.describe(item_name="remove_item_specs-args-item-description")
 	@app_commands.checks.has_permissions(manage_guild=True)
 	async def remove_item(self, ctx: Context, item_name: str):
 		row = await self.client.db.fetchrow(
-			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
-			ctx.guild.id,
-			item_name.lower(),
+			"SELECT * FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2", ctx.guild.id, item_name.lower()
 		)
 		if not row:
 			await ctx.send("shop.remove.errors.not_found")
 			return
 
-		item = ShopItem(
-			row["item_name"],
-			row["item_price"],
-			row["item_description"],
-			ctx.guild.get_role(row["role"]),
-		)
+		item = ShopItem(row["item_name"], row["item_price"], row["item_description"], ctx.guild.get_role(row["role"]))
 		if ctx.author.top_role.position <= item.role.position:
 			await ctx.send("shop.remove.errors.role_higher")
 			return
 
 		await self.client.db.execute(
-			"DELETE FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2",
-			ctx.guild.id,
-			item.name.lower(),
+			"DELETE FROM shop WHERE guild_id = $1 AND LOWER(item_name) = $2", ctx.guild.id, item.name.lower()
 		)
 		await ctx.send("shop.remove.success", item=item)
 

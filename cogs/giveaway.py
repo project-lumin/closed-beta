@@ -1,16 +1,17 @@
 import asyncio
 import random
 from datetime import datetime, timedelta
+from logging import getLogger
 from typing import Optional
 
 import discord
-from discord import app_commands
-from discord.ext import commands
-
 import helpers
 from core import Context, MyClient
+from discord import app_commands
+from discord.ext import commands
 from helpers import FormatDateTime
-from main import logger
+
+logger = getLogger(__name__)
 
 
 class Giveaway(commands.Cog, name="Giveaway"):
@@ -83,16 +84,12 @@ class Giveaway(commands.Cog, name="Giveaway"):
 				await message.reply(**response)
 
 			await self.client.db.execute(
-				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2",
-				winner_ids,
-				message_id,
+				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2", winner_ids, message_id
 			)
 			del self.active_giveaways[message_id]
 
 			await self.client.db.execute(
-				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2",
-				winner_ids,
-				message_id,
+				"UPDATE giveaways SET ended = TRUE, won_by = $1 WHERE message_id = $2", winner_ids, message_id
 			)
 
 		except discord.NotFound:
@@ -102,15 +99,10 @@ class Giveaway(commands.Cog, name="Giveaway"):
 			raise e
 
 	@commands.hybrid_group(
-		name="giveaway",
-		description="gw_specs-description",
-		usage="gw_specs-usage",
-		fallback="gw_specs-fallback",
+		name="giveaway", description="gw_specs-description", usage="gw_specs-usage", fallback="gw_specs-fallback"
 	)
 	@app_commands.rename(
-		winners="gw_specs-args-winners-name",
-		duration="gw_specs-args-duration-name",
-		prize="gw_specs-args-prize-name",
+		winners="gw_specs-args-winners-name", duration="gw_specs-args-duration-name", prize="gw_specs-args-prize-name"
 	)
 	@app_commands.describe(
 		winners="gw_specs-args-winners-description",
@@ -136,10 +128,7 @@ class Giveaway(commands.Cog, name="Giveaway"):
 			raise commands.BadArgument("winners,prize")
 
 		message = await ctx.send(
-			"giveaway.start.response",
-			prize=prize,
-			winners=winners_count,
-			ends=FormatDateTime(end_time, "R"),
+			"giveaway.start.response", prize=prize, winners=winners_count, ends=FormatDateTime(end_time, "R")
 		)
 
 		await message.add_reaction(self.GIVEAWAY_EMOJI)
