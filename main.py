@@ -5,19 +5,15 @@ from core.bot import MyClient
 from core.logging import logger
 from dotenv import load_dotenv
 
-if __debug__:
-	TOKEN = os.getenv("DEBUG_TOKEN")
+try:
+	import uvloop  # type: ignore
 
-if __name__ == "__main__":
-	if platform.system() != "Windows":
-		import uvloop  # type: ignore
-
-		uvloop.install()
-		asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-		logger.info("Using uvloop event loop policy")
-	else:
+	asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+except ImportError:
+	if os.name == "nt":
 		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-		logger.info("Using default event loop policy")
+	else:
+		asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
 
 logger.info("Starting the bot...")
 client = MyClient()
