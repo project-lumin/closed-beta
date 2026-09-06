@@ -412,7 +412,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "asyncpraw", specifier = ">=7.8.1" },
     { name = "discord", specifier = ">=2.3.2" },
-    { name = "discord-localization", specifier = ">=1.1.4" },
+    { name = "discord-localization", specifier = ">=1.1.5" },
     { name = "docutils-stubs", specifier = ">=0.0.22" },
     { name = "emoji", specifier = ">=2.14.1" },
     { name = "pillow", specifier = ">=11.3.0" },
