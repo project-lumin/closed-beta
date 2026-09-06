@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: lumin
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: lumin_beta
+      POSTGRES_DB: ${DB_NAME:-lumin_beta}
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
@@ -27,7 +27,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT:-5432}
       DB_HOST: ${DB_HOST:-db}
-      DB_NAME: ${DB_NAME:-lumin}
+      DB_NAME: ${DB_NAME:-lumin_beta}
     volumes:
       - .:/bot
 
