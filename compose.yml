@@ -10,11 +10,18 @@ services:
     volumes:
       - ./first_time.sql:/docker-entrypoint-initdb.d/first_time.sql:ro
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U lumin" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   bot:
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       TOKEN: ${TOKEN}
       DB_PASSWORD: ${DB_PASSWORD}
