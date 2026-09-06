@@ -1,11 +1,11 @@
 class VPSProvider:
 	@property
 	def name(self):
-		return "Bladehost VPS"
+		return "PlayClan"
 
 	@property
 	def url(self):
-		return "https://www.bladehost.eu/"
+		return "https://www.playclan.org/"
 
 	def __str__(self):
 		return f"[{self.name}]({self.url})"
