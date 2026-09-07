@@ -1031,7 +1031,7 @@
 					"description": "Invite **{bot.name}** to your server [here!](https://fm01.bot/invite)\nWebsite: https://fm01.bot/",
 					"fields": [
 						{
-							"name": "VPS",
+							"name": "VPS Provider",
 							"value": "{bot.provider}",
 							"inline": true
 						},

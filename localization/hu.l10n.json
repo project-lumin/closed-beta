@@ -1028,10 +1028,10 @@
 			"embeds": [
 				{
 					"title": "Bot információk",
-					"description": "Invite **{bot.name}** to your server [here!](https://fm01.bot/invite)\nWebsite: https://fm01.bot/",
+					"description": "Hívd be az **{bot.name}** botot a szerveredre [itt!](https://fm01.bot/invite)\nWeboldal: https://fm01.bot/",
 					"fields": [
 						{
-							"name": "VPS",
+							"name": "VPS Szolgáltató",
 							"value": "{bot.provider}",
 							"inline": true
 						},
@@ -1041,7 +1041,7 @@
 							"inline": true
 						},
 						{
-							"name": "Memory usage",
+							"name": "Memória használat",
 							"value": "{bot.memory}",
 							"inline": true
 						},
