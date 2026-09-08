@@ -32,7 +32,7 @@ featuring moderation, utility, and fun commands.
 
 3. **Create a `config.yml` file** following the structure of `config.yml.example`
 
-4. **Install PostgreSQL**, then:
+4. **Install PostgreSQL** (if not running with docker), then:
     - Create a user named `lumin` with the password you defined above
     - Create a database named `lumin`, preferably owned by the `lumin` user
     - Optionally initialize tables by running the contents of `first_time.sql`
@@ -48,9 +48,9 @@ featuring moderation, utility, and fun commands.
 
 ## Using Docker
 
-We've provided a Dockerfile and a compose file in the Github repo. You can simply run `docker compose up --build`
-to start the bot in a Docker container. Make sure to follow until step 2, because the bot still needs
-the `.env` file to function properly.
+We've provided a Dockerfile and a compose file in the Github repo. You can simply run `docker compose up -d --build`
+to start the bot in a Docker container. Make sure to follow until step 3, because the bot still needs
+the `.env` and `config.yml` files to function properly.
 
 ## Contributor Notice
 
