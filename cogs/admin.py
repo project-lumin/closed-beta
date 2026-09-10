@@ -7,7 +7,6 @@ import discord
 from core import Bot, Context, command, update_slash_localizations
 from discord import app_commands
 from discord.ext import commands
-from discord.utils import MISSING
 
 logger = getLogger(__name__)
 
@@ -90,13 +89,16 @@ class Admin(commands.GroupCog, name="admin"):
 	async def sync(
 		self,
 		ctx: Context,
-		guilds: commands.Greedy[discord.Object] = MISSING,
+		guilds: commands.Greedy[discord.Object] = None,  # ty:ignore[invalid-parameter-default]
+		# ^ until 2.7.1+ comes out dpy is gonna cry about `Greedy[X] | Y`,
+		# this is fixed and merged in https://github.com/Rapptz/discord.py/pull/10452
+		# but rapptz didn't release it yet
 		scope: Literal["~", "*", "^", "/"] | None = None,
 	) -> None:
 		tree: discord.app_commands.CommandTree[ctx.bot] = ctx.bot.tree
 		benchmark = perf_counter()
 
-		if not guilds:
+		if guilds is None:
 			if scope == "~":
 				synced = await tree.sync(guild=ctx.guild)
 			elif scope == "*":
