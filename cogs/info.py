@@ -4,9 +4,7 @@ import re
 import discord
 import pypokedex
 import requests
-from args import (
-	Bot as BotArg,
-)
+from args import Bot as BotArg
 from args import (
 	Category,
 	Emoji,
