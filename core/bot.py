@@ -164,6 +164,10 @@ class Bot(commands.AutoShardedBot):
 			if cog.stem in allowed or "*" in allowed:  # if you're having issues with cogs not loading, check this list
 				await self.load_extension(f"cogs.{cog.stem}")
 				self.logger.debug(f"Loaded extension {cog.name}")
+		for module in allowed:
+			if module != "*" and not (Path("cogs") / f"{module}.py").exists():
+				await self.load_extension(module)
+				self.logger.debug(f"Loaded external extension {module}")
 		end = perf_counter() - benchmark
 		self.logger.debug(f"Loaded cogs in {end:.2f}s")
 
