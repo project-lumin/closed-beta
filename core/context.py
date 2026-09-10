@@ -57,10 +57,8 @@ class Context(commands.Context):
 			"poll": poll,
 		}
 
-		locale_str = self.guild.preferred_locale if self.guild and self.guild.preferred_locale else "en"
-
 		if key is not None:
-			localized_payload = await self.bot.custom_response.get_message(key, locale_str, **format_kwargs)
+			localized_payload = await self.bot.custom_response.get_message(key, self, **format_kwargs)
 		else:
 			localized_payload = content
 

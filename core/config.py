@@ -4,6 +4,8 @@ from typing import Any
 
 import yaml
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class Config:
@@ -21,7 +23,7 @@ class Config:
 			with open(file, "r", encoding="utf-8") as f:
 				return cls(**yaml.safe_load(f))
 		except FileNotFoundError:
-			logging.warning("No config.yml file found, defaults are applied")
+			logger.warning("No config.yml file found, defaults are applied")
 			with open("config.yml.example", "r", encoding="utf-8") as f:
 				return cls(**yaml.safe_load(f))
 

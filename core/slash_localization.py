@@ -20,11 +20,11 @@ def update_slash_localizations():
 		try:
 			data = json.loads(Path(file_path).read_text(encoding="utf-8"))
 			if not isinstance(data, dict):
-				raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
+				raise TypeError(f"Expected dict in {file_path}, got {type(data).__name__}")
 			if lang not in slash_localizations:
 				slash_localizations[lang] = {}
 			slash_localizations[lang].update(data)
-		except Exception as e:
+		except json.JSONDecodeError as e:
 			logger.warning(f"Failed to load {file_path}: {e}")
 	global slash_command_localization
 	slash_command_localization = localization.Localization(slash_localizations, default_locale="en", separator="-")

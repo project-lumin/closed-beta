@@ -134,7 +134,7 @@ class HelpCommand(commands.HelpCommand):
 		await self.context.send("errors.command_not_found", command=Command.from_ctx(self.context))
 
 
-class Help(commands.Cog, command_attrs=dict(hidden=True)):
+class Help(commands.Cog, command_attrs={"hidden": True}):
 	def __init__(self, client: Bot):
 		self.client = client
 		help_command = HelpCommand()

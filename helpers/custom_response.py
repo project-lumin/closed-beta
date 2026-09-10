@@ -182,6 +182,8 @@ class CustomResponse:
 			"now": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
 		}
 
+		logger.debug(context_formatting)
+
 		kwag_mapping = {
 			discord.Guild: Guild.from_guild,
 			discord.Member: Member.from_member,

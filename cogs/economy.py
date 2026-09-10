@@ -259,7 +259,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		message = await self.custom_response("leaderboard", ctx)
 
 		if not isinstance(message, dict):
-			raise Exception
+			raise TypeError("leaderboard response is not a dict")
 
 		embeds: list[discord.Embed] = message.get("embeds", [])
 		if not rows:
@@ -405,11 +405,10 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 
 		message: dict = await self.custom_response("balance", ctx, member=member, cash=cash, bank=bank)  # type: ignore
 
-		if bank >= 0:
-			if message.get("embeds"):  # remove the debt alert embed field
-				for index, embed in enumerate(message["embeds"]):
-					if len(embed.fields) > 2:
-						message["embeds"][index].remove_field(2)
+		if bank >= 0 and message.get("embeds"):  # remove the debt alert embed field
+			for index, embed in enumerate(message["embeds"]):
+				if len(embed.fields) > 2:
+					message["embeds"][index].remove_field(2)
 
 		await ctx.send(**message)
 
@@ -439,11 +438,10 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 			message: dict = await self.custom_response(
 				"slots.lose", ctx, convert_embeds=False, results=" ".join(results), amount=bet
 			)  # type: ignore
-			if new_balance >= 0:  # remove the debt alert embed field
-				if message.get("embeds"):
-					for index, embed in enumerate(message["embeds"]):
-						if len(embed.fields) > 2:
-							message["embeds"][index].remove_field(2)
+			if new_balance >= 0 and message.get("embeds"):
+				for index, embed in enumerate(message["embeds"]):
+					if len(embed.fields) > 2:
+						message["embeds"][index].remove_field(2)
 
 			await ctx.send(**message)
 

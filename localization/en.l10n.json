@@ -2463,7 +2463,8 @@
 						"title": "Playlist Enqueued",
 						"description": "**[{name}]({url})**\nEnqueued **{count}** tracks.",
 						"footer": {
-							"text": "Requested by {author.name}"
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
 						},
 						"color": 5793266
 					}
@@ -2492,7 +2493,8 @@
 							}
 						],
 						"footer": {
-							"text": "Requested by {author.name}"
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
 						},
 						"color": 5793266
 					}
@@ -2521,7 +2523,8 @@
 							}
 						],
 						"footer": {
-							"text": "Requested by {author.name}"
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
 						},
 						"color": 5793266
 					}

@@ -29,8 +29,11 @@ class Say(commands.Cog, name="Says"):
 		match = DISCORD_MESSAGE_URL.search(message_link)
 		try:
 			if match:
-				guild_id, channel_id, message_id = match.groups()
-				message = await self.client.get_channel(int(channel_id)).fetch_message(int(message_id))
+				_, channel_id, message_id = match.groups()
+				channel = self.client.get_channel(int(channel_id))
+				if not isinstance(channel, (discord.TextChannel, discord.VoiceChannel, discord.Thread)):
+					raise commands.BadArgument
+				message = await channel.fetch_message(int(message_id))
 			else:
 				message = await ctx.channel.fetch_message(int(message_link))
 		except (discord.NotFound, discord.Forbidden):
@@ -55,7 +58,7 @@ class Say(commands.Cog, name="Says"):
 	async def achievement_say(self, ctx: Context, *, message: commands.Range[str, 1, 50]):
 		icon = random.randint(1, 29)
 		localized_title = await self.custom_response("say.achievement.title", ctx)
-		achievement_title = quote_plus(localized_title)
+		achievement_title = quote_plus(localized_title) if isinstance(localized_title, str) else ""
 		achievement_text = quote_plus(message)
 		url = f"https://skinmc.net/achievement/{icon}/{achievement_title}/{achievement_text}"
 		await ctx.send("say.achievement.response", achievement=url)
