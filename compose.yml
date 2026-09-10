@@ -42,6 +42,7 @@ services:
         condition: service_healthy
       lavalink:
         condition: service_healthy
+    restart: unless-stopped
     environment:
       TOKEN: ${TOKEN}
       DB_PASSWORD: ${DB_PASSWORD}
