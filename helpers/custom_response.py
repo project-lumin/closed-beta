@@ -123,6 +123,7 @@ class CustomResponse:
 		self,
 		name: str,
 		locale: Union[str, discord.Locale, discord.Guild, discord.Interaction, commands.Context, Context],
+		/,
 		*,
 		convert_embeds: bool = True,
 		**kwargs,
