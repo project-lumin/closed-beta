@@ -4,7 +4,6 @@ from urllib.parse import quote_plus
 import discord
 from art import text2art
 from core import Bot, Context, group
-from discord import app_commands
 from discord.ext import commands
 from helpers import CustomResponse
 from helpers.convert import text_to_emoji

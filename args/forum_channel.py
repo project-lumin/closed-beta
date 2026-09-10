@@ -1,6 +1,6 @@
 import datetime
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Optional, Sequence
 
 import discord
 
@@ -26,13 +26,13 @@ class ForumChannel:
 	"""The forum channel's nsfw status."""
 	_default_auto_archive_duration: int
 	_default_thread_slowmode_delay: int
-	_default_reaction_emoji: Optional[discord.PartialEmoji]
+	_default_reaction_emoji: discord.PartialEmoji | None
 	_members: list[discord.Member]
 	_threads: list[discord.Thread]
 	_available_tags: Sequence[discord.ForumTag]
 	media: bool
 	"""Whether or not the channel is a media channel."""
-	_category: Optional[discord.CategoryChannel]
+	_category: discord.CategoryChannel | None
 	_created_at: datetime.datetime
 	_jump_url: str
 	mention: str
@@ -92,7 +92,7 @@ class ForumChannel:
 	thread_slowmode = default_thread_slowmode_delay
 
 	@property
-	def default_reaction_emoji(self) -> Optional[PartialEmoji]:
+	def default_reaction_emoji(self) -> PartialEmoji | None:
 		return PartialEmoji.from_emoji(self._default_reaction_emoji) if self._default_reaction_emoji else None
 
 	@property
@@ -113,7 +113,7 @@ class ForumChannel:
 	tags = available_tags
 
 	@property
-	def category(self) -> Optional[Category]:
+	def category(self) -> Category | None:
 		"""The channel's category."""
 		return Category.from_category(self._category) if self._category else None
 

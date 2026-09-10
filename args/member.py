@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import Optional
 
 import discord
 
@@ -11,9 +10,9 @@ from args.user import User
 
 @dataclass(slots=True)
 class Member(User):
-	_nickname: Optional[str] = field(repr=False)
-	_color: Optional[Color] = field(repr=False)
-	_accent_color: Optional[Color] = field(repr=False)
+	_nickname: str | None = field(repr=False)
+	_color: Color | None = field(repr=False)
+	_accent_color: Color | None = field(repr=False)
 	_joined_at: datetime.datetime | None = field(repr=False)
 	_roles: list[discord.Role] = field(repr=False)
 
@@ -58,7 +57,7 @@ class Member(User):
 	joined = joined_at
 
 	@property
-	def roles(self) -> Optional[str]:
+	def roles(self) -> str | None:
 		"""The roles the user has (excluding @everyone)."""
 		roles_string = ", ".join([role.mention for role in self._roles[1:]])
 		if len(roles_string) > 512:
@@ -66,7 +65,7 @@ class Member(User):
 		return roles_string
 
 	@property
-	def roles_reverse(self) -> Optional[str]:
+	def roles_reverse(self) -> str | None:
 		roles_string = ", ".join([role.mention for role in reversed(self._roles[1:])])
 		if len(roles_string) > 512:
 			return None

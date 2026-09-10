@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 
@@ -19,10 +18,10 @@ class Template:
 	roles: int
 	channels: int
 	uses: int
-	description: Optional[str]
-	_updated_at: Optional[datetime.datetime]
-	_is_dirty: Optional[bool]
-	url: Optional[str]
+	description: str | None
+	_updated_at: datetime.datetime | None
+	_is_dirty: bool | None
+	url: str | None
 
 	@classmethod
 	async def from_dict(cls, client: discord.Client, data: dict):
@@ -73,7 +72,7 @@ class Template:
 	created = created_at
 
 	@property
-	def updated_at(self) -> Optional[FormatDateTime]:
+	def updated_at(self) -> FormatDateTime | None:
 		return FormatDateTime(self._updated_at, "f") if self._updated_at else None
 
 	updated = updated_at

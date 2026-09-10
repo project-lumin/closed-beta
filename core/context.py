@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Union
+from collections.abc import Sequence
 
 import discord
 from discord.ext import commands
@@ -7,25 +7,25 @@ from discord.ext import commands
 class Context(commands.Context):
 	async def send(  # type: ignore
 		self,
-		key: Optional[str] = None,
+		key: str | None = None,
 		*,
-		content: Optional[str] = None,
+		content: str | None = None,
 		tts: bool = False,
-		embed: Optional[discord.Embed] = None,
-		embeds: Optional[Sequence[discord.Embed]] = None,
-		file: Optional[discord.File] = None,
-		files: Optional[Sequence[discord.File]] = None,
-		stickers: Optional[Sequence[Union[discord.GuildSticker, discord.StickerItem]]] = None,
-		delete_after: Optional[float] = None,
-		nonce: Optional[Union[str, int]] = None,
-		allowed_mentions: Optional[discord.AllowedMentions] = None,
-		reference: Optional[Union[discord.Message, discord.MessageReference, discord.PartialMessage]] = None,
-		mention_author: Optional[bool] = None,
-		view: Optional[discord.ui.View] = None,
+		embed: discord.Embed | None = None,
+		embeds: Sequence[discord.Embed] | None = None,
+		file: discord.File | None = None,
+		files: Sequence[discord.File] | None = None,
+		stickers: Sequence[discord.GuildSticker | discord.StickerItem] | None = None,
+		delete_after: float | None = None,
+		nonce: str | int | None = None,
+		allowed_mentions: discord.AllowedMentions | None = None,
+		reference: discord.Message | discord.MessageReference | discord.PartialMessage | None = None,
+		mention_author: bool | None = None,
+		view: discord.ui.View | None = None,
 		suppress_embeds: bool = False,
 		ephemeral: bool = False,
 		silent: bool = False,
-		poll: Optional[discord.Poll] = None,
+		poll: discord.Poll | None = None,
 		**format_kwargs: object,
 	) -> discord.Message:
 		"""Sends a localized message.

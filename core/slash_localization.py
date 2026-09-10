@@ -1,8 +1,6 @@
 import json
 from logging import getLogger
 from pathlib import Path
-from time import perf_counter
-from typing import Optional
 
 import discord
 from discord import app_commands
@@ -10,7 +8,7 @@ from discord.ext import localization
 
 logger = getLogger(__name__)
 
-slash_command_localization: Optional[localization.Localization] = None
+slash_command_localization: localization.Localization | None = None
 
 
 def update_slash_localizations():

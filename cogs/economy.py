@@ -1,5 +1,5 @@
 import random
-from typing import Literal, Optional, Union, cast
+from typing import Literal
 
 import discord
 from args import Role, User
@@ -138,8 +138,8 @@ class EconomyHelper:
 			return int(bank - amount)
 
 	async def get_balance(
-		self, user_id: int, guild_id: int, wallet: Optional[Literal["cash", "bank"]] = "cash"
-	) -> Union[int, tuple[int, int]]:
+		self, user_id: int, guild_id: int, wallet: Literal["cash", "bank"] | None = "cash"
+	) -> int | tuple[int, int]:
 		"""
 		Get a user's balance.
 
@@ -201,7 +201,7 @@ class EconomyHelper:
 		if not row:
 			await self.client.db.execute("INSERT INTO economy(user_id, guild_id) VALUES($1, $2)", user_id, guild_id)
 		else:
-			raise ValueError("User already registered ({} @ {})".format(user_id, guild_id))
+			raise ValueError(f"User already registered ({user_id} @ {guild_id})")
 
 	async def set_balance(
 		self, user_id: int, guild_id: int, amount: int, wallet: Literal["cash", "bank"] = "cash"
@@ -399,7 +399,7 @@ class Economy(commands.GroupCog, name="Economy", group_name="economy"):
 		await ctx.send("pay.success", amount=amount, member=member)
 
 	@command(user=False)
-	async def balance(self, ctx: Context, member: Optional[discord.Member]):
+	async def balance(self, ctx: Context, member: discord.Member | None):
 		member = member or ctx.author
 		cash, bank = await self.helper.get_balance(member.id, ctx.guild.id, wallet=None)  # type: ignore
 

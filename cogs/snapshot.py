@@ -2,13 +2,11 @@ import asyncio
 import datetime
 import json
 import uuid
-from typing import Optional, Union
 from uuid import UUID
 
 import asyncpg
 import discord
 from core import Bot, Context, group
-from discord import app_commands
 from discord.ext import commands
 
 
@@ -83,7 +81,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 
 		return payload
 
-	async def create_snapshot(self, ctx: Context) -> Optional[UUID]:
+	async def create_snapshot(self, ctx: Context) -> UUID | None:
 		"""
 		Creates a snapshot and inserts it into the database.
 
@@ -117,7 +115,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 
 		return code
 
-	async def get_snapshot(self, code: Union[str, UUID]) -> Optional[dict]:
+	async def get_snapshot(self, code: str | UUID) -> dict | None:
 		"""
 		Gets a snapshot from the database.
 

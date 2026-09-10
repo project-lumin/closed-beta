@@ -276,14 +276,12 @@ class Case:
 
 		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user.
 		"""
-		pass
 
 	async def after_deletion(self):
 		"""An overrideable method that is called after a case is deleted. The default implementation does nothing.
 
 		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user.
 		"""
-		pass
 
 	async def delete(self, db: asyncpg.Pool) -> None:
 		"""Delete the case from the database. This will also call `before_deletion` and `after_deletion`.
@@ -299,11 +297,9 @@ class Case:
 
 	async def before_creation(self) -> None:
 		"""An overrideable method that is called before a case is created. The default implementation does nothing."""
-		pass
 
 	async def after_creation(self) -> None:
 		"""An overrideable method that is called after a case is created. The default implementation does nothing."""
-		pass
 
 	async def create(self, db: asyncpg.Pool) -> Self | None:
 		"""Create the case in the database.
@@ -483,7 +479,7 @@ class Mute(Case):
 		reason = await self._custom_response("mod.mute.reason", self._guild, mute=self)
 		if isinstance(self._user, discord.Member) and self.expires is not None:
 			await self._user.timeout(
-				self.expires.astimezone(datetime.timezone.utc), reason=reason if isinstance(reason, str) else None
+				self.expires.astimezone(datetime.UTC), reason=reason if isinstance(reason, str) else None
 			)
 
 	async def after_creation(self) -> None:
@@ -682,7 +678,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 				self.client,
 				ctx.guild,
 				user=member,
-				expires=member.timed_out_until.astimezone(datetime.timezone.utc).replace(tzinfo=None),
+				expires=member.timed_out_until.astimezone(datetime.UTC).replace(tzinfo=None),
 			)
 			if cases:
 				for case in cases:

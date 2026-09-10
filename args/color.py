@@ -1,4 +1,3 @@
-from typing import Optional
 
 import discord
 
@@ -20,7 +19,7 @@ class Color:
 	'https://dummyimage.com/500x500/FF0000/000000&text=+'
 	"""
 
-	def __init__(self, color: Optional[discord.Color]):
+	def __init__(self, color: discord.Color | None):
 		self.__color = color or discord.Color.light_grey()
 
 	def __str__(self):

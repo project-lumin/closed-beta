@@ -1,34 +1,25 @@
 from __future__ import annotations
 
-import inspect
+from collections.abc import Callable, Coroutine
 from typing import (
 	TYPE_CHECKING,
 	Any,
-	Callable,
 	ClassVar,
-	Coroutine,
-	Dict,
 	Literal,
-	Optional,
-	Self,
-	Tuple,
-	Type,
 	TypeVar,
-	Union,
 	Unpack,
 )
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands import Cog, FlagConverter
-from discord.ext.commands.hybrid import _CallableDefault, maybe_coroutine, replace_parameters
+from discord.ext.commands.hybrid import _CallableDefault, maybe_coroutine
 from discord.utils import MISSING
 
 if TYPE_CHECKING:
-	from discord.ext.commands.hybrid import _HybridCommandDecoratorKwargs, _HybridGroupDecoratorKwargs
+	from discord.ext.commands.hybrid import _HybridCommandDecoratorKwargs
 
-import core.slash_localization as slash_localization
+from core import slash_localization
 
 T = TypeVar("T")
 CogT = TypeVar("CogT")
@@ -162,11 +153,11 @@ class HybridAppCommand(commands.hybrid.HybridAppCommand):
 	__commands_is_hybrid_app_command__: ClassVar[bool] = True
 
 	@property
-	def usage(self) -> Optional[str]:
+	def usage(self) -> str | None:
 		return getattr(self.wrapped, "usage", None)
 
 	def __init__(
-		self, wrapped: Union[HybridCommand, HybridGroup], name: Optional[Union[str, app_commands.locale_str]] = None
+		self, wrapped: HybridCommand | HybridGroup, name: str | app_commands.locale_str | None = None
 	) -> None:
 		super().__init__(wrapped, name)
 
@@ -185,7 +176,7 @@ class HybridAppCommand(commands.hybrid.HybridAppCommand):
 
 	async def _transform_arguments(
 		self, interaction: discord.Interaction, namespace: app_commands.Namespace
-	) -> Dict[str, Any]:
+	) -> dict[str, Any]:
 		values = namespace.__dict__
 		transformed_values = {}
 

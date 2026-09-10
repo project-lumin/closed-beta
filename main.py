@@ -1,15 +1,15 @@
-from core.config import Config
-import argparse
 import asyncio
 import logging
 import os
 
-import yaml
 from core.bot import Bot
+from core.config import Config
 from discord.utils import setup_logging
 from dotenv import load_dotenv
 
 setup_logging(level=logging.INFO, root=True)
+
+logger = logging.getLogger(__name__)
 
 try:
 	import uvloop  # type: ignore
@@ -25,7 +25,7 @@ client: Bot | None = None
 
 
 async def main() -> None:
-	logging.info("Starting the bot...")
+	logger.info("Starting the bot...")
 	load_dotenv()
 
 	global client

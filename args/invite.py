@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import Optional
 
 import discord
 
@@ -15,15 +14,15 @@ class Invite:
 	"""The invite's code."""
 	url: str
 	"""The invite's URL."""
-	_inviter: Optional[discord.User] = field(repr=False)
-	_created_at: Optional[datetime.datetime] = field(repr=False)
-	_max_age: Optional[int] = field(repr=False)
-	max_uses: Optional[int]
+	_inviter: discord.User | None = field(repr=False)
+	_created_at: datetime.datetime | None = field(repr=False)
+	_max_age: int | None = field(repr=False)
+	max_uses: int | None
 	"""The maximum number of uses for the invite."""
-	temporary: Optional[bool]
+	temporary: bool | None
 	"""Whether the invite is temporary."""
-	_channel: Optional[discord.abc.GuildChannel]
-	uses: Optional[int]
+	_channel: discord.abc.GuildChannel | None
+	uses: int | None
 	"""The number of times the invite has been used."""
 
 	@classmethod
@@ -55,7 +54,7 @@ class Invite:
 		)
 
 	@property
-	def max_age(self) -> Optional[FormatDateTime]:
+	def max_age(self) -> FormatDateTime | None:
 		"""The invite's max age as a relative timestamp or a human-readable duration."""
 		if not self._max_age or self._max_age == 0:
 			return None
@@ -69,21 +68,21 @@ class Invite:
 	expires = max_age
 
 	@property
-	def inviter(self) -> Optional[User]:
+	def inviter(self) -> User | None:
 		"""The user who created the invite."""
 		return User.from_user(self._inviter) if self._inviter else None
 
 	author = inviter
 
 	@property
-	def created_at(self) -> Optional[FormatDateTime]:
+	def created_at(self) -> FormatDateTime | None:
 		"""The date the invite was created as a Discord timestamp. This is not available in ``on_invite_delete`` events."""
 		return FormatDateTime(self._created_at, "f") if self._created_at else None
 
 	created = created_at
 
 	@property
-	def channel(self) -> Optional[Channel]:
+	def channel(self) -> Channel | None:
 		"""The channel the invite is for."""
 		return convert_to_custom_channel(self._channel)
 

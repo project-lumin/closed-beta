@@ -1,11 +1,12 @@
 import asyncio
 import re
-from typing import Optional
 
-import args.bot
 import discord
 import pypokedex
 import requests
+from args import (
+	Bot as BotArg,
+)
 from args import (
 	Category,
 	Emoji,
@@ -20,10 +21,8 @@ from args import (
 	TextChannel,
 	User,
 	VoiceChannel,
-	Bot as BotArg,
 )
 from core import Bot, Context, group
-from discord import app_commands
 from discord.ext import commands
 from emoji.unicode_codes import EMOJI_DATA
 from helpers.regex import DISCORD_TEMPLATE
@@ -73,7 +72,7 @@ class Info(commands.Cog, name="Information"):
 		await ctx.send("info.server", server=Guild.from_guild(ctx.guild))
 
 	@info.command(user=False, l10n_key="roleinfo")
-	async def role(self, ctx: Context, role: Optional[discord.Role] = None):
+	async def role(self, ctx: Context, role: discord.Role | None = None):
 		role = role or ctx.author.top_role
 		if not role:
 			raise commands.BadArgument("role")

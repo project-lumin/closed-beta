@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import Optional, Union
 
 import discord
 
@@ -25,16 +24,16 @@ class User:
 	Otherwise, it is the same as ``global_name``."""
 	bot: bool
 	"""Whether or not the user is a Discord bot."""
-	_color: Optional[Color] = field(repr=False)
+	_color: Color | None = field(repr=False)
 	_avatar: str = field(repr=False)
-	_decoration: Optional[str] = field(repr=False)
-	_banner: Optional[str] = field(repr=False)
+	_decoration: str | None = field(repr=False)
+	_banner: str | None = field(repr=False)
 	_created_at: datetime.datetime = field(repr=False)
 	mention: str
 	"""A string that mentions the user."""
 
 	@classmethod
-	def from_user(cls, user: Union[discord.User, discord.Member]):
+	def from_user(cls, user: discord.User | discord.Member):
 		"""Creates a ``CustomUser`` from a ``discord.User`` or a ``discord.Member`` object."""
 		return cls(
 			_name=f"{user.name}#{user.discriminator}" if user.discriminator != "0" else user.name,

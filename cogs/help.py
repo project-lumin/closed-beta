@@ -1,4 +1,5 @@
-from typing import Any, Literal, Optional, get_args, get_origin, Mapping
+from collections.abc import Mapping
+from typing import Any, Literal, get_args, get_origin
 
 import discord
 from core import Bot, Command, Context
@@ -15,7 +16,7 @@ class HelpCommand(commands.HelpCommand):
 		super().__init__()
 		self.name = "help"
 
-	async def prepare_help_command(self, ctx: Context, command: Optional[str] = None, /) -> None:
+	async def prepare_help_command(self, ctx: Context, command: str | None = None, /) -> None:
 		if not hasattr(self, "custom_response"):
 			self.custom_response = ctx.bot.custom_response
 

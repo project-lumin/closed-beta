@@ -8,7 +8,7 @@ import logging
 import pathlib
 import random
 import time
-from typing import TYPE_CHECKING, Any, Optional, Union, overload
+from typing import TYPE_CHECKING, Any, overload
 
 import discord
 import wavelink
@@ -18,14 +18,13 @@ from discord.ext import commands, localization
 from helpers import emojis
 
 if TYPE_CHECKING:
-	from args import Emoji, FormatDateTime, Guild, Member, PartialEmoji, Role, User
 	from core.bot import Bot
 
 logger = logging.getLogger(__name__)
 
 
 class CustomResponse:
-	def __init__(self, client: "Bot", name: Optional[str] = None) -> None:
+	def __init__(self, client: Bot, name: str | None = None) -> None:
 		"""A class to handle custom responses with localization.
 
 		Parameters
@@ -99,7 +98,7 @@ class CustomResponse:
 	@overload
 	def update_localizations(self, path: str): ...
 
-	def update_localizations(self, data: Union[dict, str]):
+	def update_localizations(self, data: dict | str):
 		if isinstance(data, dict):
 			self.localizations.update(data)
 		elif isinstance(data, str):
@@ -113,9 +112,9 @@ class CustomResponse:
 				with open(file_path, encoding="utf-8") as f:
 					data = json.load(f)
 					if not isinstance(data, dict):
-						raise ValueError(f"Expected dict in {file_path}, got {type(data).__name__}")
+						raise TypeError(f"Expected dict in {file_path}, got {type(data).__name__}")
 					self.localizations.setdefault(lang, {}).update(data)
-			except Exception as e:
+			except (OSError, json.JSONDecodeError) as e:
 				logger.warning(f"Failed to load {file_path}: {e}")
 
 		self._localizer = localization.Localization(self.localizations, default_locale="en")
@@ -123,12 +122,12 @@ class CustomResponse:
 	async def get_message(
 		self,
 		name: str,
-		locale: Union[str, discord.Locale, discord.Guild, discord.Interaction, commands.Context, Context],
+		locale: str | discord.Locale | discord.Guild | discord.Interaction | commands.Context | Context,
 		/,
 		*,
 		convert_embeds: bool = True,
 		**kwargs,
-	) -> Union[dict, str, list, int, float, bool]:
+	) -> dict | str | list | int | float | bool:
 		"""Returns a custom message from the database, or if not found, returns the default message.
 
 		Parameters
@@ -156,14 +155,6 @@ class CustomResponse:
 		else:
 			locale = str(locale)
 
-		match original:
-			case discord.Guild():
-				guild_id = original.id
-			case discord.Interaction() | commands.Context():
-				guild_id = original.guild.id if original.guild else None
-			case _:
-				guild_id = None
-
 		from args import Emoji, FormatDateTime, Guild, Member, PartialEmoji, Role, Track, User
 
 		# these are variables that are always inserted into commands IF there is a context
@@ -188,7 +179,7 @@ class CustomResponse:
 				if isinstance(original, discord.Guild)
 				else None
 			),
-			"now": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+			"now": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
 		}
 
 		kwag_mapping = {

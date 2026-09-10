@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 from helpers import seconds_to_text
@@ -17,7 +16,7 @@ class TextChannel:
 	_guild: discord.Guild
 	id: int
 	"""The channel's id."""
-	topic: Optional[str]
+	topic: str | None
 	"""The channel's topic."""
 	position: int
 	"""The channel's position."""
@@ -97,7 +96,7 @@ class TextChannel:
 		return len(self._threads)
 
 	@property
-	def category(self) -> Optional[Category]:
+	def category(self) -> Category | None:
 		"""The channel's category."""
 		return Category.from_category(self._category) if self._category else None
 

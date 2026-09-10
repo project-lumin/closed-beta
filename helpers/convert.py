@@ -1,6 +1,5 @@
 """A helper for converting stuff."""
 
-import re
 
 import discord
 

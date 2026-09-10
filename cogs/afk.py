@@ -1,4 +1,3 @@
-from typing import Optional
 
 import discord
 from args import Member, User
@@ -75,7 +74,7 @@ class AFK(commands.Cog):
 		await ctx.reply(final_message)
 
 	@command(user=False)
-	async def afk(self, ctx: Context, reason: Optional[str] = None):
+	async def afk(self, ctx: Context, reason: str | None = None):
 		reason_text = reason
 		if not reason:
 			reason_text = await self.custom_response("afk.dnd", ctx)
