@@ -2471,16 +2471,16 @@
 				"embeds": [
 					{
 						"title": "Zeneszám hozzáadva",
-						"description": "**[{title}]({url})**",
+						"description": "**[{track.title}]({track.url})**",
 						"fields": [
 							{
 								"name": "Előadó",
-								"value": "{author_name}",
+								"value": "{track.author}",
 								"inline": true
 							},
 							{
 								"name": "Hossz",
-								"value": "{duration}",
+								"value": "{track.duration}",
 								"inline": true
 							},
 							{
@@ -2501,16 +2501,16 @@
 				"embeds": [
 					{
 						"title": "Most szól",
-						"description": "**[{title}]({url})**",
+						"description": "**[{track.title}]({track.url})**",
 						"fields": [
 							{
 								"name": "Előadó",
-								"value": "{author_name}",
+								"value": "{track.author}",
 								"inline": true
 							},
 							{
 								"name": "Hossz",
-								"value": "{duration}",
+								"value": "{track.duration}",
 								"inline": true
 							},
 							{
@@ -2551,7 +2551,7 @@
 		},
 		"skip": {
 			"success_next": {
-				"content": "Átlépve erre: **[{title}]({url})**."
+				"content": "Átlépve erre: **[{track.title}]({track.url})**."
 			},
 			"success_empty": {
 				"content": "Átlépve. A lejátszási sor üres."
@@ -2580,18 +2580,18 @@
 		},
 		"loop": {
 			"set": {
-				"content": "🔁 Ismétlési mód beállítva erre: **{mode}**."
+				"content": "Ismétlési mód beállítva erre: **{mode}**"
 			}
 		},
 		"np": {
 			"embeds": [
 				{
 					"title": "Most szól",
-					"description": "**[{title}]({url})**\n{progress_bar}",
+					"description": "**[{track.title}]({track.url})**\n{progress_bar}",
 					"fields": [
 						{
 							"name": "Előadó",
-							"value": "{author_name}",
+							"value": "{track.author}",
 							"inline": true
 						},
 						{
@@ -2626,7 +2626,7 @@
 				"content": "Túl nagy sorszám, a maximum `{max}`."
 			},
 			"success": {
-				"content": "**{title}** eltávolítva a lejátszási sorból."
+				"content": "**{track.title}** eltávolítva a lejátszási sorból."
 			}
 		},
 		"clear": {

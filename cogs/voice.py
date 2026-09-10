@@ -7,7 +7,6 @@ import wavelink
 from core import Bot, Context
 from core.hybrid import command
 from discord.ext import commands
-from helpers import seconds_to_text
 
 
 class LuminPlayer(wavelink.Player):
@@ -135,24 +134,10 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 			track = results[0]
 			was_playing = player.playing or len(player.queue) > 0
 			await player.queue.put_wait(track)
-			duration_str = "Live" if track.is_stream else seconds_to_text(max(1, int(track.length / 1000)))
 			if was_playing:
-				await ctx.send(
-					"voice.play.track_enqueued",
-					title=track.title,
-					url=track.uri,
-					author_name=track.author or "Unknown",
-					duration=duration_str,
-					position=len(player.queue),
-				)
+				await ctx.send("voice.play.track_enqueued", track=track, position=len(player.queue))
 			else:
-				await ctx.send(
-					"voice.play.now_playing",
-					title=track.title,
-					url=track.uri,
-					author_name=track.author or "Unknown",
-					duration=duration_str,
-				)
+				await ctx.send("voice.play.now_playing", track=track)
 
 		if not player.playing and len(player.queue) > 0:
 			await player.play(player.queue.get())
@@ -201,7 +186,7 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 			return
 		await player.skip(force=True)
 		if player.current:
-			await ctx.send("voice.skip.success_next", title=player.current.title, url=player.current.uri)
+			await ctx.send("voice.skip.success_next", track=player.current)
 		else:
 			await ctx.send("voice.skip.success_empty")
 
@@ -263,9 +248,9 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 				player.queue.mode = wavelink.QueueMode.normal
 
 		mode_names = {
-			wavelink.QueueMode.normal: "Off",
-			wavelink.QueueMode.loop: "Current Track",
-			wavelink.QueueMode.loop_all: "Entire Queue",
+			wavelink.QueueMode.normal: "❌",
+			wavelink.QueueMode.loop: "🔁",
+			wavelink.QueueMode.loop_all: "🔁🔁",
 		}
 		await ctx.send("voice.loop.set", mode=mode_names.get(player.queue.mode, "Off"))
 
@@ -286,10 +271,8 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 		)
 		await ctx.send(
 			"voice.np",
-			title=track.title,
-			url=track.uri,
+			track=track,
 			progress_bar=make_progress_bar(player.position, track.length),
-			author_name=track.author or "Unknown",
 			volume=player.volume,
 			loop=loop_name,
 		)
@@ -331,7 +314,7 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 			return
 		target = player.queue[index - 1]
 		player.queue.delete(index - 1)
-		await ctx.send("voice.remove.success", title=target.title)
+		await ctx.send("voice.remove.success", track=target)
 
 	@command(user=False)
 	async def clear(self, ctx: Context):

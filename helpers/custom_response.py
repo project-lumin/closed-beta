@@ -11,6 +11,7 @@ import time
 from typing import TYPE_CHECKING, Any, Optional, Union, overload
 
 import discord
+import wavelink
 from core.context import Context
 from discord.ext import commands, localization
 
@@ -163,7 +164,7 @@ class CustomResponse:
 			case _:
 				guild_id = None
 
-		from args import Emoji, FormatDateTime, Guild, Member, PartialEmoji, Role, User
+		from args import Emoji, FormatDateTime, Guild, Member, PartialEmoji, Role, Track, User
 
 		# these are variables that are always inserted into commands IF there is a context
 		context_formatting = {
@@ -197,6 +198,7 @@ class CustomResponse:
 			discord.Role: Role.from_role,
 			discord.Emoji: Emoji.from_emoji,
 			discord.PartialEmoji: PartialEmoji.from_emoji,
+			wavelink.Playable: Track.from_track,
 		}
 
 		# these are kwargs that are passed in but they're converted into custom args

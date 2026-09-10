@@ -2473,16 +2473,16 @@
 				"embeds": [
 					{
 						"title": "Track added to queue",
-						"description": "**[{title}]({url})**",
+						"description": "**[{track.title}]({track.url})**",
 						"fields": [
 							{
 								"name": "Artist",
-								"value": "{author_name}",
+								"value": "{track.author}",
 								"inline": true
 							},
 							{
 								"name": "Duration",
-								"value": "{duration}",
+								"value": "{track.duration}",
 								"inline": true
 							},
 							{
@@ -2502,16 +2502,16 @@
 				"embeds": [
 					{
 						"title": "Now playing",
-						"description": "**[{title}]({url})**",
+						"description": "**[{track.title}]({track.url})**",
 						"fields": [
 							{
 								"name": "Artist",
-								"value": "{author_name}",
+								"value": "{track.author}",
 								"inline": true
 							},
 							{
 								"name": "Duration",
-								"value": "{duration}",
+								"value": "{track.duration}",
 								"inline": true
 							},
 							{
@@ -2551,7 +2551,7 @@
 		},
 		"skip": {
 			"success_next": {
-				"content": "Skipped to **[{title}]({url})**."
+				"content": "Skipped to **[{track.title}]({track.url})**."
 			},
 			"success_empty": {
 				"content": "Skipped. The queue is now empty."
@@ -2580,18 +2580,18 @@
 		},
 		"loop": {
 			"set": {
-				"content": "🔁 Loop mode set to **{mode}**."
+				"content": "Loop mode set to **{mode}**"
 			}
 		},
 		"np": {
 			"embeds": [
 				{
 					"title": "Now playing",
-					"description": "**[{title}]({url})**\n{progress_bar}",
+					"description": "**[{track.title}]({track.url})**\n{progress_bar}",
 					"fields": [
 						{
 							"name": "Artist",
-							"value": "{author_name}",
+							"value": "{track.author}",
 							"inline": true
 						},
 						{
@@ -2626,7 +2626,7 @@
 				"content": "Index out of range. Max index is {max}."
 			},
 			"success": {
-				"content": "Removed **{title}** from the queue."
+				"content": "Removed **{track.title}** from the queue."
 			}
 		},
 		"clear": {
