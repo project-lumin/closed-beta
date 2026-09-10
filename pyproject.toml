@@ -1,6 +1,6 @@
 [project]
 name = "fm01"
-version = "0.7.1"
+version = "0.7.2"
 description = "All-in-one Discord bot for general purposes"
 authors = [{ name = "Pearoo", email = "contact@pearoo.dev" }]
 readme = "README.md"
@@ -15,7 +15,6 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "docutils-stubs>=0.0.22",
     "uvloop; sys_platform == 'linux' or sys_platform == 'darwin'",
-    "aiodns>=3.5.0",
     "psutil>=7.0.0",
     "py-cpuinfo>=9.0.0",
     "emoji>=2.14.1",

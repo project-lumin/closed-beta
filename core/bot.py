@@ -111,7 +111,7 @@ class Bot(commands.AutoShardedBot):
 		await self.cache_prefixes()
 		await self.tree.set_translator(SlashCommandLocalizer())
 		self.session = aiohttp.ClientSession(
-			connector=aiohttp.TCPConnector(resolver=aiohttp.AsyncResolver(), family=socket.AF_INET)
+			connector=aiohttp.TCPConnector(resolver=aiohttp.ThreadedResolver(), family=socket.AF_INET)
 		)
 		end = perf_counter() - benchmark
 		self.logger.debug(f"Initial setup hook complete in {end:.2f}s")
