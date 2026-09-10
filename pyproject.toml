@@ -26,6 +26,7 @@ dependencies = [
     "pytemperature>=1.1",
     "ty>=0.0.1a33",
     "wavelink>=3.5.2",
+    "jishaku>=2.7.5",
 ]
 
 [dependency-groups]
