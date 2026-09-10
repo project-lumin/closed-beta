@@ -11,23 +11,46 @@ services:
       - ./first_time.sql:/docker-entrypoint-initdb.d/first_time.sql:ro
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U lumin" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lumin} -d ${DB_NAME:-lumin_beta}" ]
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4-alpine
+    restart: unless-stopped
+    environment:
+      _JAVA_OPTIONS: -Xmx512M -Duser.language=en -Duser.country=US
+      LAVALINK_PASSWORD: ${LAVALINK_PASSWORD}
+      LAVALINK_URI: ${LAVALINK_URI:-http://lavalink:2333}
+    volumes:
+      - ./application.yml:/opt/Lavalink/application.yml:ro
+    ports:
+      - "2333:2333"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- --header=\"Authorization: ${LAVALINK_PASSWORD}\" http://localhost:2333/version || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   bot:
     build: .
     depends_on:
       db:
         condition: service_healthy
+      lavalink:
+        condition: service_healthy
+    restart: unless-stopped
     environment:
       TOKEN: ${TOKEN}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT:-5432}
       DB_HOST: ${DB_HOST:-db}
       DB_NAME: ${DB_NAME:-lumin_beta}
+      LAVALINK_URI: ${LAVALINK_URI:-http://lavalink:2333}
+      LAVALINK_PASSWORD: ${LAVALINK_PASSWORD}
     volumes:
       - .:/bot
 

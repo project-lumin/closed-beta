@@ -1,7 +1,7 @@
 from time import perf_counter
 
 from core import Bot, Context
-from core.hybrid import command, group
+from core.hybrid import command
 from discord.ext import commands
 
 

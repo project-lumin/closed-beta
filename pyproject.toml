@@ -26,6 +26,7 @@ dependencies = [
     "asyncpraw>=7.8.1",
     "pytemperature>=1.1",
     "ty>=0.0.1a33",
+    "wavelink>=3.5.2",
 ]
 
 [dependency-groups]
@@ -41,17 +42,12 @@ line-length = 120
 src = ["core", "helpers", "cogs"]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["E402", "F403"]
+"__init__.py" = ["E402", "F403", "F401"]
 
 [tool.ruff.format]
 docstring-code-format = true
 indent-style = "tab"
 skip-magic-trailing-comma = true
-
-[tool.ruff.lint]
-logger-objects = ["core.logging"]
-select = ["D"]
-ignore = ["D100", "D101", "D102", "D103", "D105", "D206", "D401"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

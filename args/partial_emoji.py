@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 from emoji import demojize
@@ -12,9 +11,9 @@ from args.format_date_time import FormatDateTime
 class PartialEmoji:
 	_name: str
 	animated: bool
-	id: Optional[int]
-	_created_at: Optional[datetime.datetime]
-	_url: Optional[str]
+	id: int | None
+	_created_at: datetime.datetime | None
+	_url: str | None
 	_is_unicode: bool
 	display: str
 

@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 
@@ -17,7 +16,7 @@ class StageChannel:
 	id: int
 	nsfw: bool
 	"""The stage channel's nsfw status."""
-	topic: Optional[str]
+	topic: str | None
 	"""The stage channel's topic."""
 	position: int
 	"""The stage channel's position."""
@@ -31,7 +30,7 @@ class StageChannel:
 	_speakers: list[discord.Member]
 	_listeners: list[discord.Member]
 	_moderators: list[discord.Member]
-	_category: Optional[discord.CategoryChannel]
+	_category: discord.CategoryChannel | None
 	_created_at: datetime.datetime
 	_jump_url: str
 	_members: list[discord.Member]
@@ -113,7 +112,7 @@ class StageChannel:
 		return len(self._moderators)
 
 	@property
-	def category(self) -> Optional[Category]:
+	def category(self) -> Category | None:
 		"""The channel's category."""
 		return Category.from_category(self._category) if self._category else None
 

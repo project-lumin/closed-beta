@@ -1,5 +1,3 @@
-from typing import Optional
-
 from core import Bot, Context
 from core.hybrid import command
 from discord.ext import commands
@@ -10,7 +8,7 @@ class Setup(commands.Cog, name="Setup"):
 		self.client = client
 
 	@command(user=False, permissions=["administrator"])
-	async def prefix(self, ctx: Context, prefix: str, mention: Optional[bool] = True):
+	async def prefix(self, ctx: Context, prefix: str, mention: bool | None = True):
 		if len(prefix) > 10:
 			return await ctx.send("setup.prefix.errors.long", prefix=prefix, limit=10)
 		await self.client.db.execute(

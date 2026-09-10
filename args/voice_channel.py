@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 
@@ -24,9 +23,9 @@ class VoiceChannel:
 	"""The channel's bitrate."""
 	user_limit: int
 	"""The channel's user limit."""
-	_rtc_region: Optional[str]
+	_rtc_region: str | None
 	_slowmode_delay: int
-	_category: Optional[discord.CategoryChannel]
+	_category: discord.CategoryChannel | None
 	_created_at: datetime.datetime
 	_jump_url: str
 	mention: str
@@ -77,7 +76,7 @@ class VoiceChannel:
 	slowmode = slowmode_delay
 
 	@property
-	def category(self) -> Optional[Category]:
+	def category(self) -> Category | None:
 		"""The channel's category."""
 		return Category.from_category(self._category) if self._category else None
 

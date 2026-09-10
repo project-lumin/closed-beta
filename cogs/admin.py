@@ -1,13 +1,13 @@
-from discord.utils import MISSING
+import sys
 from logging import getLogger
 from time import perf_counter
-from typing import Literal, Optional
+from typing import Literal
 
 import discord
 from core import Bot, Context, command, update_slash_localizations
 from discord import app_commands
 from discord.ext import commands
-import sys
+from discord.utils import MISSING
 
 logger = getLogger(__name__)
 
@@ -28,7 +28,12 @@ class Admin(commands.GroupCog, name="admin"):
 			end = perf_counter() - benchmark
 			await ctx.reply(content=f"Reloaded extension `{cog}` in **{end:.2f}s**")
 			logger.info(f"{ctx.author.name} reloaded {cog}.py")
-		except Exception as e:
+		except (
+			commands.ExtensionNotLoaded,
+			commands.ExtensionNotFound,
+			commands.NoEntryPointError,
+			commands.ExtensionFailed,
+		) as e:
 			await ctx.reply(content=f"Failed to reload extension `{cog}`: {e}")
 
 	@command()
@@ -40,7 +45,12 @@ class Admin(commands.GroupCog, name="admin"):
 			end = perf_counter() - benchmark
 			await ctx.reply(content=f"Loaded extension `{cog}` in **{end:.2f}s**")
 			logger.info(f"{ctx.author.name} loaded {cog}.py")
-		except Exception as e:
+		except (
+			commands.ExtensionNotLoaded,
+			commands.ExtensionNotFound,
+			commands.NoEntryPointError,
+			commands.ExtensionFailed,
+		) as e:
 			await ctx.reply(content=f"Failed to load extension `{cog}`: {e}")
 
 	@command()
@@ -52,7 +62,12 @@ class Admin(commands.GroupCog, name="admin"):
 			end = perf_counter() - benchmark
 			await ctx.reply(content=f"Unloaded extension `{cog}` in **{end:.2f}s**")
 			logger.info(f"{ctx.author.name} unloaded {cog}.py")
-		except Exception as e:
+		except (
+			commands.ExtensionNotLoaded,
+			commands.ExtensionNotFound,
+			commands.NoEntryPointError,
+			commands.ExtensionFailed,
+		) as e:
 			await ctx.reply(content=f"Failed to unload extension `{cog}`: {e}")
 
 	@command()
@@ -76,7 +91,7 @@ class Admin(commands.GroupCog, name="admin"):
 		self,
 		ctx: Context,
 		guilds: commands.Greedy[discord.Object] = MISSING,
-		scope: Optional[Literal["~", "*", "^", "/"]] = None,
+		scope: Literal["~", "*", "^", "/"] | None = None,
 	) -> None:
 		tree: discord.app_commands.CommandTree[ctx.bot] = ctx.bot.tree
 		benchmark = perf_counter()

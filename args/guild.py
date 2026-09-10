@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Optional, Sequence, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import discord
 
@@ -20,13 +21,13 @@ class Guild:
 	"""The guild's name."""
 	id: int
 	"""The guild's ID."""
-	_icon: Optional[discord.Asset] = field(repr=False)
-	_banner: Optional[discord.Asset] = field(repr=False)
-	_splash: Optional[discord.Asset] = field(repr=False)
-	_discovery_splash: Optional[discord.Asset] = field(repr=False)
-	description: Optional[str] = field(repr=False)
+	_icon: discord.Asset | None = field(repr=False)
+	_banner: discord.Asset | None = field(repr=False)
+	_splash: discord.Asset | None = field(repr=False)
+	_discovery_splash: discord.Asset | None = field(repr=False)
+	description: str | None = field(repr=False)
 	"""The guild's description, if it has one."""
-	members: Optional[int] = field(repr=False)
+	members: int | None = field(repr=False)
 	"""The number of members in the guild."""
 	_owner: discord.Member | None = field(repr=False)
 	boosts: int = field(repr=False)
@@ -36,18 +37,18 @@ class Guild:
 	_default_notifications: discord.NotificationLevel = field(repr=False)
 	_explicit_content_filter: discord.ContentFilter = field(repr=False)
 	_mfa_level: discord.MFALevel = field(repr=False)
-	_system_channel: Optional[discord.TextChannel] = field(repr=False)
-	_rules_channel: Optional[discord.TextChannel] = field(repr=False)
-	_public_updates_channel: Optional[discord.TextChannel] = field(repr=False)
+	_system_channel: discord.TextChannel | None = field(repr=False)
+	_rules_channel: discord.TextChannel | None = field(repr=False)
+	_public_updates_channel: discord.TextChannel | None = field(repr=False)
 	_preferred_locale: discord.Locale = field(repr=False)
-	_afk_channel: Optional[Union[discord.VoiceChannel, discord.StageChannel]] = field(repr=False)
+	_afk_channel: discord.VoiceChannel | discord.StageChannel | None = field(repr=False)
 	"""The guild's AFK channel."""
 	_afk_timeout: int = field(repr=False)
 	"""The guild's AFK timeout."""
-	_vanity_url: Optional[str] = field(repr=False)
+	_vanity_url: str | None = field(repr=False)
 	_premium_tier: int = field(repr=False)
 	_premium_subscribers: list[discord.Member] = field(repr=False)
-	_premium_subscriber_role: Optional[discord.Role] = field(repr=False)
+	_premium_subscriber_role: discord.Role | None = field(repr=False)
 	_nsfw_level: discord.NSFWLevel = field(repr=False)
 	_channels: Sequence[discord.abc.GuildChannel] = field(repr=False)
 	_voice_channels: list[discord.VoiceChannel] = field(repr=False)
@@ -123,22 +124,22 @@ class Guild:
 		return Member.from_member(self._owner)
 
 	@property
-	def icon(self) -> Optional[str]:
+	def icon(self) -> str | None:
 		"""The guild's icon URL."""
 		return self._icon.url if self._icon else ""
 
 	@property
-	def banner(self) -> Optional[str]:
+	def banner(self) -> str | None:
 		"""The guild's banner URL."""
 		return self._banner.url if self._banner else ""
 
 	@property
-	def splash(self) -> Optional[str]:
+	def splash(self) -> str | None:
 		"""The guild's splash URL."""
 		return self._splash.url if self._splash else ""
 
 	@property
-	def discovery_splash(self) -> Optional[str]:
+	def discovery_splash(self) -> str | None:
 		"""The guild's discovery splash URL."""
 		return self._discovery_splash.url if self._discovery_splash else ""
 

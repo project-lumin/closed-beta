@@ -823,5 +823,100 @@
 			}
 		}
 	},
-	"cog": "cog"
+	"cog": "cog",
+	"voice": "zene",
+	"play": {
+		"name": "play",
+		"desc": "Lejátszik egy zenét a YouTube Music-ról",
+		"usage": "play [keresés]",
+		"args": {
+			"query": {
+				"name": "keresés",
+				"desc": "Zeneszám neve vagy YouTube link"
+			}
+		}
+	},
+	"pause": {
+		"name": "pause",
+		"desc": "Megállítja a lejátszást"
+	},
+	"resume": {
+		"name": "resume",
+		"desc": "Folytatja a lejátszást"
+	},
+	"stop": {
+		"name": "stop",
+		"desc": "Megállítja a lejátszást és törli a lejátszási listát"
+	},
+	"skip": {
+		"name": "skip",
+		"desc": "Átugrik a következő zenére"
+	},
+	"volume": {
+		"name": "volume",
+		"desc": "Beállítja a hangerőt (0-150%)",
+		"usage": "volume (szint)",
+		"args": {
+			"level": {
+				"name": "szint",
+				"desc": "Hangerő (0-150)"
+			}
+		}
+	},
+	"seek": {
+		"name": "seek",
+		"desc": "Előre-/visszatekerés a zenében másodpercben megadva",
+		"usage": "seek [másodperc]",
+		"args": {
+			"seconds": {
+				"name": "másodperc",
+				"desc": "Az előre-/visszatekerés mértéke"
+			}
+		}
+	},
+	"shuffle": {
+		"name": "shuffle",
+		"desc": "Megkeveri a zenéket a lejátszási sorban"
+	},
+	"loop": {
+		"name": "loop",
+		"desc": "Beállítja az ismétlési módot (off, track, vagy queue)",
+		"usage": "loop (mód)",
+		"args": {
+			"mode": {
+				"name": "mód",
+				"desc": "Ismétlési mód: off, track, vagy queue"
+			}
+		}
+	},
+	"np": {
+		"name": "most",
+		"desc": "Megjeleníti a jelenleg szóló zene adatait"
+	},
+	"queue": {
+		"name": "queue",
+		"desc": "Megjeleníti a zenéket a lejátszási sorban",
+		"usage": "queue (oldal)",
+		"args": {
+			"page": {
+				"name": "oldal",
+				"desc": "Egy oldalon maximum 10 zene jeleníthető meg."
+			}
+		}
+	},
+	"voice_remove": {
+		"name": "remove",
+		"desc": "Eltávolít egy zenét a sorszáma alapján",
+		"usage": "remove [sorszám]",
+		"args": {
+			"index": {
+				"name": "sorszám",
+				"desc": "A zene sorszáma a lejátszási sorban"
+			}
+		}
+	},
+	"clear": {
+		"name": "töröl",
+		"desc": "Minden zenét kiszed a lejátszási sorból"
+	}
 }

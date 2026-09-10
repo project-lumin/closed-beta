@@ -25,6 +25,7 @@ from .rule_action import RuleAction
 from .stage_channel import StageChannel
 from .template import Template
 from .text_channel import TextChannel
+from .track import Track
 from .user import User
 from .voice_channel import VoiceChannel
 from .vps_provider import VPSProvider

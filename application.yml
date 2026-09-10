@@ -1,0 +1,55 @@
+server:
+  port: 2333
+  address: 0.0.0.0
+
+lavalink:
+  plugins:
+    - dependency: "dev.lavalink.youtube:youtube-plugin:f45bbb7aebfcbc1c553769e04af6cd43afa8b7c3"
+      repository: "https://maven.lavalink.dev/snapshots"
+      snapshot: true
+  server:
+    password: "${LAVALINK_PASSWORD}"
+    sources:
+      youtube: false
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      nico: true
+      http: true
+      local: true
+    filters:
+      volume: true
+      equalizer: true
+      karaoke: true
+      timescale: true
+      tremolo: true
+      vibrato: true
+      distortion: true
+      rotation: true
+      channelMix: true
+      lowPass: true
+    bufferDurationMs: 400
+    frameBufferDurationMs: 5000
+    youtubePlaylistLoadLimit: 50
+    gc-warnings: true
+
+logging:
+  level:
+    root: INFO
+    lavalink: INFO
+    lavalink.server.io.RequestLoggingFilter: WARN
+
+plugins:
+  youtube:
+    enabled: true
+    oauth:
+      enabled: false
+    clients:
+      - MUSIC
+      - IOS
+      - TV
+      - ANDROID_VR
+      - TVHTML5_SIMPLY
+      - WEB
+      - MWEB

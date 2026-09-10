@@ -10,6 +10,7 @@ from core import Bot, Context
 from core.hybrid import command, group
 from discord import app_commands
 from discord.ext import commands, localization, tasks
+from discord.utils import MISSING
 from helpers import convert_to_query, custom_response, seconds_to_text, text_to_seconds
 
 
@@ -29,11 +30,17 @@ class Case:
 		guild: discord.Guild,
 		user: discord.Member | discord.User,
 		moderator: discord.User,
-		created: datetime.datetime | None = None,
+		created: datetime.datetime = MISSING,
 		reason: str | None = None,
 		expires: datetime.datetime | None = None,
 		message: str | None = None,
 	):
+		if created is MISSING:
+			created = datetime.datetime.now(tz=datetime.UTC)
+		elif created and created.tzinfo is None:
+			created = created.replace(tzinfo=datetime.UTC)
+		if expires and expires.tzinfo is None:
+			expires = expires.replace(tzinfo=datetime.UTC)
 		self.bot: Bot = bot
 		self.type: CaseType = _type
 		self.id: int = _id
@@ -44,7 +51,7 @@ class Case:
 		self.expires: datetime.datetime | None = expires
 		self.message: str | None = message
 		self.length: str | None = discord.utils.format_dt(self.expires, "R") if self.expires else self.expires
-		self._created: datetime.datetime = created or datetime.datetime.now()
+		self._created: datetime.datetime = created or datetime.datetime.now(tz=datetime.UTC)
 
 	def __repr__(self):
 		return f"Case(type={self.type} user={self._user} reason={self.reason} moderator={self._moderator} duration={self.expires} message={self.message} id={self.id})"
@@ -73,12 +80,12 @@ class Case:
 	def __bool__(self):
 		if self.expires is None:
 			return True
-		return self.expires > datetime.datetime.now()
+		return self.expires > datetime.datetime.now(tz=datetime.UTC)
 
 	def __len__(self):
 		if self.expires is None:
 			return 0
-		return datetime.datetime.now() - self.expires
+		return datetime.datetime.now(tz=datetime.UTC) - self.expires
 
 	@classmethod
 	def from_dict(cls, data: dict, client: discord.Client, get_type: bool = False) -> Self:
@@ -276,14 +283,12 @@ class Case:
 
 		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user.
 		"""
-		pass
 
 	async def after_deletion(self):
 		"""An overrideable method that is called after a case is deleted. The default implementation does nothing.
 
 		Example usage: when deleting a Case(type=CaseType.MUTE), you want to remove the timeout from the user.
 		"""
-		pass
 
 	async def delete(self, db: asyncpg.Pool) -> None:
 		"""Delete the case from the database. This will also call `before_deletion` and `after_deletion`.
@@ -299,11 +304,9 @@ class Case:
 
 	async def before_creation(self) -> None:
 		"""An overrideable method that is called before a case is created. The default implementation does nothing."""
-		pass
 
 	async def after_creation(self) -> None:
 		"""An overrideable method that is called after a case is created. The default implementation does nothing."""
-		pass
 
 	async def create(self, db: asyncpg.Pool) -> Self | None:
 		"""Create the case in the database.
@@ -401,7 +404,7 @@ class Warn(Case):
 		reason: str | None = None,
 		expires: datetime.datetime | None = None,
 		message: str | None = None,
-		created: datetime.datetime = datetime.datetime.now(),
+		created: datetime.datetime = MISSING,
 	):
 		self._user = user
 		self._guild = guild
@@ -440,7 +443,7 @@ class Kick(Case):
 		moderator: discord.User,
 		reason: str | None = None,
 		message: str | None = None,
-		created: datetime.datetime = datetime.datetime.now(),
+		created: datetime.datetime = MISSING,
 		expires=None,
 	):
 		super().__init__(CaseType.KICK, _id, bot, guild, user, moderator, created, reason, expires, message)
@@ -473,7 +476,7 @@ class Mute(Case):
 		expires: datetime.datetime,
 		reason: str | None = None,
 		message: str | None = None,
-		created: datetime.datetime = datetime.datetime.now(),
+		created: datetime.datetime = MISSING,
 	):
 		super().__init__(CaseType.MUTE, _id, bot, guild, user, moderator, created, reason, expires, message)
 
@@ -483,7 +486,7 @@ class Mute(Case):
 		reason = await self._custom_response("mod.mute.reason", self._guild, mute=self)
 		if isinstance(self._user, discord.Member) and self.expires is not None:
 			await self._user.timeout(
-				self.expires.astimezone(datetime.timezone.utc), reason=reason if isinstance(reason, str) else None
+				self.expires.astimezone(datetime.UTC), reason=reason if isinstance(reason, str) else None
 			)
 
 	async def after_creation(self) -> None:
@@ -528,7 +531,7 @@ class Ban(Case):
 		reason: str | None = None,
 		expires: datetime.datetime | None = None,
 		message: str | None = None,
-		created: datetime.datetime = datetime.datetime.now(),
+		created: datetime.datetime = MISSING,
 	):
 		super().__init__(CaseType.BAN, _id, bot, guild, user, moderator, created, reason, expires, message)
 
@@ -577,7 +580,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@tasks.loop(seconds=30)
 	async def case_removal(self):
 		case_rows = await self.client.db.fetch(
-			"SELECT * FROM cases WHERE expires IS NOT NULL AND expires <= $1", datetime.datetime.now()
+			"SELECT * FROM cases WHERE expires IS NOT NULL AND expires <= $1", datetime.datetime.now(tz=datetime.UTC)
 		)
 		for row in case_rows:
 			case = Case.from_dict(row, self.client, get_type=True)
@@ -623,7 +626,9 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 				raise commands.MemberNotFound(str(member))
 		try:
 			expiry_date = (
-				datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
+				datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(seconds=text_to_seconds(expires))
+				if expires
+				else None
 			)
 		except (ValueError, TypeError):
 			reason = " ".join([expires or "", reason or ""] if reason else [expires or ""])
@@ -654,7 +659,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	@command(user=False, permissions=["moderate_members"])
 	async def mute(self, ctx: Context, member: discord.Member, expires: str, *, reason: str | None = None):
 		try:
-			expiry_date = datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires))
+			expiry_date = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(seconds=text_to_seconds(expires))
 		except (ValueError, TypeError):
 			raise commands.BadArgument
 		if member == ctx.me:
@@ -682,7 +687,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 				self.client,
 				ctx.guild,
 				user=member,
-				expires=member.timed_out_until.astimezone(datetime.timezone.utc).replace(tzinfo=None),
+				expires=member.timed_out_until.astimezone(datetime.UTC),
 			)
 			if cases:
 				for case in cases:
@@ -715,7 +720,9 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 	async def ban(self, ctx: Context, user: discord.User, expires: str | None = None, *, reason: str | None = None):
 		try:
 			expiry_date = (
-				datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(expires)) if expires else None
+				datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(seconds=text_to_seconds(expires))
+				if expires
+				else None
 			)
 		except (ValueError, TypeError):
 			raise commands.BadArgument
@@ -849,7 +856,9 @@ class Cases(commands.Cog, name="Cases"):
 
 		if value == "expires":
 			try:
-				final_value = datetime.datetime.now() + datetime.timedelta(seconds=text_to_seconds(new_value))
+				final_value = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(
+					seconds=text_to_seconds(new_value)
+				)
 			except (ValueError, TypeError):
 				await ctx.send("mod.edit.errors.invalid_time", case_id=fetched_case_id)
 				return

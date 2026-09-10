@@ -5,8 +5,10 @@ import discord
 from core import Bot
 from discord.ext import commands, tasks
 
+logger = logging.getLogger(__name__)
 
-class Status(commands.Cog, command_attrs=dict(hidden=True)):
+
+class Status(commands.Cog, command_attrs={"hidden": True}):
 	def __init__(self, client: Bot):
 		self.client = client
 
@@ -34,12 +36,12 @@ class Status(commands.Cog, command_attrs=dict(hidden=True)):
 
 	async def cog_unload(self) -> None:
 		self.update_status.cancel()
-		logging.info("Status unloaded!")
+		logger.info("Status unloaded!")
 
 	async def cog_load(self) -> None:
 		if not self.update_status.is_running():
 			self.update_status.start()
-			logging.info("Status loaded!")
+			logger.info("Status loaded!")
 
 
 async def setup(client: Bot):

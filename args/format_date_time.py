@@ -1,7 +1,7 @@
-import time
 import datetime
 
 import discord
+
 from args.formattable import Formattable
 
 
@@ -14,7 +14,7 @@ class FormatDateTime:
 
 	@property
 	def timestamp(self) -> str:
-		return self.data.astimezone(datetime.timezone.utc).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+		return self.data.astimezone(datetime.UTC).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 	@property
 	def time(self) -> Formattable:

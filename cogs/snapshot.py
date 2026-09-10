@@ -2,13 +2,11 @@ import asyncio
 import datetime
 import json
 import uuid
-from typing import Optional, Union
 from uuid import UUID
 
 import asyncpg
 import discord
 from core import Bot, Context, group
-from discord import app_commands
 from discord.ext import commands
 
 
@@ -83,7 +81,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 
 		return payload
 
-	async def create_snapshot(self, ctx: Context) -> Optional[UUID]:
+	async def create_snapshot(self, ctx: Context) -> UUID | None:
 		"""
 		Creates a snapshot and inserts it into the database.
 
@@ -111,13 +109,13 @@ class Snapshot(commands.Cog, name="Snapshots"):
 			await self.custom_response("snapshot.strings.server_snapshot", ctx),
 			json.dumps(payload),
 			ctx.author.id,
-			datetime.datetime.now(),
+			datetime.datetime.now(tz=datetime.UTC),
 			str(code),
 		)
 
 		return code
 
-	async def get_snapshot(self, code: Union[str, UUID]) -> Optional[dict]:
+	async def get_snapshot(self, code: str | UUID) -> dict | None:
 		"""
 		Gets a snapshot from the database.
 
@@ -176,7 +174,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 				color = discord.Colour(int(payload["roles"][x]["color"]))
 			else:
 				color = None
-			if not payload["roles"][x]["name"] == "@everyone":
+			if payload["roles"][x]["name"] != "@everyone":
 				try:
 					dicon = (
 						payload["roles"][x]["display_icon"].encode("latin1")
@@ -331,7 +329,7 @@ class Snapshot(commands.Cog, name="Snapshots"):
 		await self.delete_all_roles(ctx)
 		await self.load_snapshot(ctx, payload)
 
-		if not ctx.guild.owner_id == ctx.author.id:  # prevent griefs by sending the code to the owner
+		if ctx.guild.owner_id != ctx.author.id:  # prevent griefs by sending the code to the owner
 			alert = await self.custom_response("snapshot.owner_alert", ctx, code=old)
 			alert.pop("reply", None)  # type: ignore
 			alert.pop("ephemeral", None)  # type: ignore

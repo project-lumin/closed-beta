@@ -43,7 +43,7 @@ class Bot:
 	@property
 	def boot_time(self):
 		"""The time since the server was booted up."""
-		return FormatDateTime(datetime.datetime.fromtimestamp(psutil.boot_time()), "R")
+		return FormatDateTime(datetime.datetime.fromtimestamp(psutil.boot_time(), tz=datetime.UTC), "R")
 
 	@property
 	def network(self):

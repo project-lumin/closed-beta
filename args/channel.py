@@ -1,15 +1,14 @@
-from typing import Optional, Union
-
 import discord
+
 from args.forum_channel import ForumChannel
 from args.stage_channel import StageChannel
 from args.text_channel import TextChannel
 from args.voice_channel import VoiceChannel
 
-Channel = Union[TextChannel, VoiceChannel, StageChannel, ForumChannel]
+Channel = TextChannel | VoiceChannel | StageChannel | ForumChannel
 
 
-def convert_to_custom_channel(channel: Optional[discord.abc.GuildChannel]):
+def convert_to_custom_channel(channel: discord.abc.GuildChannel | None):
 	if channel:
 		if isinstance(channel, discord.TextChannel):
 			return TextChannel.from_channel(channel)

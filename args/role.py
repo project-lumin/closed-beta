@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass, field
-from typing import Optional, TYPE_CHECKING
 
 import discord
 
 from args.color import Color
 from args.format_date_time import FormatDateTime
-
-if TYPE_CHECKING:
-	from args._emoji import Emoji
 
 
 @dataclass(slots=True)
@@ -32,7 +28,7 @@ class Role:
 	_boost: bool = field(repr=False)
 	_integration: bool = field(repr=False)
 	_assignable: bool = field(repr=False)
-	_color: Optional[discord.Colour] = field(repr=False)
+	_color: discord.Colour | None = field(repr=False)
 	icon: str | None = field(repr=False)
 	"""The role's icon URL, or an emoji, if the role has one. This is only available for guilds that are
 	boosted to at least level 2."""

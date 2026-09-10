@@ -1,34 +1,18 @@
 from __future__ import annotations
 
-import inspect
-from typing import (
-	TYPE_CHECKING,
-	Any,
-	Callable,
-	ClassVar,
-	Coroutine,
-	Dict,
-	Literal,
-	Optional,
-	Self,
-	Tuple,
-	Type,
-	TypeVar,
-	Union,
-	Unpack,
-)
+from collections.abc import Callable, Coroutine
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, TypeVar, Unpack
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands import Cog, FlagConverter
-from discord.ext.commands.hybrid import _CallableDefault, maybe_coroutine, replace_parameters
+from discord.ext.commands.hybrid import _CallableDefault, maybe_coroutine
 from discord.utils import MISSING
 
 if TYPE_CHECKING:
-	from discord.ext.commands.hybrid import _HybridCommandDecoratorKwargs, _HybridGroupDecoratorKwargs
+	from discord.ext.commands.hybrid import _HybridCommandDecoratorKwargs
 
-import core.slash_localization as slash_localization
+from core import slash_localization
 
 T = TypeVar("T")
 CogT = TypeVar("CogT")
@@ -121,9 +105,11 @@ def _localize_app_command_attributes(
 		return None
 
 	name_key = f"{base}-name"
-	if isinstance(command_or_group, commands.hybrid.HybridAppCommand):
-		if getattr(command_or_group.wrapped, "parent", None) is not None:
-			name_key = command_or_group.name
+	if (
+		isinstance(command_or_group, commands.hybrid.HybridAppCommand)
+		and getattr(command_or_group.wrapped, "parent", None) is not None
+	):
+		name_key = command_or_group.name
 
 	command_or_group._locale_name = _l10n_str(command_or_group.name, name_key)
 	command_or_group._locale_description = _l10n_desc(command_or_group.description, f"{base}-desc")
@@ -162,12 +148,10 @@ class HybridAppCommand(commands.hybrid.HybridAppCommand):
 	__commands_is_hybrid_app_command__: ClassVar[bool] = True
 
 	@property
-	def usage(self) -> Optional[str]:
+	def usage(self) -> str | None:
 		return getattr(self.wrapped, "usage", None)
 
-	def __init__(
-		self, wrapped: Union[HybridCommand, HybridGroup], name: Optional[Union[str, app_commands.locale_str]] = None
-	) -> None:
+	def __init__(self, wrapped: HybridCommand | HybridGroup, name: str | app_commands.locale_str | None = None) -> None:
 		super().__init__(wrapped, name)
 
 		base = getattr(wrapped, "l10n_key", None)
@@ -185,7 +169,7 @@ class HybridAppCommand(commands.hybrid.HybridAppCommand):
 
 	async def _transform_arguments(
 		self, interaction: discord.Interaction, namespace: app_commands.Namespace
-	) -> Dict[str, Any]:
+	) -> dict[str, Any]:
 		values = namespace.__dict__
 		transformed_values = {}
 

@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import Optional
 
 import discord
 
@@ -27,23 +26,23 @@ class Message:
 	_attachments: list[discord.Attachment] = field(repr=False)
 	_stickers: list[discord.StickerItem] = field(repr=False)
 	_author: discord.User | discord.Member = field(repr=False)
-	_channel: Optional[discord.TextChannel] = field(repr=False)
-	_guild: Optional[discord.Guild] = field(repr=False)
+	_channel: discord.TextChannel | None = field(repr=False)
+	_guild: discord.Guild | None = field(repr=False)
 	_created_at: datetime.datetime = field(repr=False)
-	_edited_at: Optional[datetime.datetime] = field(repr=False)
+	_edited_at: datetime.datetime | None = field(repr=False)
 	_pinned: bool = field(repr=False)
 	_tts: bool = field(repr=False)
 	_mention_everyone: bool = field(repr=False)
 	_mentions: list[discord.Member] = field(repr=False)
 	_role_mentions: list[discord.Role] = field(repr=False)
 	_channel_mentions: list[discord.abc.GuildChannel | discord.Thread] = field(repr=False)
-	_reference: Optional[discord.MessageReference] = field(repr=False)
+	_reference: discord.MessageReference | None = field(repr=False)
 	_flags: discord.MessageFlags = field(repr=False)
 	_components: list[discord.ActionRow | discord.ui.Button | discord.SelectMenu | discord.ui.TextInput] = field(
 		repr=False
 	)
 	_jump_url: str = field(repr=False)
-	_poll: Optional[discord.Poll] = field(repr=False)
+	_poll: discord.Poll | None = field(repr=False)
 
 	@classmethod
 	def from_message(cls, message: discord.Message):
@@ -104,7 +103,7 @@ class Message:
 		)
 
 	@property
-	def channel(self) -> Optional[Channel]:
+	def channel(self) -> Channel | None:
 		"""The message's channel mention."""
 		return convert_to_custom_channel(self._channel)
 
@@ -158,7 +157,7 @@ class Message:
 		return len(self._channel_mentions)
 
 	@property
-	def reference(self) -> Optional[str]:
+	def reference(self) -> str | None:
 		"""The message's reference if it exists."""
 		return self._reference.jump_url if self._reference else None
 

@@ -1,6 +1,5 @@
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 from discord.ext import commands
 
@@ -15,7 +14,7 @@ class Command:
 	description: str
 	usage: str
 	prefix: str
-	aliases: Optional[str]
+	aliases: str | None
 
 	@classmethod
 	def from_ctx(cls, ctx: commands.Context):

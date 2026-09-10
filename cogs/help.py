@@ -1,4 +1,5 @@
-from typing import Any, Literal, Optional, get_args, get_origin, Mapping
+from collections.abc import Mapping
+from typing import Any, Literal, get_args, get_origin
 
 import discord
 from core import Bot, Command, Context
@@ -15,7 +16,7 @@ class HelpCommand(commands.HelpCommand):
 		super().__init__()
 		self.name = "help"
 
-	async def prepare_help_command(self, ctx: Context, command: Optional[str] = None, /) -> None:
+	async def prepare_help_command(self, ctx: Context, command: str | None = None, /) -> None:
 		if not hasattr(self, "custom_response"):
 			self.custom_response = ctx.bot.custom_response
 
@@ -133,7 +134,7 @@ class HelpCommand(commands.HelpCommand):
 		await self.context.send("errors.command_not_found", command=Command.from_ctx(self.context))
 
 
-class Help(commands.Cog, command_attrs=dict(hidden=True)):
+class Help(commands.Cog, command_attrs={"hidden": True}):
 	def __init__(self, client: Bot):
 		self.client = client
 		help_command = HelpCommand()
