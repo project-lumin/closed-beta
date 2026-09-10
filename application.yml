@@ -38,6 +38,7 @@ logging:
   level:
     root: INFO
     lavalink: INFO
+    lavalink.server.io.RequestLoggingFilter: WARN
 
 plugins:
   youtube:
