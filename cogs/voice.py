@@ -1,4 +1,3 @@
-import asyncio
 import math
 import os
 from typing import Literal, cast
@@ -46,16 +45,14 @@ async def _safe_emit(client: Bot, event: str, data: dict, *, to: str | None = No
 class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 	def __init__(self, client: Bot):
 		self.client: Bot = client
-		self._lava_task: asyncio.Task[None] | None = None
 
 	async def cog_load(self) -> None:
-		if not hasattr(self.client, "lavalink"):
-			self._lava_task = asyncio.create_task(self._init_lavalink())
+		if not self.client.lavalink:
+			await self._init_lavalink()
 
 	async def cog_unload(self) -> None:
 		await wavelink.Pool.close()
-		if hasattr(self.client, "lavalink"):
-			delattr(self.client, "lavalink")
+		self.client.lavalink = None
 		self.client.logger.info("[Lavalink] ~> Connection closed.")
 
 	async def _init_lavalink(self) -> None:
@@ -76,6 +73,10 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 
 		if not isinstance(ctx.author, discord.Member) or not ctx.author.voice or not ctx.author.voice.channel:
 			await ctx.send("voice.errors.not_in_voice")
+			return None
+
+		if not self.client.lavalink or not wavelink.Pool.nodes:
+			await ctx.send("voice.errors.not_connected")
 			return None
 
 		player = cast(LuminPlayer | None, ctx.guild.voice_client)
