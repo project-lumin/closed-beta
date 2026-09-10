@@ -33,15 +33,6 @@ def make_progress_bar(position_ms: int, duration_ms: int, length: int = 14) -> s
 	return f"`{format_ms(position_ms)}` {bar} `{format_ms(duration_ms)}`"
 
 
-async def _safe_emit(client: Bot, event: str, data: dict, *, to: str | None = None) -> None:
-	sio = getattr(client, "sio", None)
-	if sio:
-		if to:
-			await sio.emit(event, data, to=to)
-		else:
-			await sio.emit(event, data)
-
-
 class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 	def __init__(self, client: Bot):
 		self.client: Bot = client
@@ -113,8 +104,6 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 			and len(before.channel.members) <= 1
 		):
 			await player.disconnect()
-			guild_id = str(member.guild.id)
-			await _safe_emit(self.client, "music_end", {"guild": guild_id}, to=guild_id)
 			if player.home:
 				ch = member.guild.get_channel(player.home)
 				if ch and isinstance(ch, discord.TextChannel):
@@ -125,64 +114,6 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 						await ch.send(**msg)
 					elif isinstance(msg, str):
 						await ch.send(msg)
-
-	@commands.Cog.listener()
-	async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload):
-		player = cast(LuminPlayer | None, payload.player)
-		if not player or not player.guild:
-			return
-		if payload.reason in ("replaced", "REPLACED"):
-			return
-		guild_id = str(player.guild.id)
-		if len(player.queue) == 0 and player.queue.mode not in (wavelink.QueueMode.loop, wavelink.QueueMode.loop_all):
-			await _safe_emit(self.client, "music_end", {"guild": guild_id}, to=guild_id)
-		else:
-			await _safe_emit(self.client, "track_end", {"guild": guild_id}, to=guild_id)
-
-	@commands.Cog.listener()
-	async def on_wavelink_track_exception(self, payload: wavelink.TrackExceptionEventPayload):
-		player = cast(LuminPlayer | None, payload.player)
-		if not player or not player.guild:
-			return
-		guild_id = str(player.guild.id)
-		await _safe_emit(self.client, "track_error", {"guild": guild_id}, to=guild_id)
-
-	@commands.Cog.listener()
-	async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload):
-		player = cast(LuminPlayer | None, payload.player)
-		if not player or not player.guild or not player.current or not player.channel:
-			return
-		guild_id = str(player.guild.id)
-		track = player.current
-		resp = {
-			"currentsong": {
-				"title": track.title,
-				"url": track.uri,
-				"position": player.position,
-				"length": track.length,
-				"uploader": track.author,
-				"thumbnail": track.artwork,
-				"stream": track.is_stream,
-				"volume": player.volume,
-			},
-			"discord": str(player.channel.id),
-			"shuffle": player.is_shuffle,
-			"loop": player.queue.mode in (wavelink.QueueMode.loop, wavelink.QueueMode.loop_all),
-			"paused": player.paused,
-			"queue": [
-				{
-					"title": t.title,
-					"url": t.uri,
-					"position": t.position,
-					"length": t.length,
-					"uploader": t.author,
-					"thumbnail": t.artwork,
-					"stream": t.is_stream,
-				}
-				for t in player.queue
-			],
-		}
-		await _safe_emit(self.client, "track_start", {"guild": guild_id, "track": resp}, to=guild_id)
 
 	@command(user=False)
 	async def play(self, ctx: Context, *, query: str):
@@ -284,9 +215,6 @@ class Voice(commands.GroupCog, name="Voice", group_name="voice"):
 			return
 		await player.set_volume(level)
 		await ctx.send("voice.volume.set", volume=player.volume)
-		if ctx.guild:
-			guild_id = str(ctx.guild.id)
-			await _safe_emit(self.client, "volume", {"volume": player.volume, "guild": guild_id}, to=guild_id)
 
 	@command(user=False)
 	async def seek(self, ctx: Context, seconds: int):
