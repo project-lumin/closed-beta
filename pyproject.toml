@@ -15,7 +15,6 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "docutils-stubs>=0.0.22",
     "uvloop; sys_platform == 'linux' or sys_platform == 'darwin'",
-    "aiodns>=3.5.0",
     "psutil>=7.0.0",
     "py-cpuinfo>=9.0.0",
     "emoji>=2.14.1",
