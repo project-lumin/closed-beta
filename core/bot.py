@@ -1,25 +1,27 @@
-from core.config import Config
 import asyncio
 import datetime
 import json
 import os
 import socket
+import sys
 import traceback
 from io import StringIO
 from logging import getLogger
 from pathlib import Path
 from time import perf_counter
-from typing import Any, Optional, Union, cast
+from typing import Any
 
 import aiohttp
 import asyncpg
 import discord
+import wavelink
 from discord import app_commands
 from discord.ext import commands, localization
 from helpers import custom_response, seconds_to_text
 from helpers.emojis import LOADING
 
 from core import Command, Context, SlashCommandLocalizer, slash_command_localization, update_slash_localizations
+from core.config import Config
 
 
 class Bot(commands.AutoShardedBot):
@@ -28,8 +30,9 @@ class Bot(commands.AutoShardedBot):
 		update_slash_localizations()
 		self.debug: bool = self.config.get("debug")
 		self.logger = getLogger(__name__)
-		self.uptime: Optional[datetime.datetime] = None
+		self.uptime: datetime.datetime | None = None
 		self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+		self.lavalink: dict[str, wavelink.Node] | None = None
 		intents: discord.Intents = discord.Intents.all()
 		self.db: asyncpg.Pool = None
 		self.session: aiohttp.ClientSession | None = None
@@ -92,7 +95,7 @@ class Bot(commands.AutoShardedBot):
 		if guild.id in self.prefix_cache:
 			del self.prefix_cache[guild.id]
 
-	async def get_context(self, origin: Union[discord.Message, discord.Interaction], /, *, cls=None) -> Any:
+	async def get_context(self, origin: discord.Message | discord.Interaction, /, *, cls=None) -> Any:
 		return await super().get_context(origin, cls=Context)
 
 	async def setup_hook(self):
@@ -102,8 +105,8 @@ class Bot(commands.AutoShardedBot):
 		try:
 			await self.database_initialization()
 		except asyncpg.InvalidAuthorizationSpecificationError:
-			self.logger.error("Failed to connect to database", exc_info=True)
-			exit(-1)
+			self.logger.exception("Failed to connect to database")
+			sys.exit()
 		await self.load_cogs()
 		await self.cache_prefixes()
 		await self.tree.set_translator(SlashCommandLocalizer())
@@ -178,11 +181,9 @@ class Bot(commands.AutoShardedBot):
 		self.logger.info(f"Loaded cogs: {', '.join([cog for cog in self.cogs])}")
 		self.logger.debug(f"discord-localization v{localization.__version__}")
 
-	async def handle_error(self, ctx: Context, error: Union[commands.CommandError, app_commands.AppCommandError]):
+	async def handle_error(self, ctx: Context, error: commands.CommandError | app_commands.AppCommandError):
 		command = None
-		if isinstance(ctx, (Context, commands.Context)):
-			command = Command.from_ctx(ctx)
-		elif hasattr(ctx, "command") and ctx.command:
+		if isinstance(ctx, (Context, commands.Context)) or hasattr(ctx, "command") and ctx.command:
 			command = Command.from_ctx(ctx)
 
 		if isinstance(error, commands.HybridCommandError):
@@ -255,9 +256,9 @@ class Bot(commands.AutoShardedBot):
 				if channel and isinstance(channel, discord.TextChannel):
 					# show original error for chained exceptions
 					root_exc = None
-					if getattr(error, "__cause__"):
+					if error.__cause__:
 						root_exc = error.__cause__
-					elif getattr(error, "__context__") and not getattr(error, "__suppress_context__"):
+					elif error.__context__ and not error.__suppress_context__:
 						root_exc = error.__context__
 					if root_exc:
 						stack = "".join(traceback.format_exception(type(root_exc), root_exc, root_exc.__traceback__))

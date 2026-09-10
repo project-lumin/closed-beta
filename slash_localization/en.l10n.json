@@ -823,5 +823,100 @@
 			}
 		}
 	},
-	"cog": "cog"
+	"cog": "cog",
+	"voice": "voice",
+	"play": {
+		"name": "play",
+		"desc": "Play a track or playlist from YouTube or URL",
+		"usage": "play [query]",
+		"args": {
+			"query": {
+				"name": "query",
+				"desc": "Song name or YouTube URL"
+			}
+		}
+	},
+	"pause": {
+		"name": "pause",
+		"desc": "Pause the current playback"
+	},
+	"resume": {
+		"name": "resume",
+		"desc": "Resume the paused playback"
+	},
+	"stop": {
+		"name": "stop",
+		"desc": "Stop playback and clear the queue"
+	},
+	"skip": {
+		"name": "skip",
+		"desc": "Skip the currently playing track"
+	},
+	"volume": {
+		"name": "volume",
+		"desc": "Check or change the player volume (0-150%)",
+		"usage": "volume (level)",
+		"args": {
+			"level": {
+				"name": "level",
+				"desc": "Volume level (0-150)"
+			}
+		}
+	},
+	"seek": {
+		"name": "seek",
+		"desc": "Fast forward or rewind playback by seconds",
+		"usage": "seek [seconds]",
+		"args": {
+			"seconds": {
+				"name": "seconds",
+				"desc": "Number of seconds to seek by"
+			}
+		}
+	},
+	"shuffle": {
+		"name": "shuffle",
+		"desc": "Shuffle the tracks in the queue"
+	},
+	"loop": {
+		"name": "loop",
+		"desc": "Set the playback loop mode",
+		"usage": "loop (mode)",
+		"args": {
+			"mode": {
+				"name": "mode",
+				"desc": "Loop mode: off, track, or queue"
+			}
+		}
+	},
+	"np": {
+		"name": "playing",
+		"desc": "View the currently playing track and progress"
+	},
+	"queue": {
+		"name": "queue",
+		"desc": "List songs in the queue",
+		"usage": "queue (page)",
+		"args": {
+			"page": {
+				"name": "page",
+				"desc": "Page number to view"
+			}
+		}
+	},
+	"voice_remove": {
+		"name": "remove",
+		"desc": "Remove a track from the queue by its index number",
+		"usage": "remove [index]",
+		"args": {
+			"index": {
+				"name": "index",
+				"desc": "The index of the track to remove"
+			}
+		}
+	},
+	"clear": {
+		"name": "clear",
+		"desc": "Clear all tracks from the queue"
+	}
 }

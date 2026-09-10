@@ -2431,5 +2431,216 @@
 				}
 			]
 		}
+	},
+	"voice": {
+		"errors": {
+			"not_in_voice": {
+				"content": "Be kell lépned egy hangcsatornába a parancs használatához."
+			},
+			"not_connected": {
+				"content": "A bot nincs bent hangcsatornában."
+			},
+			"different_channel": {
+				"content": "Ugyan abban a hangcsatornában kell lenned, mint a botnak, hogy ezt a parancsot használhasd."
+			},
+			"no_results": {
+				"content": "Nincs találat a következőre: `{query}`"
+			},
+			"not_playing": {
+				"content": "Jelenleg nem szól zene."
+			},
+			"empty_queue": {
+				"content": "A lejátszási sor üres."
+			}
+		},
+		"play": {
+			"playlist_enqueued": {
+				"embeds": [
+					{
+						"title": "Lejátszási lista hozzáadva",
+						"description": "**[{name}]({url})**\n**{count}** zeneszám került a lejátszási sorhoz.",
+						"footer": {
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
+						},
+						"color": 5793266
+					}
+				]
+			},
+			"track_enqueued": {
+				"embeds": [
+					{
+						"title": "Zeneszám hozzáadva",
+						"description": "**[{title}]({url})**",
+						"fields": [
+							{
+								"name": "Előadó",
+								"value": "{author_name}",
+								"inline": true
+							},
+							{
+								"name": "Hossz",
+								"value": "{duration}",
+								"inline": true
+							},
+							{
+								"name": "Pozíció a lejátszási sorban",
+								"value": "#{position}",
+								"inline": true
+							}
+						],
+						"footer": {
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
+						},
+						"color": 5793266
+					}
+				]
+			},
+			"now_playing": {
+				"embeds": [
+					{
+						"title": "Most szól",
+						"description": "**[{title}]({url})**",
+						"fields": [
+							{
+								"name": "Előadó",
+								"value": "{author_name}",
+								"inline": true
+							},
+							{
+								"name": "Hossz",
+								"value": "{duration}",
+								"inline": true
+							},
+							{
+								"name": "Pozíció a lejátszási sorban",
+								"value": "Most",
+								"inline": true
+							}
+						],
+						"footer": {
+							"text": "Requested by {author.name}",
+							"icon_url": "{author.avatar}"
+						},
+						"color": 5793266
+					}
+				]
+			}
+		},
+		"pause": {
+			"already_paused": {
+				"content": "A lejátszás jelenleg is szünetelve van."
+			},
+			"success": {
+				"content": "Lejátszás megállítva."
+			}
+		},
+		"resume": {
+			"not_paused": {
+				"content": "A lejátszás nincs leállítva."
+			},
+			"success": {
+				"content": "Lejátszás folytatva."
+			}
+		},
+		"stop": {
+			"success": {
+				"content": "A bot kilépett, a lejátszási sor törölve."
+			}
+		},
+		"skip": {
+			"success_next": {
+				"content": "Átlépve erre: **[{title}]({url})**."
+			},
+			"success_empty": {
+				"content": "Átlépve. A lejátszási sor üres."
+			}
+		},
+		"volume": {
+			"current": {
+				"content": "🔊 Hangerő: **{volume}%**."
+			},
+			"set": {
+				"content": "Új hangerő: **{volume}%**."
+			}
+		},
+		"seek": {
+			"out_of_range": {
+				"content": "A tekerés túllóg a zeneszám hosszán."
+			},
+			"success": {
+				"content": "Áttekerve ide: {position}"
+			}
+		},
+		"shuffle": {
+			"success": {
+				"content": "🔀 **{count}** zeneszám összekeverve a lejátszási sorban."
+			}
+		},
+		"loop": {
+			"set": {
+				"content": "🔁 Ismétlési mód beállítva erre: **{mode}**."
+			}
+		},
+		"np": {
+			"embeds": [
+				{
+					"title": "Most szól",
+					"description": "**[{title}]({url})**\n{progress_bar}",
+					"fields": [
+						{
+							"name": "Előadó",
+							"value": "{author_name}",
+							"inline": true
+						},
+						{
+							"name": "Hangerő",
+							"value": "{volume}%",
+							"inline": true
+						},
+						{
+							"name": "Ismétlés",
+							"value": "{loop}",
+							"inline": true
+						}
+					],
+					"color": 5793266
+				}
+			]
+		},
+		"queue": {
+			"embeds": [
+				{
+					"title": "Lejátszási sor",
+					"description": "{tracks}",
+					"footer": {
+						"text": "{page}./{total_pages} oldal | {total_tracks} zene összesen"
+					},
+					"color": 5793266
+				}
+			]
+		},
+		"remove": {
+			"out_of_range": {
+				"content": "Túl nagy sorszám, a maximum `{max}`."
+			},
+			"success": {
+				"content": "**{title}** eltávolítva a lejátszási sorból."
+			}
+		},
+		"clear": {
+			"already_empty": {
+				"content": "A lejátszási sor már üres."
+			},
+			"success": {
+				"content": "**{count}** eltávolítva a lejátszási sorból."
+			}
+		},
+		"listener": {
+			"disconnected_empty": {
+				"content": "Nincsen több hallgató, a bot kilép."
+			}
+		}
 	}
 }
