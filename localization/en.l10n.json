@@ -1031,7 +1031,7 @@
 					"description": "Invite **{bot.name}** to your server [here!](https://fm01.bot/invite)\nWebsite: https://fm01.bot/",
 					"fields": [
 						{
-							"name": "VPS",
+							"name": "VPS Provider",
 							"value": "{bot.provider}",
 							"inline": true
 						},
@@ -2430,6 +2430,220 @@
 					]
 				}
 			]
+		}
+	},
+	"voice": {
+		"errors": {
+			"only_server": {
+				"content": "This command can only be used in a server."
+			},
+			"not_in_voice": {
+				"content": "You must be in a voice channel to use this command."
+			},
+			"not_connected": {
+				"content": "The bot is not connected to a voice channel."
+			},
+			"different_channel": {
+				"content": "You must be in the same voice channel as the bot."
+			},
+			"no_results": {
+				"content": "No results found for {query}."
+			},
+			"not_playing": {
+				"content": "Nothing is currently playing."
+			},
+			"empty_queue": {
+				"content": "The queue is empty."
+			}
+		},
+		"play": {
+			"playlist_enqueued": {
+				"embeds": [
+					{
+						"title": "Playlist Enqueued",
+						"description": "**[{name}]({url})**\nEnqueued **{count}** tracks.",
+						"footer": {
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
+						},
+						"color": 5793266
+					}
+				]
+			},
+			"track_enqueued": {
+				"embeds": [
+					{
+						"title": "Track added to queue",
+						"description": "**[{track.title}]({track.url})**",
+						"fields": [
+							{
+								"name": "Artist",
+								"value": "{track.author}",
+								"inline": true
+							},
+							{
+								"name": "Duration",
+								"value": "{track.duration}",
+								"inline": true
+							},
+							{
+								"name": "Position in queue",
+								"value": "#{position}",
+								"inline": true
+							}
+						],
+						"footer": {
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
+						},
+						"color": 5793266
+					}
+				]
+			},
+			"now_playing": {
+				"embeds": [
+					{
+						"title": "Now playing",
+						"description": "**[{track.title}]({track.url})**",
+						"fields": [
+							{
+								"name": "Artist",
+								"value": "{track.author}",
+								"inline": true
+							},
+							{
+								"name": "Duration",
+								"value": "{track.duration}",
+								"inline": true
+							},
+							{
+								"name": "Position in queue",
+								"value": "Now",
+								"inline": true
+							}
+						],
+						"footer": {
+							"text": "{author.name}",
+							"icon_url": "{author.avatar}"
+						},
+						"color": 5793266
+					}
+				]
+			}
+		},
+		"pause": {
+			"already_paused": {
+				"content": "Playback is already paused."
+			},
+			"success": {
+				"content": "Paused playback."
+			}
+		},
+		"resume": {
+			"not_paused": {
+				"content": "Playback is not paused."
+			},
+			"success": {
+				"content": "Resumed playback."
+			}
+		},
+		"stop": {
+			"success": {
+				"content": "Disconnected and cleared queue."
+			}
+		},
+		"skip": {
+			"success_next": {
+				"content": "Skipped to **[{track.title}]({track.url})**."
+			},
+			"success_empty": {
+				"content": "Skipped. The queue is now empty."
+			}
+		},
+		"volume": {
+			"current": {
+				"content": "🔊 Current volume: **{volume}%**."
+			},
+			"set": {
+				"content": "Volume set to **{volume}%**."
+			}
+		},
+		"seek": {
+			"out_of_range": {
+				"content": "Seek position is out of range."
+			},
+			"success": {
+				"content": "Seeked to {position}."
+			}
+		},
+		"shuffle": {
+			"success": {
+				"content": "🔀 Shuffled **{count}** tracks in queue."
+			}
+		},
+		"loop": {
+			"set": {
+				"content": "Loop mode set to **{mode}**"
+			}
+		},
+		"np": {
+			"embeds": [
+				{
+					"title": "Now playing",
+					"description": "**[{track.title}]({track.url})**\n{progress_bar}",
+					"fields": [
+						{
+							"name": "Artist",
+							"value": "{track.author}",
+							"inline": true
+						},
+						{
+							"name": "Volume",
+							"value": "{volume}%",
+							"inline": true
+						},
+						{
+							"name": "Loop",
+							"value": "{loop}",
+							"inline": true
+						}
+					],
+					"color": 5793266
+				}
+			]
+		},
+		"queue": {
+			"embeds": [
+				{
+					"title": "Queue",
+					"description": "{tracks}",
+					"footer": {
+						"text": "Page {page}/{total_pages} | {total_tracks} total tracks"
+					},
+					"color": 5793266
+				}
+			]
+		},
+		"remove": {
+			"out_of_range": {
+				"content": "Index out of range. Max index is {max}."
+			},
+			"success": {
+				"content": "Removed **{track.title}** from the queue."
+			}
+		},
+		"clear": {
+			"already_empty": {
+				"content": "The queue is already empty."
+			},
+			"success": {
+				"content": "Cleared **{count}** tracks from the queue."
+			}
+		},
+		"listener": {
+			"disconnected_empty": {
+				"content": "No listeners left in the voice channel. Disconnected."
+			}
 		}
 	}
 }
