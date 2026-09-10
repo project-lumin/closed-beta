@@ -37,6 +37,10 @@ class Case:
 	):
 		if created is MISSING:
 			created = datetime.datetime.now(tz=datetime.UTC)
+		elif created and created.tzinfo is None:
+			created = created.replace(tzinfo=datetime.UTC)
+		if expires and expires.tzinfo is None:
+			expires = expires.replace(tzinfo=datetime.UTC)
 		self.bot: Bot = bot
 		self.type: CaseType = _type
 		self.id: int = _id
@@ -683,7 +687,7 @@ class Moderation(commands.GroupCog, name="Moderation", group_name="mod"):
 				self.client,
 				ctx.guild,
 				user=member,
-				expires=member.timed_out_until.astimezone(datetime.UTC).replace(tzinfo=None),
+				expires=member.timed_out_until.astimezone(datetime.UTC),
 			)
 			if cases:
 				for case in cases:

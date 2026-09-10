@@ -123,7 +123,7 @@ create table if not exists snapshots
     guild_id  numeric   not null,
     name      text      not null,
     author_id numeric   not null,
-    date      timestamp not null,
+    date      timestamptz not null,
     code      text      not null,
     payload jsonb not null
 );
@@ -141,9 +141,9 @@ create table if not exists cases
     user_id      numeric not null,
     moderator_id numeric not null,
     reason       text,
-    expires      timestamp,
+    expires      timestamptz,
     message      text,
-    created      timestamp default now()
+    created      timestamptz default now()
 );
 
 alter table cases
@@ -159,7 +159,7 @@ create table if not exists giveaways
     role_id    numeric,
     prize      text,
     winners    integer default 1 not null,
-    ends_at    timestamp         not null,
+    ends_at    timestamptz       not null,
     ended      boolean,
     won_by     numeric[]
 );
